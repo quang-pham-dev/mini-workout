@@ -1,0 +1,114 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "globalDependencies": [],
+  "globalEnv": [
+    "NEXT_PUBLIC_API_URL",
+  ],
+  "globalPassThroughEnv": [
+    "CI"
+  ],
+  "ui": "tui",
+  "tasks": {
+    "transit": {
+      "dependsOn": [
+        "^transit"
+      ]
+    },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env",
+        ".env.*"
+      ],
+      "outputs": [
+        "dist/**",
+        "build/**"
+      ]
+    },
+    "format": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".prettierrc*",
+        "prettier.config.*"
+      ]
+    },
+    "format:fix": {
+      "cache": false
+    },
+    "lint": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "eslint.config.*",
+        ".eslintignore"
+      ]
+    },
+    "lint:fix": {
+      "cache": false
+    },
+    "check-types": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "tsconfig*.json"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "clean": {
+      "cache": false
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env",
+        ".env.*"
+      ]
+    },
+    "test:watch": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "test:coverage": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env",
+        ".env.*"
+      ]
+    }
+  }
+}

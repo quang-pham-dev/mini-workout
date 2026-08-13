@@ -1,0 +1,34 @@
+{
+  "name": "@mini-workout/eslint-config",
+  "version": "0.0.1",
+   "type": "module",
+  "private": true,
+  "description": "ESLint configurations for workspace projects",
+  "keywords": [
+    "eslint",
+    "config",
+    "typescript",
+    "react"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist node_modules"
+  },
+  "exports": {
+    "./base": "./base.js",
+    "./reactjs-library": "./reactjs-library.js",
+    "./nextjs-library": "./nextjs-library.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "eslint": "catalog:",
+    "@next/eslint-plugin-next": "catalog:lint",
+    "eslint-config-prettier": "catalog:lint",
+    "eslint-plugin-only-warn": "catalog:lint",
+    "eslint-plugin-react": "catalog:lint",
+    "eslint-plugin-react-hooks": "catalog:lint",
+    "eslint-plugin-turbo": "catalog:lint",
+    "globals": "catalog:lint",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:lint"
+  }
+}

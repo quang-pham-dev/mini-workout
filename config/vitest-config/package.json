@@ -1,0 +1,22 @@
+{
+  "name": "@mini-workout/vitest-config",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./react": "./react.ts",
+    "./node": "./node.ts"
+  },
+  "dependencies": {
+    "vitest": "catalog:test-unit",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "@vitest/ui": "catalog:test-unit",
+    "jsdom": "catalog:test-unit",
+    "vite": "catalog:build-vite",
+    "@vitejs/plugin-react": "catalog:build-vite",
+    "vite-tsconfig-paths": "catalog:build-vite"
+  }
+}

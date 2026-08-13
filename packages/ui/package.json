@@ -1,0 +1,75 @@
+{
+  "name": "@mini-workout/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Shared UI component library for the Mini Workout monorepo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quang-pham-dev/mini-workout.git"
+  },
+  "homepage": "https://github.com/quang-pham-dev/mini-workout",
+  "bugs": {
+    "url": "https://github.com/quang-pham-dev/mini-workout/issues"
+  },
+  "keywords": [
+    "ui",
+    "react",
+    "tailwindcss",
+    "shadcn",
+    "component-library"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./styles.css": "./src/styles/globals.css"
+  },
+  "files": [
+    "dist",
+    "src/styles/globals.css"
+  ],
+  "sideEffects": [
+    "src/styles/globals.css"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --max-warnings 0 --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "clean": "rm -rf dist node_modules",
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "generate:component": "turbo gen react-component",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mini-workout/design-system": "workspace:*",
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "@vitest/ui": "catalog:test-unit",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

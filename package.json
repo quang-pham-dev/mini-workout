@@ -1,0 +1,56 @@
+{
+  "name": "mini-workout",
+  "private": true,
+  "version": "0.1.0",
+  "author": "Quang Pham <quangpham.developer@gmail.com>",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo watch dev",
+    "build": "turbo run build",
+    "build:apps": "turbo run build --filter=\"./apps/*\"",
+    "build:packages": "turbo run build --filter=\"./packages/*\"",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "turbo run format",
+    "format:fix": "turbo run format:fix",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "test:coverage": "turbo run test:coverage",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@commitlint/cli": "catalog:",
+    "@commitlint/config-conventional": "catalog:",
+    "@trivago/prettier-plugin-sort-imports": "catalog:format",
+    "eslint": "catalog:",
+    "husky": "catalog:",
+    "lint-staged": "catalog:",
+    "prettier": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.0",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=10.0.0"
+  },
+  "prettier": "@mini-workout/prettier-config/base",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

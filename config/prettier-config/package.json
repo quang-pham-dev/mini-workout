@@ -1,0 +1,29 @@
+{
+  "name": "@mini-workout/prettier-config",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Shared prettier configuration for the Mini Workout monorepo",
+  "keywords": [
+    "prettier",
+    "config",
+    "mini-workout"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./base.js",
+    "./base": "./base.js"
+  },
+  "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "catalog:format"
+  },
+  "peerDependencies": {
+    "prettier": ">=3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "catalog:"
+  }
+}

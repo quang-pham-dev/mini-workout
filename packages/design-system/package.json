@@ -1,0 +1,41 @@
+{
+  "name": "@mini-workout/design-system",
+  "private": true,
+  "type": "module",
+  "description": "Tailwind CSS v4 design system for the mini workout monorepo",
+  "exports": {
+    ".": "./globals.css",
+    "./design-tokens": "./design-tokens.css",
+    "./theme-light": "./theme-light.css",
+    "./theme-dark": "./theme-dark.css",
+    "./globals": "./globals.css",
+    "./postcss-config": "./postcss-config.js"
+  },
+  "files": [
+    "*.css",
+    "postcss-config.js"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo node_modules",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "catalog:ui-styling",
+    "postcss": "catalog:ui-styling",
+    "tailwindcss": "catalog:ui-styling"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}
