@@ -1,159 +1,118 @@
-# Turborepo starter
+# Mini Workout
 
-This Turborepo starter is maintained by the Turborepo core team.
+Mini Workout is a Turborepo monorepo for a workout video platform and a modern
+Next.js learning project. The repository currently contains the web foundation,
+shared UI components, a Tailwind CSS design system, and a Storybook workspace.
+The full-stack product roadmap is documented separately in
+[`docs/NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](docs/NEXTJS_16_3_WORKOUT_MASTER_PLAN.md).
 
-## Using this example
+## Current status
 
-Run the following command:
+Implemented today:
 
-```sh
-npx create-turbo@latest
+- Next.js 16.3 App Router web application in `apps/web`.
+- Storybook 10/Vite component workspace in `apps/storybook`.
+- Compiled React component library in `packages/ui`.
+- Tailwind CSS v4 design system in `packages/design-system`.
+- Shared ESLint, Prettier, TypeScript, and Vitest configuration packages.
+- Provider-agnostic observability primitives and a web health endpoint.
+- Turborepo task orchestration, package boundaries, affected CI checks, and
+  optional Vercel remote caching.
+
+The authentication, database, workout domain, and full-stack product features
+described in the roadmap are planned work, not current production behavior.
+
+## Requirements
+
+- Node.js `>=20`.
+- pnpm `10.30.0` or a compatible pnpm 10 release.
+
+The repository declares its package manager and engine requirements in the root
+`package.json`.
+
+## Getting started
+
+```bash
+pnpm install
+pnpm dev
 ```
 
-## What's inside?
+The development command starts the workspace dev tasks through Turborepo.
+Open the web app at <http://localhost:3000> and Storybook at
+<http://localhost:6006>.
 
-This Turborepo includes the following packages/apps:
+To run one workspace directly:
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@mini-workout/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@mini-workout/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@mini-workout/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+pnpm --filter web dev
+pnpm --filter @mini-workout/storybook dev
 ```
 
-Without global `turbo`, use your package manager:
+## Common commands
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+| Command                      | Purpose                                                  |
+| ---------------------------- | -------------------------------------------------------- |
+| `pnpm dev`                   | Start persistent development tasks.                      |
+| `pnpm build`                 | Build all packages and applications with Turborepo.      |
+| `pnpm build:apps`            | Build only workspaces under `apps/`.                     |
+| `pnpm build:packages`        | Build only workspaces under `packages/`.                 |
+| `pnpm lint`                  | Run cached lint tasks.                                   |
+| `pnpm lint:fix`              | Apply lint fixes.                                        |
+| `pnpm format`                | Check Prettier formatting.                               |
+| `pnpm format:fix`            | Apply Prettier formatting.                               |
+| `pnpm check-types`           | Run workspace TypeScript checks.                         |
+| `pnpm test`                  | Run workspace tests.                                     |
+| `pnpm test:coverage`         | Run tests with coverage reporting.                       |
+| `pnpm exec turbo boundaries` | Check package boundary violations.                       |
+| `pnpm docs:check`            | Check local documentation links and stale template text. |
+
+Use Turborepo filters for focused work:
+
+```bash
+pnpm exec turbo run build --filter=web
+pnpm exec turbo run lint --filter=@mini-workout/ui
+pnpm exec turbo run build --filter=web...
+pnpm exec turbo run build --affected
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## Repository structure
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+```text
+apps/
+  web/                 Next.js application
+  storybook/           Storybook component explorer
+packages/
+  ui/                  Compiled React component library
+  design-system/       Tailwind CSS v4 tokens and themes
+  observability/       Shared logging, tracing, health, and metric contracts
+  types/               Reserved shared types package
+config/
+  eslint-config/       Shared ESLint flat configs
+  prettier-config/     Shared Prettier config
+  typescript-config/   Shared TypeScript configs
+  vitest-config/       Shared Vitest configs
+docs/                  Architecture, testing, and product roadmap docs
+e2e/                   Reserved browser end-to-end test area
 ```
 
-Without global `turbo`:
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for dependency and task
+graph details.
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## CI and caching
 
-### Develop
+GitHub Actions runs package boundary checks and affected build, lint,
+type-check, and test tasks. CI uses the frozen pnpm lockfile and full Git
+history so Turborepo can calculate affected workspaces correctly.
 
-To develop all apps and packages, run the following command:
+Remote caching is enabled when the repository has a `TURBO_TEAM` GitHub
+variable and a configured Vercel OIDC policy. Otherwise CI falls back to a
+local GitHub Actions cache.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+## Documentation
 
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- [`docs/README.md`](docs/README.md) — documentation index.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — repository and build architecture.
+- [`docs/TESTING.md`](docs/TESTING.md) — unit, component, and E2E testing guidance.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution workflow and checks.
+- [`SECURITY.md`](SECURITY.md) — vulnerability reporting policy.
+- [`docs/NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](docs/NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) — product and learning roadmap.

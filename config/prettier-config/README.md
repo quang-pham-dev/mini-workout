@@ -1,35 +1,12 @@
-<p align="center">
-  <img src="https://avatars.githubusercontent.com/u/25822731" width="100" alt="Prettier Logo" style="border-radius: 20%;" />
-</p>
+# `@mini-workout/prettier-config`
 
-<h1 align="center">💅 Mini Workout Prettier Config</h1>
-
-<p align="center">
-  <strong>Shared Prettier configuration for the Mini Workout monorepo</strong>
-</p>
-
-<p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/Prettier-3.x-F7B93E?logo=prettier&logoColor=black" alt="Prettier" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/pnpm-10.x-F69220?logo=pnpm&logoColor=white" alt="pnpm" /></a>
-</p>
-
----
-
-## Overview
-
-Centralized code formatting rules for the monorepo to ensure a unified code style without developer arguments. This config automatically formats TS, TSX, JS, JSON, CSS, and Markdown. It also includes plugins for sorting imports.
-
-## Installation
-
-```bash
-pnpm add -D @mini-workout/prettier-config
-```
+Shared Prettier configuration for JavaScript, TypeScript, CSS, JSON, YAML, and
+Markdown files in the monorepo. The package also enables the configured import
+sorting plugin.
 
 ## Usage
 
-You do not need a `.prettierrc` file in every package. Instead, declare the prettier configuration directly in the package's `package.json`.
-
-In any app or package `package.json`, add:
+Declare the shared configuration in an app or package `package.json`:
 
 ```json
 {
@@ -37,13 +14,14 @@ In any app or package `package.json`, add:
 }
 ```
 
-## IDE Setup (VSCode)
+The root package already uses this configuration. No per-package `.prettierrc`
+file is required unless a workspace has a documented exception.
 
-Ensure your IDE uses Prettier as the default formatter. Add this to your `.vscode/settings.json` (already configured at monorepo root):
+## Commands
 
-```json
-{
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true
-}
+```bash
+pnpm format
+pnpm format:fix
 ```
+
+Use the repository formatter in CI and before submitting a pull request.

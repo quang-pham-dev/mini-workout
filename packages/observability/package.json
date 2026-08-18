@@ -1,0 +1,43 @@
+{
+  "name": "@mini-workout/observability",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Provider-agnostic observability primitives for Mini Workout applications",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {},
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:lint",
+    "prettier": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:lint",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

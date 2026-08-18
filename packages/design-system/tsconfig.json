@@ -1,0 +1,11 @@
+{
+  "extends": "@mini-workout/typescript-config/reactjs-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

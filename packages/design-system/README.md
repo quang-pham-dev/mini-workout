@@ -1,33 +1,25 @@
-<p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg" width="100" alt="Tailwind CSS Logo" />
-</p>
+# `@mini-workout/design-system`
 
-<h1 align="center">🎨 Mini Workout Design System</h1>
+Shared semantic design tokens, component contracts, Tailwind CSS v4 web
+adapters, themes, utilities, and PostCSS configuration for the Mini Workout
+monorepo.
 
-<p align="center">
-  <strong>Shared Tailwind CSS v4 design system for the Mini Workout</strong>
-</p>
+## Package exports
 
-<p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/TailwindCSS-v4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/PostCSS-DD3A0A?logo=postcss&logoColor=white" alt="PostCSS" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/pnpm-10.x-F69220?logo=pnpm&logoColor=white" alt="pnpm" /></a>
-</p>
+- `@mini-workout/design-system` — global CSS entrypoint.
+- `@mini-workout/design-system/globals` — global CSS entrypoint.
+- `@mini-workout/design-system/design-tokens` — token definitions.
+- `@mini-workout/design-system/theme-light` — light theme overrides.
+- `@mini-workout/design-system/theme-dark` — dark theme overrides.
+- `@mini-workout/design-system/postcss-config` — shared PostCSS config.
+- `@mini-workout/design-system/tokens` — platform-neutral semantic token names
+  and types.
+- `@mini-workout/design-system/contracts` — shared component names, variants,
+  and accessibility expectations.
 
----
+## Usage
 
-Shared Tailwind CSS v4 design system for the Mini Workout monorepo. This package
-ships tokens, themes, base styles, and custom utilities as CSS, plus a PostCSS
-config that enables `@tailwindcss/postcss`.
-
-## Overview
-
-- CSS-first Tailwind v4 (no `tailwind.config.js` required)
-- Design tokens defined in `@theme` using CSS variables
-- Theme overrides split into light/dark files
-- Custom utilities declared with top-level `@utility`
-
-## Installation
+Declare the workspace dependency in the consuming app or package:
 
 ```json
 {
@@ -37,63 +29,101 @@ config that enables `@tailwindcss/postcss`.
 }
 ```
 
-## Exports
+Import the global stylesheet once:
 
-- `@mini-workout/design-system` -> `globals.css`
-- `@mini-workout/design-system/globals` -> `globals.css`
-- `@mini-workout/design-system/design-tokens` -> `design-tokens.css`
-- `@mini-workout/design-system/theme-light` -> `theme-light.css`
-- `@mini-workout/design-system/theme-dark` -> `theme-dark.css`
-- `@mini-workout/design-system/postcss-config` -> `postcss-config.js`
+```css
+@import '@mini-workout/design-system';
+```
 
-## Usage
-
-1. Configure PostCSS in your app or package:
+Use the shared PostCSS configuration when the application needs it:
 
 ```js
 export { default } from '@mini-workout/design-system/postcss-config';
 ```
 
-2. Import the globals once in your main CSS entry point:
+### Using semantic tokens in web UI
 
-```css
-@import '@mini-workout/design-system';
+Use semantic Tailwind utilities in components instead of primitive values:
 
-/* package-specific styles */
+```tsx
+export function WorkoutSummary() {
+  return (
+    <section className="bg-surface-raised text-fg-primary rounded-lg border border-default p-6">
+      <p className="text-fg-secondary text-body-sm">Today's progress</p>
+      <strong className="text-primary text-heading-md">3 workouts</strong>
+    </section>
+  );
+}
 ```
 
-3. Theme switching:
+The same semantic classes work in light and dark mode. The consuming app only
+needs to toggle the `dark` class on the document root:
 
-- Light theme lives in `:root` (`theme-light.css`)
-- Dark theme uses `.dark` (`theme-dark.css`)
-- Additional variants can be added via `@custom-variant` in `design-tokens.css`
+```ts
+document.documentElement.classList.toggle('dark', isDarkMode);
+```
 
-## What is inside
+### Referencing the shared foundation from TypeScript
 
-- `globals.css`: Tailwind base layer and utilities
-- `design-tokens.css`: source of truth for tokens (`@theme`)
-- `theme-light.css` / `theme-dark.css`: semantic overrides
+Use the token names and component contracts when building or reviewing a
+platform implementation:
 
-## Best practices
+```ts
+import { componentContracts } from '@mini-workout/design-system/contracts';
+import { semanticTokens } from '@mini-workout/design-system/tokens';
+import { getCssVariable } from '@mini-workout/design-system/tokens';
 
-- Prefer semantic tokens over raw scale values
-- Keep `@utility` blocks top-level (Tailwind v4 disallows nesting)
-- Avoid custom utility names that collide with Tailwind color utilities (`text-primary`, `bg-primary`, etc.)
-- Update both themes when you add new semantic tokens
-- Import the globals only once per app/library
+const primaryColor = getCssVariable(semanticTokens.color.primary);
+const buttonVariants = componentContracts.button.variants;
+```
 
-## Notes for apps in this monorepo
+The TypeScript foundation describes shared vocabulary and behavior. It does not
+render components and must not introduce DOM, Tailwind, or React Native
+dependencies.
 
-- Use `@source` in each app CSS entry to include monorepo packages in class scanning.
-- Keep the design-system source of truth in CSS (`@theme`, `@utility`, `@custom-variant`).
+## Architecture rules
 
-## Migration (from @mini-workout/tailwind-config)
+- Treat this package as the design-system foundation, not a UI renderer.
+- Keep semantic token names and component contracts platform-neutral.
+- Keep platform-specific rendering in `@mini-workout/ui` for web. A future
+  native package may implement the same foundation without changing product
+  code contracts.
+- Prefer semantic tokens over raw color and spacing values in web components.
+- Update both light and dark themes when adding semantic tokens.
+- Keep Tailwind v4 `@theme`, `@utility`, and `@custom-variant` declarations at
+  the appropriate top level.
+- Use `@source` in application CSS when classes are consumed from workspace
+  packages.
+- Import global styles only once per application.
 
-- Replace package dependency with `@mini-workout/design-system`
-- Update imports to `@mini-workout/design-system` and `/postcss-config`
+## Change rules
 
-## Contributing
+When changing the design system:
 
-1. Update tokens in `design-tokens.css`
-2. Adjust theme overrides as needed
-3. Validate in Web and Storybook
+1. Add or update the semantic name in `src/tokens.ts` when the concept is
+   shared across platforms.
+2. Update the light and dark CSS values for web semantic tokens.
+3. Update `src/contracts.ts` when adding a public component, variant, size, or
+   accessibility expectation.
+4. Implement rendering details in `@mini-workout/ui`; do not put DOM code in
+   this package's TypeScript foundation.
+5. Add or update Storybook coverage for visual and accessibility behavior.
+6. Run the validation commands below.
+
+Do not add a token for a one-off component value. Prefer an existing semantic
+token or introduce a new token only when it represents a reusable design
+decision.
+
+## Validation
+
+```bash
+pnpm --filter @mini-workout/design-system format
+pnpm --filter @mini-workout/design-system check-foundation
+pnpm --filter @mini-workout/design-system build
+pnpm --filter @mini-workout/design-system check-types
+pnpm --filter @mini-workout/design-system lint
+```
+
+The CSS files are the web adapter. The small TypeScript foundation is compiled
+so consumers can share token names and component contracts without importing
+web-only CSS or DOM code.

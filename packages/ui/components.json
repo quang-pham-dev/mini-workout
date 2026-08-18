@@ -4,16 +4,17 @@
   "rsc": false,
   "tsx": true,
   "tailwind": {
-    "config": "tailwind.config.ts",
+    "config": "",
     "css": "src/styles/globals.css",
-    "baseColor": "zinc",
+    "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
   },
   "aliases": {
-    "components": "@mini-workout/ui/components",
-    "utils": "@mini-workout/ui/lib/utils",
-    "ui": "@mini-workout/ui/components",
-    "lib": "@mini-workout/ui/lib"
-  }
+    "components": "@/components",
+    "ui": "@/components",
+    "lib": "@/lib",
+    "utils": "@/lib/utils"
+  },
+  "iconLibrary": "lucide"
 }

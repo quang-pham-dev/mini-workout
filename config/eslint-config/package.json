@@ -1,7 +1,7 @@
 {
   "name": "@mini-workout/eslint-config",
   "version": "0.0.1",
-   "type": "module",
+  "type": "module",
   "private": true,
   "description": "ESLint configurations for workspace projects",
   "keywords": [
@@ -16,7 +16,8 @@
   "exports": {
     "./base": "./base.js",
     "./reactjs-library": "./reactjs-library.js",
-    "./nextjs-library": "./nextjs-library.js"
+    "./nextjs-library": "./nextjs-library.js",
+    "./storybook": "./storybook.js"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
@@ -25,6 +26,7 @@
     "eslint-config-prettier": "catalog:lint",
     "eslint-plugin-only-warn": "catalog:lint",
     "eslint-plugin-react": "catalog:lint",
+    "eslint-plugin-storybook": "catalog:lint",
     "eslint-plugin-react-hooks": "catalog:lint",
     "eslint-plugin-turbo": "catalog:lint",
     "globals": "catalog:lint",

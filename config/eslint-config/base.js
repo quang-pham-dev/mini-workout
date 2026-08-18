@@ -16,6 +16,7 @@ export const config = [
       'build/**',
       '.turbo/**',
       '.next/**',
+      '.next-build/**',
       '.output/**',
       '.tanstack/**',
       'out/**',

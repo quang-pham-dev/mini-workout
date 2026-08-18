@@ -1,0 +1,18 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["@mini-workout/ui#build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "persistent": true
+    },
+    "preview": {
+      "persistent": true
+    },
+    "test": {
+      "extends": false
+    }
+  }
+}

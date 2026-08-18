@@ -1,0 +1,16 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": { "extends": false },
+    "check-types": { "extends": false },
+    "dev": { "extends": false },
+    "format": { "extends": false },
+    "format:fix": { "extends": false },
+    "lint": { "extends": false },
+    "lint:fix": { "extends": false },
+    "start": { "extends": false },
+    "test": { "extends": false },
+    "test:coverage": { "extends": false },
+    "test:watch": { "extends": false }
+  }
+}

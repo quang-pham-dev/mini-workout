@@ -1,47 +1,36 @@
-<p align="center">
-  <img src="https://avatars.githubusercontent.com/u/95747107" width="100" alt="Vitest Logo" style="border-radius: 20%;" />
-</p>
+# `@mini-workout/vitest-config`
 
-<h1 align="center">⚡ Mini Workout Vitest Config</h1>
+Shared Vitest configuration for Node and React/jsdom tests.
 
-<p align="center">
-  <strong>Shared Vitest configuration for the Mini Workout monorepo</strong>
-</p>
+## Available exports
 
-<p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/Vitest-3.x-6E9F18?logo=vitest&logoColor=white" alt="Vitest" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/pnpm-10.x-F69220?logo=pnpm&logoColor=white" alt="pnpm" /></a>
-</p>
+- `@mini-workout/vitest-config` — base configuration and coverage thresholds.
+- `@mini-workout/vitest-config/react` — React/jsdom configuration.
+- `@mini-workout/vitest-config/node` — Node environment configuration.
 
----
+The modules expose named configurations. Example:
 
-## Overview
+```ts
+import { reactConfig } from '@mini-workout/vitest-config/react';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
-Centralized testing setup and configuration for Vitest. Used across all modules to ensure tests run consistently and quickly. Includes configurations for pure Node environments and React testing (jsdom).
+export default mergeConfig(
+  reactConfig,
+  defineConfig({
+    test: {
+      include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+    },
+  }),
+);
+```
 
-## Installation
+The shared base config uses the V8 provider and an 80% threshold for lines,
+functions, branches, and statements. A package may narrow coverage scope when
+that is intentional and documented.
+
+Run tests from the repository root or target a package directly:
 
 ```bash
-pnpm add -D @mini-workout/vitest-config vitest
+pnpm test
+pnpm --filter @mini-workout/ui test:coverage
 ```
-
-## Usage
-
-### React Frontend Apps
-
-Create `vitest.config.ts` in the package root:
-
-```typescript
-import { defineProject } from 'vitest/config';
-import reactConfig from '@mini-workout/vitest-config/react';
-
-export default defineProject({
-  ...reactConfig,
-  // Add project-specific overrides here
-});
-```
-
-## Best Practices
-- Write co-located `.spec.ts` files alongside implementation files.
-- Avoid using `jest` globals; Vitest provides native replacements or allows auto-importing.
-- Run `pnpm test:coverage` to ensure code coverage meets standards before pushing.

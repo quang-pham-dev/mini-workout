@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+# Web application
 
-## Getting Started
+The `web` workspace is the deployable Next.js 16.3 App Router application for
+Mini Workout.
 
-First, run the development server:
+## Development
+
+From the repository root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm --filter web dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application uses local Geist fonts from `app/fonts` and consumes the shared
+UI package through its public exports.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
+Its route, data, error, network, security, testing, and observability
+conventions are documented in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## Learn More
+## Commands
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm --filter web lint
+pnpm --filter web check-types
+pnpm --filter web build
+pnpm --filter web start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The root scripts run these tasks through Turborepo and should be preferred when
+validating the whole repository.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Application structure
 
-## Deploy on Vercel
+- `app/layout.tsx` — root layout, local fonts, and metadata.
+- `app/page.tsx` — current landing page.
+- `app/globals.css` — application-level global styles.
+- `public/` — static assets.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Product routes, authentication, database access, and workout domain features
+are planned in the master roadmap and are not implemented yet.

@@ -1,79 +1,46 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "globalDependencies": [],
-  "globalEnv": [
-    "NEXT_PUBLIC_API_URL",
-  ],
-  "globalPassThroughEnv": [
-    "CI"
-  ],
+  "globalPassThroughEnv": ["CI"],
   "ui": "tui",
   "tasks": {
     "transit": {
-      "dependsOn": [
-        "^transit"
-      ]
+      "dependsOn": ["^transit"]
     },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env",
-        ".env.*"
-      ],
-      "outputs": [
-        "dist/**",
-        "build/**"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": ["dist/**", "build/**", ".next-build/**"]
     },
     "format": {
-      "dependsOn": [
-        "^build"
-      ],
       "inputs": [
         "$TURBO_DEFAULT$",
-        ".prettierrc*",
-        "prettier.config.*"
+        "$TURBO_ROOT$/.prettierrc*",
+        "$TURBO_ROOT$/prettier.config.*"
       ]
     },
     "format:fix": {
       "cache": false
     },
     "lint": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "eslint.config.*",
-        ".eslintignore"
-      ]
+      "dependsOn": ["transit"],
+      "inputs": ["$TURBO_DEFAULT$", "eslint.config.*", ".eslintignore"]
     },
     "lint:fix": {
       "cache": false
     },
     "check-types": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "tsconfig*.json"
-      ]
+      "dependsOn": ["transit"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"]
     },
     "dev": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "interruptible": true
     },
     "start": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -81,34 +48,18 @@
       "cache": false
     },
     "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env",
-        ".env.*"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$"]
     },
     "test:watch": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
     "test:coverage": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env",
-        ".env.*"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "inputs": ["$TURBO_DEFAULT$"]
     }
   }
 }

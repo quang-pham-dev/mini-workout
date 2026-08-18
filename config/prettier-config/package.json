@@ -2,7 +2,6 @@
   "name": "@mini-workout/prettier-config",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "description": "Shared prettier configuration for the Mini Workout monorepo",
   "keywords": [
     "prettier",

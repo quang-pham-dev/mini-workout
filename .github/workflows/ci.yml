@@ -1,4 +1,5 @@
 name: code-quality
+
 on:
   push:
     branches:
@@ -12,71 +13,50 @@ on:
         type: string
         default: ''
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: ESLint
+  quality:
+    name: Turborepo quality checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required only for the optional Turborepo OIDC cache setup.
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
+          fetch-depth: 0
 
-      - name: Prepare
-        uses: ./.github/composite-actions/prepare
-
-      - name: Run ESLint check
-        run: pnpm run lint
-
-  type-check:
-    name: Type Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+      - name: Setup Turborepo remote cache
+        if: ${{ vars.TURBO_TEAM != '' }}
+        uses: vercel/setup-turborepo-remote-cache-action@v1.0.0
         with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
+          team: ${{ vars.TURBO_TEAM }}
 
-      - name: Prepare
-        uses: ./.github/composite-actions/prepare
-
-      - name: Run type checks
-        run: pnpm run check-types
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+      - name: Restore local Turborepo cache
+        uses: actions/cache@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/turbo.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
 
       - name: Prepare
         uses: ./.github/composite-actions/prepare
 
-      - name: Run build
-        run: pnpm run build
+      - name: Check package boundaries
+        run: pnpm exec turbo boundaries
 
-  test:
-    name: Unit Test
-    runs-on: ubuntu-latest
+      - name: Check documentation
+        run: pnpm docs:check
 
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
-
-      - name: Prepare
-        uses: ./.github/composite-actions/prepare
-
-      - name: Run unit tests
-        run: pnpm run test
+      - name: Run affected quality checks
+        run: pnpm exec turbo run build lint check-types test --affected

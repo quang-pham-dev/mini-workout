@@ -1,0 +1,52 @@
+{
+  "name": "@mini-workout/storybook",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "storybook dev -p 6006",
+    "build": "storybook build -o dist",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --max-warnings 0 --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "check-types": "tsc --noEmit",
+    "preview": "vite preview",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@mini-workout/ui": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/design-system": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@babel/core": "^7.29.7",
+    "@eslint/js": "catalog:",
+    "@rolldown/plugin-babel": "^0.2.3",
+    "@types/babel__core": "^7.20.5",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint-plugin-react-hooks": "catalog:lint",
+    "eslint-plugin-react-refresh": "catalog:lint",
+    "globals": "catalog:lint",
+    "typescript-eslint": "catalog:lint",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:build-vite",
+    "@storybook/addon-a11y": "catalog:ui-storybook",
+    "@storybook/react": "catalog:ui-storybook",
+    "@storybook/react-vite": "catalog:ui-storybook",
+    "eslint": "catalog:",
+    "postcss": "catalog:ui-styling",
+    "prettier": "catalog:",
+    "storybook": "catalog:ui-storybook",
+    "tailwindcss": "catalog:ui-styling",
+    "typescript": "catalog:",
+    "vite": "catalog:build-vite",
+    "vite-tsconfig-paths": "catalog:build-vite"
+  }
+}

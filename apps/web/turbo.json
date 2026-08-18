@@ -1,0 +1,21 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["@mini-workout/ui#build"],
+      "inputs": ["$TURBO_EXTENDS$", ".env", ".env.*"],
+      "env": ["NEXT_PUBLIC_API_URL"],
+      "outputs": [
+        ".next-build/**",
+        "!.next-build/cache/**",
+        "!.next-build/dev/**"
+      ]
+    },
+    "format": {
+      "extends": false
+    },
+    "test": {
+      "extends": false
+    }
+  }
+}

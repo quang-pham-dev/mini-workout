@@ -5,20 +5,32 @@
   "description": "Tailwind CSS v4 design system for the mini workout monorepo",
   "exports": {
     ".": "./globals.css",
+    "./contracts": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./design-tokens": "./design-tokens.css",
     "./theme-light": "./theme-light.css",
     "./theme-dark": "./theme-dark.css",
+    "./tokens": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./globals": "./globals.css",
     "./postcss-config": "./postcss-config.js"
   },
   "files": [
     "*.css",
-    "postcss-config.js"
+    "postcss-config.js",
+    "dist"
   ],
   "sideEffects": [
     "**/*.css"
   ],
   "scripts": {
+    "build": "pnpm check-foundation && tsup",
+    "check-types": "tsc --noEmit",
+    "check-foundation": "node ../../tools/check-design-system.mjs",
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
@@ -35,6 +47,7 @@
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "tsup": "catalog:",
     "typescript": "catalog:"
   },
   "prettier": "@mini-workout/prettier-config/base"

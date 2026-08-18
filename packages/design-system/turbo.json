@@ -1,0 +1,8 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": { "extends": false },
+    "check-types": { "extends": false },
+    "test": { "extends": false }
+  }
+}

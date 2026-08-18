@@ -1,7 +1,35 @@
-# Next.js 16.3 Full-Stack Practice — Master Plan
+# Next.js 16.3 Full-Stack Practice — Product and Learning Roadmap
 
 > **Project:** Workout Video Platform  
 > **Purpose:** A production-minded learning project for practicing Next.js 16.3 with Auth.js, Prisma ORM, Neon PostgreSQL, Server Components, Server Actions, caching, mutations, testing, and deployment.
+
+> **Status:** Roadmap only. The repository currently provides the web
+> foundation, shared UI library, Tailwind design system, Storybook workspace,
+> and monorepo tooling. Authentication, database access, workout domain
+> features, and the full-stack flows below are planned work unless explicitly
+> marked as implemented in the repository.
+
+## Current implementation baseline
+
+Implemented:
+
+- Next.js 16.3 App Router application in `apps/web`.
+- Shared compiled UI package in `packages/ui`.
+- Tailwind CSS v4 design system in `packages/design-system`.
+- Storybook component workspace in `apps/storybook`.
+- pnpm/Turborepo task orchestration, linting, type checking, testing, CI, and
+  package boundary checks.
+
+Planned:
+
+- Auth.js authentication and protected routes.
+- Prisma and Neon PostgreSQL integration.
+- Workout, coach, category, like, and favourite domain models.
+- Onboarding, recommendations, search, pagination, and profile flows.
+- Full integration and browser E2E coverage.
+
+The phase definitions in this document describe the intended destination and
+learning sequence. They are not a claim that those features already exist.
 
 ---
 
