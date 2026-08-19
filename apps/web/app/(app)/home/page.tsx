@@ -1,7 +1,8 @@
-import { auth, signOut } from '../../../auth';
+import { auth } from '../../../auth';
+import { headers } from 'next/headers';
 
 export default async function HomePage() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   return (
     <main>
@@ -10,7 +11,7 @@ export default async function HomePage() {
       <form
         action={async () => {
           'use server';
-          await signOut({ redirectTo: '/login' });
+          await auth.api.signOut({ headers: await headers() });
         }}
       >
         <button type="submit">Sign out</button>

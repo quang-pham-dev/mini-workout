@@ -4,7 +4,12 @@
     "build": {
       "dependsOn": ["@mini-workout/ui#build"],
       "inputs": ["$TURBO_EXTENDS$", ".env", ".env.*"],
-      "env": ["NEXT_PUBLIC_API_URL"],
+      "env": [
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "DATABASE_URL",
+        "NEXT_PUBLIC_API_URL"
+      ],
       "outputs": [
         ".next-build/**",
         "!.next-build/cache/**",
@@ -15,7 +20,7 @@
       "extends": false
     },
     "lint": {
-      "env": ["NODE_ENV"]
+      "env": ["BETTER_AUTH_URL", "NODE_ENV"]
     },
     "test": {
       "extends": false

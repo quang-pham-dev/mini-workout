@@ -11,31 +11,33 @@
     "check-types": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "auth:generate": "pnpm dlx auth@latest generate --output prisma/schema.prisma",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev"
   },
   "dependencies": {
     "@mini-workout/observability": "workspace:*",
     "@mini-workout/ui": "workspace:*",
-    "next": "16.3.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "@better-auth/prisma-adapter": "1.7.1",
+    "@better-auth/utils": "0.4.2",
+    "@prisma/client": "6.19.3",
+    "better-auth": "1.7.1",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@mini-workout/eslint-config": "workspace:*",
     "@mini-workout/typescript-config": "workspace:*",
     "@mini-workout/vitest-config": "workspace:*",
-    "@prisma/client": "6.19.3",
-    "bcryptjs": "3.0.3",
-    "next-auth": "5.0.0-beta.32",
-    "zod": "4.4.3",
     "@vitest/coverage-v8": "catalog:test-unit",
-    "@types/node": "^22.15.3",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "prisma": "6.19.3",
-    "eslint": "^9.39.1",
-    "typescript": "5.9.2",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
     "vitest": "catalog:test-unit"
   }
 }

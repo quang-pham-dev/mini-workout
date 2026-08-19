@@ -62,28 +62,88 @@ The first authentication slice is intentionally local to `apps/web`:
 ```text
 login/register Server Action
         ↓
-Auth.js Credentials provider
+Better Auth email/password API
         ↓
-Prisma User repository
+Prisma adapter (User, Account, Session, Verification)
         ↓
 PostgreSQL
 ```
 
-- `auth.ts` is the Node-capable Auth.js configuration and owns credential
-  verification, JWT sessions, and session user typing.
-- `auth.config.ts` is the lightweight route-protection configuration used by
-  `proxy.ts`; it must remain free of Prisma and password-hashing imports.
-- `proxy.ts` protects application paths, while `(app)/layout.tsx` performs a
-  second server-side session check before rendering protected content.
-- Passwords are stored only as bcrypt hashes. Credentials and password hashes
-  must never be included in logs, session claims, or client responses.
-- The current session strategy is JWT. A database-backed session strategy can
-  be evaluated later if revocation or multi-device session management becomes
-  a product requirement.
+- `auth.ts` is the single Better Auth server instance and owns the Prisma
+  adapter, email/password API, database sessions, and `nextCookies` integration.
+- `app/api/auth/[...all]/route.ts` mounts Better Auth's standard HTTP handler.
+- `proxy.ts` performs an optimistic cookie check for redirects only. It must
+  not be treated as the authorization boundary.
+- `(app)/layout.tsx` and every protected Server Action/Route Handler perform a
+  server-side `auth.api.getSession()` check before reading or mutating data.
+- Better Auth owns password hashing and stores credentials in its `Account`
+  model. Passwords, account secrets, and session tokens must never be logged,
+  returned in DTOs, or exposed to client components.
+- Sessions are database-backed to support revocation and multi-device session
+  management. This adds database reads to session validation but is the safer
+  default for this product.
 
-The current schema contains only `User`. Auth.js, Prisma migrations, seed data,
-password reset, email verification, rate limiting, and E2E auth coverage are
-separate follow-up work.
+The current schema includes Better Auth's `User`, `Account`, `Session`, and
+`Verification` models plus the product's `onboardingCompleted` field. Prisma
+migrations, password reset, email verification, rate limiting, and E2E auth
+coverage are separate follow-up work.
+
+### Consumer and future admin surfaces
+
+`apps/web` is intentionally a full-stack Next.js application for the MVP. It
+can support both consumer and admin experiences without splitting deployment
+units prematurely:
+
+```text
+apps/web/app/
+├── (marketing)/        public landing and acquisition routes
+├── (auth)/             login and registration
+├── (consumer)/         onboarding, home, workouts, favourites, profile
+├── (admin)/            future CRUD dashboard and admin-only routes
+└── api/                explicit HTTP boundaries, including Better Auth
+
+apps/web/features/
+├── auth/
+├── onboarding/
+├── workouts/
+├── recommendations/
+└── admin/              future management use cases, not shared UI state
+```
+
+The admin surface should reuse `@mini-workout/ui` and design-system contracts,
+but it must have separate route authorization and use-case/service boundaries.
+Admin CRUD must never rely on hiding UI controls; every mutation must enforce
+role/permission checks server-side. Extract a separate admin app or backend only
+when independent deployment, team ownership, security isolation, or workload
+scaling justifies the operational cost.
+
+### MVP versus scale trade-offs
+
+The current choice is a modular monolith: one Next.js deployable owns UI,
+Server Actions, Route Handlers, authentication, and domain services.
+
+Advantages:
+
+- Fastest path to a working product with one deployment and one auth boundary.
+- Server Components can read data without an internal HTTP hop.
+- Shared transactions and authorization are straightforward.
+- Lower operational cost while product requirements are still changing.
+
+Costs and guardrails:
+
+- A single deployable couples release cadence and runtime scaling for consumer
+  and admin traffic.
+- Long-running jobs, video processing, recommendation computation, and large
+  admin exports should move to queues/workers when introduced.
+- Keep domain logic behind feature use cases and repositories so a future API
+  or worker can reuse it without importing React or route modules.
+- Keep admin routes and permissions separate from consumer routes from day one;
+  sharing a deployment does not mean sharing authorization policy.
+
+Do not split `apps/web` pre-emptively. Re-evaluate an admin app or separate API
+when at least one concrete signal exists: independent team ownership, separate
+deployment/release requirements, materially different scaling profiles,
+security/compliance isolation, or a stable external API consumer.
 
 ## Error handling
 

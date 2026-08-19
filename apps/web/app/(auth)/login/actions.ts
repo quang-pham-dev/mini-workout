@@ -1,9 +1,9 @@
 'use server';
 
-import { signIn } from '../../../auth';
+import { auth } from '../../../auth';
 import { getSafeRedirectPath } from '../../../lib/auth/authorization';
 import { loginSchema } from '../../../lib/auth/validation';
-import { AuthError } from 'next-auth';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function loginAction(formData: FormData) {
@@ -21,15 +21,17 @@ export async function loginAction(formData: FormData) {
   }
 
   try {
-    await signIn('credentials', {
-      email: parsed.data.email,
-      password: parsed.data.password,
-      redirectTo: callbackUrl,
+    await auth.api.signInEmail({
+      body: {
+        email: parsed.data.email,
+        password: parsed.data.password,
+        rememberMe: true,
+      },
+      headers: await headers(),
     });
-  } catch (error) {
-    if (error instanceof AuthError) {
-      redirect('/login?error=invalid');
-    }
-    throw error;
+  } catch {
+    redirect('/login?error=invalid');
   }
+
+  redirect(callbackUrl);
 }

@@ -16,13 +16,21 @@ Open <http://localhost:3000>.
 The application uses local Geist fonts from `app/fonts` and consumes the shared
 UI package through its public exports.
 
-Authentication currently uses Auth.js Credentials with JWT sessions and a
-Prisma-backed `User` model. Copy `.env.example` to `.env.local`, provide
-`AUTH_SECRET` and `DATABASE_URL`, then generate the Prisma client:
+Authentication currently uses Better Auth email/password authentication with
+database-backed sessions through Prisma. Copy `.env.example` to `.env.local`,
+provide `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `DATABASE_URL`, then
+generate the Prisma client:
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
 pnpm --filter web db:generate
+```
+
+The Better Auth CLI can regenerate the auth portion of the Prisma schema when
+the auth configuration or plugins change:
+
+```bash
+pnpm --filter web auth:generate
 ```
 
 Apply the first local migration once a PostgreSQL database is available:
@@ -55,7 +63,7 @@ validating the whole repository.
 - `app/globals.css` — application-level global styles.
 - `public/` — static assets.
 
-Current authentication routes are `/login`, `/register`, and `/home`.
-Unauthenticated access to protected routes is redirected to `/login`. Workout
-domain routes, onboarding, database seed data, and browser E2E coverage remain
-planned work.
+Current authentication routes are `/login`, `/register`, `/home`, and
+`/api/auth/[...all]`. Unauthenticated access to protected routes is redirected
+to `/login`. Workout domain routes, onboarding, database seed data, and browser
+E2E coverage remain planned work.

@@ -1,11 +1,11 @@
 # Next.js 16.3 Full-Stack Practice — Product and Learning Roadmap
 
 > **Project:** Workout Video Platform  
-> **Purpose:** A production-minded learning project for practicing Next.js 16.3 with Auth.js, Prisma ORM, Neon PostgreSQL, Server Components, Server Actions, caching, mutations, testing, and deployment.
+> **Purpose:** A production-minded learning project for practicing Next.js 16.3 with Better Auth, Prisma ORM, Neon PostgreSQL, Server Components, Server Actions, caching, mutations, testing, and deployment.
 
 > **Status:** Roadmap only. The repository currently provides the web
 > foundation, shared UI library, Tailwind design system, Storybook workspace,
-> monorepo tooling, and an initial Auth.js/Prisma authentication slice.
+> monorepo tooling, and an initial Better Auth/Prisma authentication slice.
 > Authentication is not yet production-ready. Database access beyond the
 > initial User schema, workout domain
 > features, and the full-stack flows below are planned work unless explicitly
@@ -21,10 +21,10 @@ Implemented:
 - Storybook component workspace in `apps/storybook`.
 - pnpm/Turborepo task orchestration, linting, type checking, testing, CI, and
   package boundary checks.
-- Auth.js Credentials provider with JWT sessions.
+- Better Auth email/password authentication with database-backed sessions.
 - Login, registration, protected `/home`, and route protection through
   `proxy.ts` plus a server-side application layout guard.
-- Prisma User schema and bcrypt password hashing boundary.
+- Better Auth Prisma schema for users, accounts, sessions, and verification.
 - Focused authentication validation and authorization tests.
 
 Planned:
@@ -96,7 +96,7 @@ It is a **Next.js 16.3 architecture playground** where each feature is intention
 
 ## Authentication
 
-- Auth.js
+- Better Auth
 - Email/password authentication
 - Session-based authentication
 
@@ -571,7 +571,9 @@ User
 - id
 - name
 - email
-- passwordHash
+- emailVerified
+- image
+- Better Auth relations to Account and Session
 - onboardingCompleted
 - experienceLevel
 - createdAt
@@ -866,7 +868,7 @@ Authentication:
 ```text
 UI
  ↓
-Auth.js
+Better Auth
  ↓
 Session
  ↓
@@ -1228,9 +1230,9 @@ Deliver:
 
 Implemented in the initial slice:
 
-- Auth.js Credentials provider with JWT sessions
+- Better Auth email/password with database-backed sessions
 - Register and login pages backed by Server Actions
-- Prisma `User` model with bcrypt password hashing
+- Better Auth Prisma models for users, accounts, sessions, and verification
 - `/home` protected by proxy and server-side layout authorization
 
 Remaining before this phase is complete:
@@ -1706,7 +1708,7 @@ This project is successful if, after completing it, we can confidently explain:
 
 ### Backend
 
-- How Auth.js integrates with the application
+- How Better Auth integrates with the application
 - How Prisma models the domain
 - How Neon works with a serverless application
 - How transactions work
@@ -1751,7 +1753,7 @@ This project is successful if, after completing it, we can confidently explain:
                     │                                 │
                     ▼                                 ▼
            ┌─────────────────┐              ┌─────────────────┐
-           │     Auth.js     │              │ Application /   │
+           │   Better Auth   │              │ Application /   │
            │                 │              │ Domain Services │
            └─────────────────┘              └────────┬────────┘
                                                      │

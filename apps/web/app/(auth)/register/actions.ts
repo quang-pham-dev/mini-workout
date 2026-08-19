@@ -1,10 +1,9 @@
 'use server';
 
-import { signIn } from '../../../auth';
+import { auth } from '../../../auth';
 import { getSafeRedirectPath } from '../../../lib/auth/authorization';
 import { registerSchema } from '../../../lib/auth/validation';
-import { prisma } from '../../../lib/db/prisma';
-import { hash } from 'bcryptjs';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function registerAction(formData: FormData) {
@@ -19,28 +18,18 @@ export async function registerAction(formData: FormData) {
     redirect('/register?error=invalid');
   }
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email: parsed.data.email },
-    select: { id: true },
-  });
-
-  if (existingUser) {
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        password: parsed.data.password,
+      },
+      headers: await headers(),
+    });
+  } catch {
     redirect('/register?error=unavailable');
   }
 
-  const passwordHash = await hash(parsed.data.password, 12);
-
-  await prisma.user.create({
-    data: {
-      name: parsed.data.name,
-      email: parsed.data.email,
-      passwordHash,
-    },
-  });
-
-  await signIn('credentials', {
-    email: parsed.data.email,
-    password: parsed.data.password,
-    redirectTo: getSafeRedirectPath(formData.get('callbackUrl')?.toString()),
-  });
+  redirect(getSafeRedirectPath(formData.get('callbackUrl')?.toString()));
 }

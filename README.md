@@ -16,15 +16,15 @@ Implemented today:
 - Tailwind CSS v4 design system in `packages/design-system`.
 - Shared ESLint, Prettier, TypeScript, and Vitest configuration packages.
 - Provider-agnostic observability primitives and a web health endpoint.
-- Auth.js Credentials authentication foundation with JWT sessions, protected
-  routes, and a Prisma `User` schema.
+- Better Auth email/password foundation with database-backed sessions, protected
+  routes, and a Prisma auth schema.
 - Turborepo task orchestration, package boundaries, affected CI checks, and
   optional Vercel remote caching.
 
 The workout domain, onboarding, production database migrations, and full-stack
 product features described in the roadmap remain planned work. Authentication
 is currently a foundation slice and is not yet production-ready without a
-configured database, rate limiting, recovery flows, and E2E coverage.
+configured database migration, rate limiting, recovery flows, and E2E coverage.
 
 ## Requirements
 
