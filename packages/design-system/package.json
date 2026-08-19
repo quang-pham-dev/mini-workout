@@ -30,7 +30,7 @@
   "scripts": {
     "build": "pnpm check-foundation && tsup",
     "check-types": "tsc --noEmit",
-    "check-foundation": "node ../../tools/check-design-system.mjs",
+    "check-foundation": "node ../../scripts/check-design-system.mjs",
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
