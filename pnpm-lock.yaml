@@ -330,6 +330,9 @@ importers:
       '@mini-workout/typescript-config':
         specifier: workspace:*
         version: link:../../config/typescript-config
+      '@mini-workout/vitest-config':
+        specifier: workspace:*
+        version: link:../../config/vitest-config
       '@types/node':
         specifier: ^22.15.3
         version: 22.15.3
@@ -339,12 +342,18 @@ importers:
       '@types/react-dom':
         specifier: 19.2.2
         version: 19.2.2(@types/react@19.2.2)
+      '@vitest/coverage-v8':
+        specifier: catalog:test-unit
+        version: 3.2.7(vitest@3.2.7)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.7.0)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
+      vitest:
+        specifier: catalog:test-unit
+        version: 3.2.7(@types/debug@4.1.13)(@types/node@22.15.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0)(lightningcss@1.33.0)(yaml@2.9.0)
 
   config/eslint-config:
     devDependencies:
@@ -6681,7 +6690,7 @@ snapshots:
       std-env: 3.10.0
       test-exclude: 7.0.2
       tinyrainbow: 2.0.0
-      vitest: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0)(lightningcss@1.33.0)(yaml@2.9.0)
+      vitest: 3.2.7(@types/debug@4.1.13)(@types/node@22.15.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0)(lightningcss@1.33.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -6754,7 +6763,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 2.0.0
-      vitest: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0)(lightningcss@1.33.0)(yaml@2.9.0)
+      vitest: 3.2.7(@types/debug@4.1.13)(@types/node@22.15.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0)(lightningcss@1.33.0)(yaml@2.9.0)
 
   '@vitest/utils@3.2.4':
     dependencies:
