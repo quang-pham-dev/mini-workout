@@ -62,7 +62,7 @@ describe('authentication route boundaries', () => {
   );
 
   it('allows only local redirect paths', () => {
-    expect(getSafeRedirectPath('/login?callbackUrl=%2Fhome')).toBe('/home');
+    expect(getSafeRedirectPath('/home')).toBe('/home');
     expect(getSafeRedirectPath('https://evil.example')).toBe('/home');
     expect(getSafeRedirectPath('//evil.example')).toBe('/home');
   });

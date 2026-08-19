@@ -55,6 +55,36 @@ database/external service
 Validate untrusted input at the boundary. Keep persistence details out of UI
 components. Use explicit DTOs or shared types for data crossing a boundary.
 
+### Authentication slice
+
+The first authentication slice is intentionally local to `apps/web`:
+
+```text
+login/register Server Action
+        ↓
+Auth.js Credentials provider
+        ↓
+Prisma User repository
+        ↓
+PostgreSQL
+```
+
+- `auth.ts` is the Node-capable Auth.js configuration and owns credential
+  verification, JWT sessions, and session user typing.
+- `auth.config.ts` is the lightweight route-protection configuration used by
+  `proxy.ts`; it must remain free of Prisma and password-hashing imports.
+- `proxy.ts` protects application paths, while `(app)/layout.tsx` performs a
+  second server-side session check before rendering protected content.
+- Passwords are stored only as bcrypt hashes. Credentials and password hashes
+  must never be included in logs, session claims, or client responses.
+- The current session strategy is JWT. A database-backed session strategy can
+  be evaluated later if revocation or multi-device session management becomes
+  a product requirement.
+
+The current schema contains only `User`. Auth.js, Prisma migrations, seed data,
+password reset, email verification, rate limiting, and E2E auth coverage are
+separate follow-up work.
+
 ## Error handling
 
 - Expected errors become typed results or safe user-facing messages.
@@ -83,3 +113,8 @@ See [`docs/OBSERVABILITY.md`](../../../docs/OBSERVABILITY.md).
 - E2E tests cover critical user journeys and deployment smoke checks.
 - Each feature adds tests with the feature; testing is not deferred until the
   end of the product build.
+
+The authentication slice currently has focused Vitest coverage for input
+normalization, credential boundaries, protected paths, and open-redirect
+prevention. Database-backed registration/login and browser flows require a
+configured test database and are planned for the next quality step.

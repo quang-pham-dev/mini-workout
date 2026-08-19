@@ -5,7 +5,9 @@
 
 > **Status:** Roadmap only. The repository currently provides the web
 > foundation, shared UI library, Tailwind design system, Storybook workspace,
-> and monorepo tooling. Authentication, database access, workout domain
+> monorepo tooling, and an initial Auth.js/Prisma authentication slice.
+> Authentication is not yet production-ready. Database access beyond the
+> initial User schema, workout domain
 > features, and the full-stack flows below are planned work unless explicitly
 > marked as implemented in the repository.
 
@@ -19,11 +21,16 @@ Implemented:
 - Storybook component workspace in `apps/storybook`.
 - pnpm/Turborepo task orchestration, linting, type checking, testing, CI, and
   package boundary checks.
+- Auth.js Credentials provider with JWT sessions.
+- Login, registration, protected `/home`, and route protection through
+  `proxy.ts` plus a server-side application layout guard.
+- Prisma User schema and bcrypt password hashing boundary.
+- Focused authentication validation and authorization tests.
 
 Planned:
 
-- Auth.js authentication and protected routes.
-- Prisma and Neon PostgreSQL integration.
+- Production database migration and seed workflow against Neon PostgreSQL.
+- Authentication recovery, verification, rate limiting, and browser E2E flow.
 - Workout, coach, category, like, and favourite domain models.
 - Onboarding, recommendations, search, pagination, and profile flows.
 - Full integration and browser E2E coverage.
@@ -1176,6 +1183,9 @@ Important principle:
 
 ## Phase 0 — Foundation
 
+**Status:** Foundation completed; database migration and seed workflow remain
+planned.
+
 Deliver:
 
 - Next.js 16.3 project
@@ -1206,6 +1216,8 @@ Seed data exists
 
 ## Phase 1 — Authentication
 
+**Status:** Initial vertical slice implemented; hardening remains planned.
+
 Deliver:
 
 - Register
@@ -1213,6 +1225,20 @@ Deliver:
 - Logout
 - Session
 - Protected routes
+
+Implemented in the initial slice:
+
+- Auth.js Credentials provider with JWT sessions
+- Register and login pages backed by Server Actions
+- Prisma `User` model with bcrypt password hashing
+- `/home` protected by proxy and server-side layout authorization
+
+Remaining before this phase is complete:
+
+- Database migration and seed workflow
+- Logout UI and session revocation strategy
+- Rate limiting and account recovery/verification
+- Integration and browser E2E coverage
 
 Definition of Done:
 

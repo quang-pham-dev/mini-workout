@@ -16,6 +16,21 @@ Open <http://localhost:3000>.
 The application uses local Geist fonts from `app/fonts` and consumes the shared
 UI package through its public exports.
 
+Authentication currently uses Auth.js Credentials with JWT sessions and a
+Prisma-backed `User` model. Copy `.env.example` to `.env.local`, provide
+`AUTH_SECRET` and `DATABASE_URL`, then generate the Prisma client:
+
+```bash
+cp apps/web/.env.example apps/web/.env.local
+pnpm --filter web db:generate
+```
+
+Apply the first local migration once a PostgreSQL database is available:
+
+```bash
+pnpm --filter web db:migrate --name init
+```
+
 Its route, data, error, network, security, testing, and observability
 conventions are documented in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -25,6 +40,7 @@ conventions are documented in
 ```bash
 pnpm --filter web lint
 pnpm --filter web check-types
+pnpm --filter web test
 pnpm --filter web build
 pnpm --filter web start
 ```
@@ -39,5 +55,7 @@ validating the whole repository.
 - `app/globals.css` — application-level global styles.
 - `public/` — static assets.
 
-Product routes, authentication, database access, and workout domain features
-are planned in the master roadmap and are not implemented yet.
+Current authentication routes are `/login`, `/register`, and `/home`.
+Unauthenticated access to protected routes is redirected to `/login`. Workout
+domain routes, onboarding, database seed data, and browser E2E coverage remain
+planned work.

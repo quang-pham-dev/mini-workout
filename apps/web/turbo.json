@@ -14,6 +14,9 @@
     "format": {
       "extends": false
     },
+    "lint": {
+      "env": ["NODE_ENV"]
+    },
     "test": {
       "extends": false
     }
