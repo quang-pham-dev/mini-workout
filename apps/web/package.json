@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@mini-workout/web",
   "version": "0.1.0",
   "type": "module",
   "private": true,
@@ -13,7 +13,8 @@
     "test:coverage": "vitest run --coverage",
     "auth:generate": "pnpm dlx auth@latest generate --output prisma/schema.prisma",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@mini-workout/observability": "workspace:*",
@@ -38,6 +39,10 @@
     "prisma": "6.19.3",
     "eslint": "catalog:",
     "typescript": "catalog:",
+    "tsx": "^4.19.2",
     "vitest": "catalog:test-unit"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

@@ -8,11 +8,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
 model User {
   id                  String   @id @default(cuid())
   name                String
   email               String   @unique
   onboardingCompleted Boolean  @default(false)
+  experienceLevel     ExperienceLevel?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -20,9 +27,31 @@ model User {
   image         String?
   sessions      Session[]
   accounts      Account[]
+  interests     UserInterest[]
 
   @@index([email])
   @@map("user")
+}
+
+model Interest {
+  id        String         @id @default(cuid())
+  name      String
+  slug      String         @unique
+  createdAt DateTime       @default(now())
+  users     UserInterest[]
+
+  @@index([name])
+}
+
+model UserInterest {
+  userId     String
+  interestId String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([userId, interestId])
+  @@index([interestId])
 }
 
 model Session {
