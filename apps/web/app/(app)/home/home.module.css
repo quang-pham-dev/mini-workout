@@ -1,0 +1,230 @@
+.page {
+  min-height: 100svh;
+  padding: clamp(1.25rem, 4vw, 4rem) clamp(1rem, 5vw, 5rem);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.shell {
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+.topbar,
+.sectionHeader,
+.cardMeta,
+.signOutRow {
+  display: flex;
+  align-items: center;
+}
+
+.topbar,
+.sectionHeader,
+.signOutRow {
+  justify-content: space-between;
+}
+
+.brand {
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.signOut {
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.signOut:hover {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-primary);
+}
+
+.signOut:focus-visible {
+  outline: 3px solid color-mix(in oklch, var(--color-ring) 38%, transparent);
+  outline-offset: 2px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.6fr);
+  gap: 2rem;
+  align-items: end;
+  margin: clamp(3rem, 9vw, 7rem) 0 clamp(4rem, 8vw, 7rem);
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--color-highlight);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 42rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 6.5rem);
+  letter-spacing: -0.07em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.heroCopy {
+  max-width: 24rem;
+  margin: 0 0 0.5rem;
+  color: var(--color-text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.section {
+  margin-top: 3rem;
+}
+
+.sectionHeader {
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.sectionNote {
+  color: var(--color-text-tertiary);
+  font-size: 0.85rem;
+}
+
+.workoutGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.workoutCard {
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.workoutCard:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 1rem 2.5rem oklch(0.2 0.02 250 / 0.08);
+  transform: translateY(-2px);
+}
+
+.workoutCard:focus-within {
+  outline: 3px solid color-mix(in oklch, var(--color-ring) 38%, transparent);
+  outline-offset: 2px;
+}
+
+.thumbnail {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.35;
+  object-fit: cover;
+  background: var(--color-surface-sunken);
+}
+
+.cardBody {
+  padding: 1rem;
+}
+
+.cardMeta {
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
+}
+
+.cardCategory {
+  color: var(--color-highlight-foreground);
+  font-weight: 700;
+}
+
+.cardTitle {
+  margin: 0.55rem 0 0.35rem;
+  font-size: 1.05rem;
+  letter-spacing: -0.025em;
+}
+
+.cardLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+}
+
+.cardDescription {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.coach {
+  margin: 1rem 0 0;
+  color: var(--color-text-tertiary);
+  font-size: 0.78rem;
+}
+
+.empty {
+  padding: 2rem;
+  border: 1px dashed var(--color-border-default);
+  border-radius: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.signOutRow {
+  margin-top: 5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+@media (max-width: 900px) {
+  .workoutGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    grid-template-columns: 1fr;
+    margin-top: 4rem;
+  }
+
+  .workoutGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workoutCard {
+    transition: none;
+  }
+}

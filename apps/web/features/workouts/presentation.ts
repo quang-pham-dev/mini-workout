@@ -1,0 +1,9 @@
+export function formatDuration(minutes: number) {
+  return `${minutes} min`;
+}
+
+export function getGreeting(hour: number) {
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
