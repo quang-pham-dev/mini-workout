@@ -29,6 +29,10 @@
   --color-primary-active: var(--color-brand-800);
   --color-primary-foreground: oklch(0.99 0 0);
 
+  --color-highlight: oklch(0.68 0.17 48);
+  --color-highlight-soft: oklch(0.96 0.04 80);
+  --color-highlight-foreground: oklch(0.2 0.03 48);
+
   /* Component-specific colors (shadcn/ui compatibility) */
   --color-card: oklch(1 0 0);
   --color-card-foreground: oklch(0.14 0.008 250);

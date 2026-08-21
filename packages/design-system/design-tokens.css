@@ -109,6 +109,11 @@
   --color-primary-active: var(--color-brand-800);
   --color-primary-foreground: oklch(0.99 0 0);
 
+  /* Warm human accent for encouragement and progress moments */
+  --color-highlight: oklch(0.68 0.17 48);
+  --color-highlight-soft: oklch(0.96 0.04 80);
+  --color-highlight-foreground: oklch(0.2 0.03 48);
+
   --color-ring-offset: oklch(1 0 0);
 
   /* ===== TYPOGRAPHY SYSTEM ===== */

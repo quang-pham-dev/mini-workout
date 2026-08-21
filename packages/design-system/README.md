@@ -63,6 +63,20 @@ needs to toggle the `dark` class on the document root:
 document.documentElement.classList.toggle('dark', isDarkMode);
 ```
 
+Use `highlight` for warm, human moments such as encouragement, onboarding
+progress, or a recommended focus. It is intentionally separate from `primary`,
+which represents the main action and brand interaction:
+
+```tsx
+<span className="bg-highlight-soft text-highlight-foreground rounded-full px-3 py-1 text-sm">
+  A good place to start
+</span>
+```
+
+Do not use the highlight token as a generic replacement for brand actions or
+create one-off feature colors. Add a semantic token only when the meaning is
+reusable across product surfaces and provide light and dark theme values.
+
 ### Referencing the shared foundation from TypeScript
 
 Use the token names and component contracts when building or reviewing a

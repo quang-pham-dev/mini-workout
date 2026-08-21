@@ -24,6 +24,9 @@ export const semanticTokens = {
     primaryHover: 'primary-hover',
     primaryActive: 'primary-active',
     primaryForeground: 'primary-foreground',
+    highlight: 'highlight',
+    highlightSoft: 'highlight-soft',
+    highlightForeground: 'highlight-foreground',
     ring: 'ring',
   },
   spacing: {
