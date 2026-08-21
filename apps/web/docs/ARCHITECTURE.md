@@ -88,6 +88,40 @@ The current schema includes Better Auth's `User`, `Account`, `Session`, and
 migrations, password reset, email verification, rate limiting, and E2E auth
 coverage are separate follow-up work.
 
+### Onboarding slice
+
+Onboarding is the first product feature after authentication. It is deliberately
+implemented as a small vertical slice:
+
+```text
+onboarding page (Server Component)
+        ↓
+OnboardingForm (small Client Component for selection state)
+        ↓
+completeOnboarding Server Action
+        ↓
+Zod boundary validation + Better Auth session check
+        ↓
+Prisma transaction (User + UserInterest)
+        ↓
+PostgreSQL
+```
+
+- `Interest` is seeded reference data; the browser submits IDs, but the server
+  verifies every ID before writing it.
+- `UserInterest` is a composite-key join table so interests remain normalized
+  and can later support recommendation queries without storing arrays in the
+  user row.
+- `/home` checks `onboardingCompleted` server-side and redirects incomplete
+  users to `/onboarding`. Middleware remains an optimistic navigation aid, not
+  the authorization boundary.
+- The form uses shared Button and semantic design-system tokens. Its layout and
+  copy are feature-specific, so they stay in `apps/web` rather than expanding
+  the reusable UI package prematurely.
+- Invalid submissions return a safe generic message. Database and unexpected
+  errors must be reported through the observability package as that boundary is
+  integrated.
+
 ### Consumer and future admin surfaces
 
 `apps/web` is intentionally a full-stack Next.js application for the MVP. It
@@ -144,6 +178,31 @@ Do not split `apps/web` pre-emptively. Re-evaluate an admin app or separate API
 when at least one concrete signal exists: independent team ownership, separate
 deployment/release requirements, materially different scaling profiles,
 security/compliance isolation, or a stable external API consumer.
+
+### Workout discovery slice
+
+The first content domain keeps discovery server-rendered and database-backed:
+
+```text
+home Server Component
+  ├── user interests → recommended published workouts
+  └── publishedAt → latest published workouts
+                  ↓
+             workout detail
+```
+
+- `Coach`, `Category`, and `Workout` are normalized product entities.
+- `WorkoutInterest` links content to the same seeded interest vocabulary used
+  by onboarding; this keeps the first recommendation query explainable and
+  avoids introducing a recommendation service prematurely.
+- Only `isPublished` workouts are exposed to consumer routes. Future admin
+  CRUD must use separate authorization and mutation use cases.
+- The MVP stores a `videoUrl` and `thumbnailUrl`, but the detail page currently
+  presents a media placeholder. Video hosting, transcoding, upload workflows,
+  and CDN policy are intentionally deferred until content operations exist.
+- The page reads Prisma directly from Server Components. Do not call an
+  internal HTTP endpoint for this same-server read; introduce an API boundary
+  only for external consumers or an independently deployed client.
 
 ## Error handling
 

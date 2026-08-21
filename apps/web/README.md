@@ -23,6 +23,7 @@ generate the Prisma client:
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
+cp apps/web/.env.example apps/web/.env
 pnpm --filter web db:generate
 ```
 
@@ -38,6 +39,19 @@ Apply the first local migration once a PostgreSQL database is available:
 ```bash
 pnpm --filter web db:migrate --name init
 ```
+
+Seed the reference interests used by onboarding:
+
+```bash
+pnpm --filter web db:seed
+```
+
+The same seed command also creates the first coaches, categories, and published
+workout fixtures used by `/home` and `/workouts/[slug]`.
+
+Prisma CLI reads `apps/web/.env` by default. Next.js reads `.env.local` for
+development. Keep both files local, use the same `DATABASE_URL`, and never
+commit either file.
 
 Its route, data, error, network, security, testing, and observability
 conventions are documented in
@@ -63,7 +77,9 @@ validating the whole repository.
 - `app/globals.css` — application-level global styles.
 - `public/` — static assets.
 
-Current authentication routes are `/login`, `/register`, `/home`, and
-`/api/auth/[...all]`. Unauthenticated access to protected routes is redirected
-to `/login`. Workout domain routes, onboarding, database seed data, and browser
-E2E coverage remain planned work.
+Current authentication and product routes are `/login`, `/register`,
+`/onboarding`, `/home`, and `/api/auth/[...all]`. Unauthenticated access to
+protected routes is redirected to `/login`; users who have not completed
+onboarding are redirected from `/home` to `/onboarding`. Workout domain routes
+are available at `/workouts/[slug]`; video playback, interaction mutations,
+and browser E2E coverage remain planned work.

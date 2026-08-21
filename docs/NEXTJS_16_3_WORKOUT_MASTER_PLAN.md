@@ -3,7 +3,8 @@
 > **Project:** Workout Video Platform  
 > **Purpose:** A production-minded learning project for practicing Next.js 16.3 with Better Auth, Prisma ORM, Neon PostgreSQL, Server Components, Server Actions, caching, mutations, testing, and deployment.
 
-> **Status:** Roadmap only. The repository currently provides the web
+> **Status:** The roadmap is being implemented incrementally. The repository
+> currently provides the web
 > foundation, shared UI library, Tailwind design system, Storybook workspace,
 > monorepo tooling, and an initial Better Auth/Prisma authentication slice.
 > Authentication is not yet production-ready. Database access beyond the
@@ -25,14 +26,17 @@ Implemented:
 - Login, registration, protected `/home`, and route protection through
   `proxy.ts` plus a server-side application layout guard.
 - Better Auth Prisma schema for users, accounts, sessions, and verification.
+- Onboarding vertical slice: normalized interests, experience level, server
+  action persistence, seed data, and incomplete-user redirect guard.
+- Human-centered onboarding UI using shared Button and semantic design tokens.
 - Focused authentication validation and authorization tests.
 
-Planned:
+Still planned:
 
 - Production database migration and seed workflow against Neon PostgreSQL.
 - Authentication recovery, verification, rate limiting, and browser E2E flow.
 - Workout, coach, category, like, and favourite domain models.
-- Onboarding, recommendations, search, pagination, and profile flows.
+- Search, pagination, and profile flows.
 - Full integration and browser E2E coverage.
 
 The phase definitions in this document describe the intended destination and
@@ -1254,12 +1258,27 @@ Logout → Login
 
 ## Phase 2 — Onboarding
 
+Status: foundation implemented. Apply the migration and seed command locally
+after PostgreSQL connectivity is available.
+
 Deliver:
 
 - Interest selection
 - Experience selection
 - Persistence
 - Redirect
+
+Implementation notes:
+
+- `apps/web/features/onboarding/schema.ts` owns boundary validation.
+- `completeOnboarding` checks the Better Auth session, verifies submitted
+  interest IDs against the database, and writes the user plus join rows in one
+  Prisma transaction.
+- `Interest` is reference data seeded by `pnpm --filter web db:seed`.
+- `/home` performs a server-side completion check and redirects incomplete
+  users to `/onboarding`.
+- Component-level interaction and browser E2E coverage remain the next quality
+  increment for this slice.
 
 Definition of Done:
 
@@ -1277,6 +1296,9 @@ Home
 
 ## Phase 3 — Workout Discovery
 
+Status: initial discovery slice implemented. Apply the workout migration and
+run the seed command against the configured PostgreSQL database.
+
 Deliver:
 
 - Home
@@ -1285,6 +1307,17 @@ Deliver:
 - Latest section
 - Workout detail
 - Coach information
+
+Implementation notes:
+
+- `Coach`, `Category`, `Workout`, and `WorkoutInterest` are the minimal content
+  domain for this phase.
+- `/home` is a Server Component that reads published content directly through
+  Prisma and derives recommendations from onboarding interests.
+- `/workouts/[slug]` provides the detail boundary and dynamic metadata.
+- The detail page uses a media placeholder until storage, transcoding, and
+  playback requirements are known.
+- Search, pagination, admin CRUD, likes, and favourites remain separate phases.
 
 Definition of Done:
 
