@@ -30,7 +30,7 @@
       "cache": false
     },
     "check-types": {
-      "dependsOn": ["transit"],
+      "dependsOn": ["^build", "transit"],
       "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"]
     },
     "dev": {

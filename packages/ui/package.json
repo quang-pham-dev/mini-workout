@@ -83,6 +83,7 @@
     "@mini-workout/typescript-config": "workspace:*",
     "@mini-workout/vitest-config": "workspace:*",
     "@storybook/react": "catalog:ui-storybook",
+    "@storybook/react-vite": "catalog:ui-storybook",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

@@ -586,6 +586,9 @@ importers:
       '@storybook/react':
         specifier: catalog:ui-storybook
         version: 10.5.8(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.2.0))(typescript@5.9.2)
+      '@storybook/react-vite':
+        specifier: catalog:ui-storybook
+        version: 10.5.8(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rollup@4.62.4)(storybook@10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.2.0))(typescript@5.9.2)(vite@8.2.1(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
