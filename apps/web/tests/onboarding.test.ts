@@ -1,4 +1,4 @@
-import { onboardingSchema } from '../features/onboarding/schema';
+import { onboardingSchema } from '@/features/onboarding/schema';
 import { describe, expect, it } from 'vitest';
 
 describe('onboardingSchema', () => {

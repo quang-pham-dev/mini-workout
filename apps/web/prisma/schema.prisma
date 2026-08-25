@@ -28,6 +28,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
   interests     UserInterest[]
+  likes         WorkoutLike[]
+  favorites     WorkoutFavorite[]
 
   @@index([email])
   @@map("user")
@@ -81,6 +83,8 @@ model Workout {
   coach           Coach             @relation(fields: [coachId], references: [id])
   category        Category          @relation(fields: [categoryId], references: [id])
   interests       WorkoutInterest[]
+  likes           WorkoutLike[]
+  favorites       WorkoutFavorite[]
 
   @@index([isPublished, publishedAt])
   @@index([categoryId])
@@ -95,6 +99,28 @@ model WorkoutInterest {
 
   @@id([workoutId, interestId])
   @@index([interestId])
+}
+
+model WorkoutLike {
+  userId    String
+  workoutId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workoutId])
+  @@index([workoutId])
+}
+
+model WorkoutFavorite {
+  userId    String
+  workoutId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workoutId])
+  @@index([workoutId])
 }
 
 model UserInterest {

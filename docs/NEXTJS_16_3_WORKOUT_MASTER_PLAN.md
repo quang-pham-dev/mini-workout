@@ -688,7 +688,6 @@ The application should not rely only on frontend checks to prevent duplicate lik
 
 ```text
 src/
-│
 ├── app/
 │   ├── (auth)/
 │   │   ├── login/
@@ -709,11 +708,6 @@ src/
 │   ├── layout.tsx
 │   └── globals.css
 │
-├── components/
-│   ├── ui/
-│   ├── layout/
-│   └── shared/
-│
 ├── features/
 │   ├── auth/
 │   ├── onboarding/
@@ -721,22 +715,13 @@ src/
 │   ├── favourites/
 │   └── profile/
 │
-├── server/
-│   ├── auth/
-│   ├── users/
-│   ├── workouts/
-│   └── coaches/
-│
-├── db/
-│   ├── prisma.ts
-│   └── ...
-│
 ├── lib/
-│   ├── validation/
-│   ├── errors/
-│   └── utils/
-│
+├── auth.ts
+├── proxy.ts
 └── types/
+
+prisma/
+tests/
 ```
 
 ---

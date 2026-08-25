@@ -23,20 +23,51 @@ not import from this app.
 
 ## Feature structure
 
-Start with feature folders inside this app:
+Use the `src` boundary for application code:
 
 ```text
-app/                    # routes and route composition
-features/<feature>/     # feature UI, schemas, and use cases
-lib/                    # app-wide infrastructure and adapters
+src/
+  app/                  # routes and route composition
+  features/<feature>/   # feature UI, schemas, and use cases
+  lib/                  # app-wide infrastructure and adapters
   auth/
   data/
   observability/
   validation/
+  auth.ts               # Better Auth server instance
+  proxy.ts              # optimistic request routing guard
+prisma/                 # schema, migrations, and seed data
+tests/                  # feature and integration tests
 ```
+
+The `@/*` TypeScript alias maps to `src/*`. Use it for imports across feature,
+infrastructure, and route boundaries; relative imports are appropriate only
+for files that are direct siblings in the same feature or route folder.
 
 Extract a feature into `packages/` only when it has a real consumer outside the
 web app. Do not create speculative domain packages.
+
+### Styling and shared UI
+
+- Use `@mini-workout/ui` components for reusable interaction contracts such as
+  Button, Input, Label, Card, and future shadcn-style primitives.
+- Use semantic Tailwind utilities for common spacing, color, typography, and
+  state styling.
+- Use a CSS Module only for a feature's composition rules that would become
+  difficult to read as utilities: a page-specific responsive grid, a complex
+  pseudo-state, or a small visual system that has no second consumer. Do not
+  create a package component for one-off product copy or layout.
+- CSS Modules must still consume design-system variables; they must not invent
+  raw product colors or bypass accessibility states.
+
+### Type safety
+
+- TypeScript `strict` mode is required for application and package code.
+- Explicit `any` is forbidden by the shared ESLint configuration. Use an
+  unknown-first boundary with a type guard or schema validation when data is
+  untrusted.
+- Do not weaken a type to make a component or database query compile. Define a
+  focused DTO/select shape instead.
 
 ## Data layer
 

@@ -72,10 +72,15 @@ validating the whole repository.
 
 ## Application structure
 
-- `app/layout.tsx` — root layout, local fonts, and metadata.
-- `app/page.tsx` — current landing page.
-- `app/globals.css` — application-level global styles.
+- `src/app/layout.tsx` — root layout, local fonts, and metadata.
+- `src/app/page.tsx` — current landing page.
+- `src/app/globals.css` — application-level global styles.
+- `src/features/` — feature UI, validation, actions, and presentation logic.
+- `src/lib/` — app-wide infrastructure such as auth and Prisma adapters.
 - `public/` — static assets.
+
+Application imports use the `@/*` alias for `src/*`. Keep relative imports for
+same-folder files such as a page's CSS Module or a feature's local action.
 
 Current authentication and product routes are `/login`, `/register`,
 `/onboarding`, `/home`, and `/api/auth/[...all]`. Unauthenticated access to

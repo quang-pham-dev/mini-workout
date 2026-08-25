@@ -1,8 +1,5 @@
-import {
-  getSafeRedirectPath,
-  isProtectedPath,
-} from '../lib/auth/authorization';
-import { loginSchema, registerSchema } from '../lib/auth/validation';
+import { getSafeRedirectPath, isProtectedPath } from '@/lib/auth/authorization';
+import { loginSchema, registerSchema } from '@/lib/auth/validation';
 import { describe, expect, it } from 'vitest';
 
 describe('authentication validation', () => {

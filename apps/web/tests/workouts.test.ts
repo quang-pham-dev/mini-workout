@@ -1,4 +1,4 @@
-import { formatDuration, getGreeting } from '../features/workouts/presentation';
+import { formatDuration, getGreeting } from '@/features/workouts/presentation';
 import { describe, expect, it } from 'vitest';
 
 describe('workout presentation', () => {
