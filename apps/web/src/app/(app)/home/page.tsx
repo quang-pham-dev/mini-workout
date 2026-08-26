@@ -5,23 +5,13 @@ import {
   RecommendedSection,
 } from './home-sections';
 import styles from './home.module.css';
-import { auth } from '@/auth';
 import { HomeFeedSkeleton } from '@/components/skeletons/home-feed-skeleton';
-import { headers } from 'next/headers';
-import Link from 'next/link';
 import { Suspense } from 'react';
 
 export default function HomePage() {
   return (
     <main className={styles.page}>
       <div className={styles.shell}>
-        <header className={styles.topbar}>
-          <Link className={styles.brand} href="/home">
-            mini / workout
-          </Link>
-          <span className={styles.sectionNote}>Your movement library</span>
-        </header>
-
         <Suspense fallback={<HeroFallback />}>
           <Hero />
         </Suspense>
@@ -49,22 +39,6 @@ export default function HomePage() {
             <LatestSection />
           </Suspense>
         </section>
-
-        <div className={styles.signOutRow}>
-          <span className={styles.sectionNote}>
-            Keep showing up for yourself.
-          </span>
-          <form
-            action={async () => {
-              'use server';
-              await auth.api.signOut({ headers: await headers() });
-            }}
-          >
-            <button className={styles.signOut} type="submit">
-              Sign out
-            </button>
-          </form>
-        </div>
       </div>
     </main>
   );

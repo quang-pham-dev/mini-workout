@@ -10,47 +10,14 @@
   margin: 0 auto;
 }
 
-.topbar,
 .sectionHeader,
-.cardMeta,
-.signOutRow {
+.cardMeta {
   display: flex;
   align-items: center;
 }
 
-.topbar,
-.sectionHeader,
-.signOutRow {
+.sectionHeader {
   justify-content: space-between;
-}
-
-.brand {
-  color: var(--color-text-primary);
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-
-.signOut {
-  padding: 0.5rem 0.75rem;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.85rem;
-}
-
-.signOut:hover {
-  background: var(--color-surface-sunken);
-  color: var(--color-text-primary);
-}
-
-.signOut:focus-visible {
-  outline: 3px solid color-mix(in oklch, var(--color-ring) 38%, transparent);
-  outline-offset: 2px;
 }
 
 .hero {
@@ -58,7 +25,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.6fr);
   gap: 2rem;
   align-items: end;
-  margin: clamp(3rem, 9vw, 7rem) 0 clamp(4rem, 8vw, 7rem);
+  margin: clamp(1.5rem, 5vw, 4rem) 0 clamp(2.5rem, 6vw, 5rem);
 }
 
 .eyebrow {
@@ -192,12 +159,6 @@
   border: 1px dashed var(--color-border-default);
   border-radius: 1rem;
   color: var(--color-text-secondary);
-}
-
-.signOutRow {
-  margin-top: 5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border-subtle);
 }
 
 @media (max-width: 900px) {

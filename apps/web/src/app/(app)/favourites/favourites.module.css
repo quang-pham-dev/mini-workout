@@ -1,0 +1,126 @@
+.page {
+  min-height: 100svh;
+  padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 5vw, 5rem);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.shell {
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--color-highlight);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+
+.subtitle {
+  max-width: 32rem;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.75rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.workoutGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  border: 1px dashed var(--color-border-default);
+  border-radius: 1.25rem;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-tertiary);
+}
+
+.emptyTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.emptyText {
+  max-width: 24rem;
+  margin: 0 0 1.5rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.exploreBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.25rem;
+  border-radius: 9999px;
+  background: var(--color-text-primary);
+  color: var(--color-background);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.exploreBtn:hover {
+  opacity: 0.9;
+}
+
+.exploreBtn:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .workoutGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .workoutGrid {
+    grid-template-columns: 1fr;
+  }
+}

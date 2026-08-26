@@ -38,6 +38,7 @@ export async function toggleWorkoutLike(workoutId: string) {
   }
 
   revalidatePath('/home');
+  revalidatePath('/favourites');
   revalidatePath(`/workouts/${slug}`);
 }
 
@@ -57,5 +58,6 @@ export async function toggleWorkoutFavorite(workoutId: string) {
   }
 
   revalidatePath('/home');
+  revalidatePath('/favourites');
   revalidatePath(`/workouts/${slug}`);
 }
