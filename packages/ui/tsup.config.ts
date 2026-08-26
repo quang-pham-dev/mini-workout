@@ -12,7 +12,7 @@ export default defineConfig((options: Options) => ({
   },
   clean: true,
   sourcemap: true,
-  external: ['react', 'react-dom', '@mini-workout/design-system'],
+  external: ['react', 'react-dom'],
   dts: true,
   ...options,
 }));
