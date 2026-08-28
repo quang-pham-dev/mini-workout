@@ -1,7 +1,9 @@
 {
   "extends": ["//"],
   "tasks": {
-    "build": { "extends": false },
+    "build": {
+      "dependsOn": ["^build"]
+    },
     "check-types": { "extends": false },
     "test": { "extends": false }
   }
