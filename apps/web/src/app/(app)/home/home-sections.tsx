@@ -1,12 +1,11 @@
 import styles from './home.module.css';
-import { formatDuration, getGreeting } from '@/features/workouts/presentation';
+import { getGreeting } from '@/features/workouts/presentation';
 import {
   WorkoutCard,
   type WorkoutCardData,
 } from '@/features/workouts/workout-card';
 import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
 import { prisma } from '@/lib/db/prisma';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 async function requireOnboardedUser() {
