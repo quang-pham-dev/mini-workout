@@ -15,6 +15,35 @@ import { join } from 'node:path';
 type LockOwner = { pid: number; token: string };
 export type DatabaseLock = { release: () => void; token: string };
 
+function parseLockOwner(value: unknown): LockOwner {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value) ||
+    Object.keys(value).length !== 2
+  ) {
+    throw new Error('E2E database fixture lock owner is malformed');
+  }
+
+  const owner = value as Record<string, unknown>;
+  if (
+    !Object.hasOwn(owner, 'pid') ||
+    !Object.hasOwn(owner, 'token') ||
+    !Number.isSafeInteger(owner.pid) ||
+    (owner.pid as number) <= 0 ||
+    typeof owner.token !== 'string' ||
+    owner.token.trim() === ''
+  ) {
+    throw new Error('E2E database fixture lock owner is malformed');
+  }
+
+  return { pid: owner.pid as number, token: owner.token };
+}
+
+function readLockOwner(path: string): LockOwner {
+  return parseLockOwner(JSON.parse(readFileSync(path, 'utf8')));
+}
+
 export function databaseRunKey(databaseUrl: string): string {
   const url = new URL(databaseUrl);
   url.searchParams.sort();
@@ -82,7 +111,7 @@ export function acquireDatabaseLock(
       throw error;
     }
     try {
-      const existing = JSON.parse(readFileSync(path, 'utf8')) as LockOwner;
+      const existing = readLockOwner(path);
       const status = processStatus(existing.pid);
       if (status !== 'dead') {
         throw new Error('E2E database fixture run is already in use');
@@ -106,7 +135,7 @@ export function acquireDatabaseLock(
     token: owner.token,
     release: () => {
       try {
-        const current = JSON.parse(readFileSync(path, 'utf8')) as LockOwner;
+        const current = readLockOwner(path);
         if (current.token === owner.token) rmSync(path);
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
@@ -123,7 +152,7 @@ export function releaseDatabaseLock(
 ): void {
   const path = lockPathForDatabase(databaseUrl, directory);
   try {
-    const owner = JSON.parse(readFileSync(path, 'utf8')) as LockOwner;
+    const owner = readLockOwner(path);
     if (owner.token === token) rmSync(path);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;

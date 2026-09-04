@@ -15,6 +15,7 @@ test('failure removes generated auth files and releases the lock', async () => {
     await assert.rejects(
       withFixtureSetup(
         authDirectory,
+        () => undefined,
         () => {
           released = true;
         },
@@ -29,4 +30,28 @@ test('failure removes generated auth files and releases the lock', async () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('attempts metadata removal and release even when earlier cleanup fails', async () => {
+  const events: string[] = [];
+  const setupError = new Error('seed failed');
+
+  await assert.rejects(
+    withFixtureSetup(
+      '/unused-auth-directory',
+      () => {
+        events.push('metadata');
+        throw new Error('metadata cleanup failed');
+      },
+      () => {
+        events.push('release');
+        throw new Error('release failed');
+      },
+      async () => {
+        throw setupError;
+      },
+    ),
+    (error) => error === setupError,
+  );
+  assert.deepEqual(events, ['metadata', 'release']);
 });

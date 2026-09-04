@@ -75,7 +75,9 @@ configuration always starts a fresh Next server, so it cannot reuse a server
 started with a different database URL. Public-only startup passes an explicit
 sanitized environment and blocks inherited database and auth settings. Lock,
 auth-state, and metadata paths are keyed by a hash of the canonical database
-URL, and teardown reads only the metadata for the current approved URL.
+URL. Metadata stores only that derived key and the lock run token; it never
+stores database credentials. Teardown reads only metadata for the current
+approved URL.
 
 Install the pinned Chromium browser before the first run:
 

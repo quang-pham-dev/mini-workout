@@ -59,6 +59,50 @@ test('does not remove an incomplete lock', () => {
   }
 });
 
+for (const [name, owner] of [
+  ['non-object JSON', []],
+  ['missing pid', { token: 'token' }],
+  ['non-positive pid', { pid: 0, token: 'token' }],
+  ['fractional pid', { pid: 1.5, token: 'token' }],
+  ['empty token', { pid: 123, token: ' ' }],
+] as const) {
+  test(`does not take over a lock with ${name}`, () => {
+    const lockDirectory = mkdtempSync(
+      join(tmpdir(), 'mini-workout-lock-test-'),
+    );
+    const databaseUrl =
+      'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
+    const path = lockPathForDatabase(databaseUrl, lockDirectory);
+
+    try {
+      writeFileSync(path, JSON.stringify(owner), 'utf8');
+      assert.throws(() => acquireDatabaseLock(databaseUrl, lockDirectory));
+      assert.equal(existsSync(path), true);
+    } finally {
+      rmSync(lockDirectory, { recursive: true, force: true });
+    }
+  });
+}
+
+test('does not take over a valid lock when its owner is still running', () => {
+  const lockDirectory = mkdtempSync(join(tmpdir(), 'mini-workout-lock-test-'));
+  const databaseUrl =
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
+  const path = lockPathForDatabase(databaseUrl, lockDirectory);
+
+  try {
+    writeFileSync(
+      path,
+      JSON.stringify({ pid: process.pid, token: 'token' }),
+      'utf8',
+    );
+    assert.throws(() => acquireDatabaseLock(databaseUrl, lockDirectory));
+    assert.equal(existsSync(path), true);
+  } finally {
+    rmSync(lockDirectory, { recursive: true, force: true });
+  }
+});
+
 test('takes over a stale lock only when its owner is definitely dead', () => {
   const lockDirectory = mkdtempSync(join(tmpdir(), 'mini-workout-lock-test-'));
   const databaseUrl =

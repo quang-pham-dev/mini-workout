@@ -20,14 +20,14 @@ export default async function globalTeardown() {
   let cleanupSucceeded = false;
   try {
     if (existsSync(lockFile)) {
-      const { databaseUrl: metadataUrl, token } = JSON.parse(
+      const { key: metadataKey, token } = JSON.parse(
         readFileSync(lockFile, 'utf8'),
       ) as {
-        databaseUrl: string;
+        key: string;
         token: string;
       };
       try {
-        if (metadataUrl !== databaseUrl)
+        if (metadataKey !== key)
           throw new Error('E2E metadata does not match this run');
         await cleanupDatabase(databaseUrl);
         cleanupSucceeded = true;

@@ -15,12 +15,14 @@ const preservedEnvironmentKeys = [
 export function publicServerEnv(
   env: NodeJS.ProcessEnv,
 ): Record<string, string> {
-  return {
-    ...Object.fromEntries(
-      preservedEnvironmentKeys.flatMap((key) =>
-        env[key] === undefined ? [] : [[key, env[key]]],
-      ),
+  const safeEnvironment = Object.fromEntries(
+    preservedEnvironmentKeys.flatMap((key) =>
+      env[key] === undefined ? [] : [[key, env[key] as string]],
     ),
+  );
+
+  return {
+    ...safeEnvironment,
     NODE_ENV: 'development',
     NEXT_TELEMETRY_DISABLED: '1',
     BETTER_AUTH_URL: baseURL,

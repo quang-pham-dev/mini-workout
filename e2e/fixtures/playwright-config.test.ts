@@ -18,6 +18,30 @@ test('always exposes a public project and sanitizes its server environment', () 
   assert.notEqual(env.BETTER_AUTH_SECRET, 'production-secret');
 });
 
+test('does not merge unrelated inherited environment variables into public startup', () => {
+  const env = publicServerEnv({
+    HOME: '/tmp/home',
+    PATH: '/bin',
+    SECRET_TOKEN: 'secret',
+    NEXT_PUBLIC_UNEXPECTED: 'unexpected',
+    NODE_OPTIONS: '--require=unexpected',
+  });
+
+  assert.deepEqual(Object.keys(env).sort(), [
+    'BETTER_AUTH_SECRET',
+    'BETTER_AUTH_URL',
+    'DATABASE_URL',
+    'E2E_DATABASE_URL',
+    'HOME',
+    'NEXT_TELEMETRY_DISABLED',
+    'NODE_ENV',
+    'PATH',
+  ]);
+  assert.equal(env.SECRET_TOKEN, undefined);
+  assert.equal(env.NODE_OPTIONS, undefined);
+  assert.equal(env.NEXT_PUBLIC_UNEXPECTED, undefined);
+});
+
 test('gates database projects on both matching database variables', () => {
   const databaseUrl =
     'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
