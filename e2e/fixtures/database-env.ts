@@ -38,5 +38,12 @@ export function resolveDatabaseUrl(env: NodeJS.ProcessEnv): string {
   }
 
   assertTestDatabase(databaseUrl);
-  return databaseUrl;
+  return canonicalDatabaseUrl(databaseUrl);
+}
+
+export function canonicalDatabaseUrl(databaseUrl: string): string {
+  const url = new URL(databaseUrl);
+  url.searchParams.sort();
+  url.hash = '';
+  return url.toString();
 }

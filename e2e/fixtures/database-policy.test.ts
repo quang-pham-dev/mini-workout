@@ -61,3 +61,17 @@ test('rejects a missing DATABASE_URL', () => {
     /both.*required|DATABASE_URL/i,
   );
 });
+
+test('limits cleanup to the four declared fixture users', async () => {
+  const { fixtureUserWhere } = await import('./database.ts');
+  assert.deepEqual(fixtureUserWhere, {
+    email: {
+      in: [
+        'active-user@example.test',
+        'empty-user@example.test',
+        'new-user@example.test',
+        'long-user@example.test',
+      ],
+    },
+  });
+});

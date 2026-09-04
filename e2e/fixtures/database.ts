@@ -1,4 +1,4 @@
-import { assertTestDatabase } from './database-env';
+import { assertTestDatabase } from './database-env.ts';
 import { createRequire } from 'node:module';
 
 const requireFromWeb = createRequire(
@@ -25,7 +25,9 @@ export const testUsers = {
   long: { email: 'long-user@example.test', password: 'VisualTest123!' },
 } as const;
 
-const testEmailDomain = '@example.test';
+export const fixtureUserWhere = {
+  email: { in: Object.values(testUsers).map(({ email }) => email) },
+};
 
 function createPrisma(databaseUrl: string): DatabaseClient {
   const { PrismaClient } = requireFromWeb('@prisma/client') as {
@@ -41,7 +43,7 @@ export async function prepareDatabase(databaseUrl: string): Promise<void> {
 
   try {
     await prisma.user.deleteMany({
-      where: { email: { endsWith: testEmailDomain } },
+      where: fixtureUserWhere,
     });
   } finally {
     await prisma.$disconnect();
@@ -54,7 +56,7 @@ export async function cleanupDatabase(databaseUrl: string): Promise<void> {
 
   try {
     await prisma.user.deleteMany({
-      where: { email: { endsWith: testEmailDomain } },
+      where: fixtureUserWhere,
     });
   } finally {
     await prisma.$disconnect();

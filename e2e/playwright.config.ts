@@ -1,5 +1,52 @@
-import { resolveDatabaseUrl } from './fixtures/database-env';
+import { resolveDatabaseUrl } from './fixtures/database-env.ts';
 import { defineConfig, devices } from '@playwright/test';
+
+const baseURL = 'http://localhost:3000';
+const preservedEnvironmentKeys = [
+  'CI',
+  'HOME',
+  'LANG',
+  'LC_ALL',
+  'PATH',
+  'PNPM_HOME',
+  'TMPDIR',
+];
+
+export function publicServerEnv(
+  env: NodeJS.ProcessEnv,
+): Record<string, string> {
+  return {
+    ...Object.fromEntries(
+      preservedEnvironmentKeys.flatMap((key) =>
+        env[key] === undefined ? [] : [[key, env[key]]],
+      ),
+    ),
+    NODE_ENV: 'development',
+    NEXT_TELEMETRY_DISABLED: '1',
+    BETTER_AUTH_URL: baseURL,
+    BETTER_AUTH_SECRET: 'e2e-public-only-secret',
+    DATABASE_URL: 'postgresql://127.0.0.1:1/public_only_blocked',
+    E2E_DATABASE_URL: '',
+  };
+}
+
+export function projectDefinitions(env: NodeJS.ProcessEnv) {
+  const hasDatabaseEnvironment =
+    Boolean(env.E2E_DATABASE_URL) && Boolean(env.DATABASE_URL);
+  return [
+    { name: 'public', testMatch: /tests\/infrastructure\.spec\.ts/ },
+    ...(hasDatabaseEnvironment
+      ? [
+          { name: 'db-setup', testMatch: /global\.setup\.ts/ },
+          {
+            name: 'db',
+            dependencies: ['db-setup'],
+            testMatch: /tests\/fixtures\.spec\.ts/,
+          },
+        ]
+      : []),
+  ];
+}
 
 const hasDatabaseEnvironment =
   Boolean(process.env.E2E_DATABASE_URL) && Boolean(process.env.DATABASE_URL);
@@ -21,7 +68,7 @@ export default defineConfig({
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: 'http://localhost:3000',
+    baseURL,
     colorScheme: 'light',
     locale: 'en-US',
     screenshot: 'only-on-failure',
@@ -35,27 +82,11 @@ export default defineConfig({
     url: 'http://localhost:3000/api/health',
     env: databaseUrl
       ? {
-          ...Object.fromEntries(
-            Object.entries(process.env).filter(
-              (entry): entry is [string, string] => entry[1] !== undefined,
-            ),
-          ),
+          ...publicServerEnv(process.env),
           DATABASE_URL: databaseUrl,
           E2E_DATABASE_URL: databaseUrl,
         }
-      : undefined,
+      : publicServerEnv(process.env),
   },
-  projects: [
-    { name: 'public', testMatch: /tests\/infrastructure\.spec\.ts/ },
-    ...(hasDatabaseEnvironment
-      ? [
-          { name: 'db-setup', testMatch: /global\.setup\.ts/ },
-          {
-            name: 'db',
-            dependencies: ['db-setup'],
-            testMatch: /tests\/fixtures\.spec\.ts/,
-          },
-        ]
-      : []),
-  ],
+  projects: projectDefinitions(process.env),
 });

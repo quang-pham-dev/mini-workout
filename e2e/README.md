@@ -42,8 +42,15 @@ resolve to `localhost`, `127.0.0.1`, or `[::1]`, and use exactly one of these da
 merely contain `test` or `e2e` are rejected. The canonical URL is propagated to
 Prisma migrate, seed, fixture setup, and the Next web server.
 
+Public-only startup receives an explicit sanitized environment with database
+variables blocked by a loopback port that cannot connect to a real database.
+
 The E2E server always starts fresh and never reuses an already-running Next
 server, preventing a database-backed run from using a different `DATABASE_URL`.
+
+Lock, auth-state, and metadata paths are keyed by a SHA-256 hash of the
+canonical database URL. Teardown reads only the metadata for its own run.
+Incomplete and permission-protected locks are retained as live or unknown.
 
 Install the pinned Chromium browser before the first run:
 

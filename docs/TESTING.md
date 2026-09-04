@@ -72,7 +72,10 @@ E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DA
 
 Approved local hosts include `localhost`, `127.0.0.1`, and `[::1]`. The E2E
 configuration always starts a fresh Next server, so it cannot reuse a server
-started with a different database URL.
+started with a different database URL. Public-only startup passes an explicit
+sanitized environment and blocks inherited database and auth settings. Lock,
+auth-state, and metadata paths are keyed by a hash of the canonical database
+URL, and teardown reads only the metadata for the current approved URL.
 
 Install the pinned Chromium browser before the first run:
 
