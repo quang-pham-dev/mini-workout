@@ -5,7 +5,10 @@ import {
   releaseDatabaseLock,
 } from './fixtures/database-lock.ts';
 import { cleanupDatabase } from './fixtures/database.ts';
-import { parseFixtureMetadata } from './fixtures/metadata.ts';
+import {
+  parseFixtureMetadata,
+  removeFixtureMetadataIfOwned,
+} from './fixtures/metadata.ts';
 import { withFixtureTeardown } from './fixtures/setup-lifecycle.ts';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -60,8 +63,11 @@ export default async function globalTeardown() {
               cleanupDatabase(databaseUrl),
             )
           : undefined,
+      () =>
+        ownsLock && token !== undefined
+          ? removeFixtureMetadataIfOwned(lockFile, key, token)
+          : undefined,
       () => (ownsLock ? releaseDatabaseLock(databaseUrl, token) : undefined),
-      () => rmSync(lockFile, { force: true }),
     );
   } catch (error) {
     cleanupError = error;

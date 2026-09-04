@@ -1,7 +1,15 @@
 import { cleanupDatabaseIfOwned } from '../global.teardown.ts';
+import { removeFixtureMetadataIfOwned } from './metadata.ts';
 import { withFixtureSetup, withFixtureTeardown } from './setup-lifecycle.ts';
 import { strict as assert } from 'node:assert';
-import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -54,7 +62,7 @@ test('attempts metadata removal and release even when earlier cleanup fails', as
     ),
     (error) => error === setupError,
   );
-  assert.deepEqual(events, ['release', 'metadata']);
+  assert.deepEqual(events, ['metadata', 'release']);
 });
 
 test('teardown attempts every cleanup and preserves the first cleanup error', async () => {
@@ -79,7 +87,7 @@ test('teardown attempts every cleanup and preserves the first cleanup error', as
     ),
     (error) => error === cleanupError,
   );
-  assert.deepEqual(events, ['auth', 'database', 'release', 'metadata']);
+  assert.deepEqual(events, ['auth', 'database', 'metadata', 'release']);
 });
 
 test('does not clean database records when another owner holds the canonical lock', async () => {
@@ -115,4 +123,55 @@ test('does not clean database records when setup never acquired a lock', async (
     },
   );
   assert.equal(cleaned, false);
+});
+
+test('removes metadata only when both key and token match', () => {
+  const root = mkdtempSync(join(tmpdir(), 'mini-workout-setup-test-'));
+  const metadataPath = join(root, 'metadata.json');
+  const key = 'a'.repeat(64);
+  const token = '123e4567-e89b-12d3-a456-426614174000';
+
+  try {
+    writeFileSync(metadataPath, JSON.stringify({ key, token }));
+    removeFixtureMetadataIfOwned(
+      metadataPath,
+      key,
+      '123e4567-e89b-12d3-a456-426614174001',
+    );
+    assert.deepEqual(JSON.parse(readFileSync(metadataPath, 'utf8')), {
+      key,
+      token,
+    });
+    removeFixtureMetadataIfOwned(metadataPath, key, token);
+    assert.equal(existsSync(metadataPath), false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('does not remove newer metadata published after owned cleanup', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'mini-workout-setup-test-'));
+  const metadataPath = join(root, 'metadata.json');
+  const key = 'a'.repeat(64);
+  const oldToken = '123e4567-e89b-12d3-a456-426614174000';
+  const newToken = '123e4567-e89b-12d3-a456-426614174001';
+
+  try {
+    writeFileSync(metadataPath, JSON.stringify({ key, token: oldToken }));
+    await withFixtureTeardown(
+      () => undefined,
+      () => undefined,
+      () => {
+        assert.equal(existsSync(metadataPath), false);
+        writeFileSync(metadataPath, JSON.stringify({ key, token: newToken }));
+      },
+      () => removeFixtureMetadataIfOwned(metadataPath, key, oldToken),
+    );
+    assert.deepEqual(JSON.parse(readFileSync(metadataPath, 'utf8')), {
+      key,
+      token: newToken,
+    });
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

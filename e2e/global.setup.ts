@@ -8,11 +8,14 @@ import {
   prepareDatabase,
   testUsers,
 } from './fixtures/database.ts';
-import { fixtureMetadata } from './fixtures/metadata.ts';
+import {
+  fixtureMetadata,
+  removeFixtureMetadataIfOwned,
+} from './fixtures/metadata.ts';
 import { withFixtureSetup } from './fixtures/setup-lifecycle.ts';
 import { request, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const baseURL = 'http://localhost:3001';
@@ -36,7 +39,7 @@ test('prepare deterministic database fixtures', async () => {
 
   await withFixtureSetup(
     authDirectory,
-    () => rmSync(metadataPath, { force: true }),
+    () => removeFixtureMetadataIfOwned(metadataPath, key, lock.token),
     lock.release,
     async () => {
       mkdirSync(authDirectory, { recursive: true });

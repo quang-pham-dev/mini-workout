@@ -29,8 +29,8 @@ export async function withFixtureTeardown(
   for (const cleanup of [
     removeAuth,
     cleanupDatabase,
-    release,
     removeMetadata,
+    release,
   ]) {
     try {
       await cleanup();

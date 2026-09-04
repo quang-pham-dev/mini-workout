@@ -1,4 +1,5 @@
 import { databaseRunKey } from './database-lock.ts';
+import { readFileSync, rmSync } from 'node:fs';
 
 export type FixtureMetadata = { key: string; token: string };
 const keyPattern = /^[0-9a-f]{64}$/;
@@ -30,4 +31,20 @@ export function parseFixtureMetadata(
   )
     throw new Error('E2E fixture metadata is malformed');
   return { key: metadata.key, token: metadata.token };
+}
+
+export function removeFixtureMetadataIfOwned(
+  path: string,
+  expectedKey: string,
+  token: string,
+): void {
+  try {
+    const metadata = parseFixtureMetadata(
+      JSON.parse(readFileSync(path, 'utf8')),
+      expectedKey,
+    );
+    if (metadata.token === token) rmSync(path, { force: true });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+  }
 }

@@ -16,6 +16,7 @@ import {
   readdirSync,
   rmSync,
   symlinkSync,
+  utimesSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -78,7 +79,7 @@ for (const [name, owner] of [
   ['missing pid', { token: 'token' }],
   ['non-positive pid', { pid: 0, token: 'token' }],
   ['fractional pid', { pid: 1.5, token: 'token' }],
-  ['empty token', { pid: 123, token: ' ' }],
+  ['empty token', { pid: 123, token: '' }],
 ] as const) {
   test(`does not take over a lock with ${name}`, () => {
     const lockDirectory = mkdtempSync(
@@ -103,6 +104,60 @@ for (const [name, owner] of [
     }
   });
 }
+
+test('preserves a lock when its owner process status is unknown', () => {
+  const lockDirectory = mkdtempSync(join(tmpdir(), 'mini-workout-lock-test-'));
+  const databaseUrl =
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
+  const path = lockPathForDatabase(databaseUrl, lockDirectory);
+  const token = '123e4567-e89b-12d3-a456-426614174000';
+
+  try {
+    mkdirSync(join(path, token), { recursive: true });
+    writeFileSync(
+      join(path, token, 'owner'),
+      JSON.stringify({ pid: 123, token }),
+    );
+    assert.throws(
+      () =>
+        acquireDatabaseLock(databaseUrl, lockDirectory, () => {
+          const error = new Error('probe failed') as NodeJS.ErrnoException;
+          error.code = 'EACCES';
+          throw error;
+        }),
+      /already in use|unknown/i,
+    );
+    assert.equal(existsSync(path), true);
+  } finally {
+    rmSync(lockDirectory, { recursive: true, force: true });
+  }
+});
+
+test('recovers an aged pending claim owned by a dead process', () => {
+  const lockDirectory = mkdtempSync(join(tmpdir(), 'mini-workout-lock-test-'));
+  const databaseUrl =
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
+  const path = lockPathForDatabase(databaseUrl, lockDirectory);
+
+  try {
+    mkdirSync(path);
+    writeFileSync(
+      join(path, 'pending'),
+      JSON.stringify({
+        pid: 2_147_483_647,
+        token: '123e4567-e89b-12d3-a456-426614174000',
+        createdAt: Date.now() - 60_000,
+      }),
+    );
+    const old = new Date(Date.now() - 60_000);
+    utimesSync(path, old, old);
+    const lock = acquireDatabaseLock(databaseUrl, lockDirectory);
+    lock.release();
+    assert.equal(existsSync(path), false);
+  } finally {
+    rmSync(lockDirectory, { recursive: true, force: true });
+  }
+});
 
 test('does not take over a valid lock when its owner is still running', () => {
   const lockDirectory = mkdtempSync(join(tmpdir(), 'mini-workout-lock-test-'));
