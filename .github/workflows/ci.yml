@@ -78,8 +78,14 @@ jobs:
       - name: Check documentation
         run: pnpm docs:check
 
+      - name: Check formatting
+        run: pnpm format
+
       - name: Run affected quality checks
         run: pnpm exec turbo run build lint check-types test --affected
+
+      - name: Run Storybook accessibility/static checks
+        run: pnpm --filter @mini-workout/storybook lint
 
       - name: Build Storybook
         run: pnpm --filter @mini-workout/storybook build

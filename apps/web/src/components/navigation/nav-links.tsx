@@ -3,6 +3,7 @@
 import { cn } from '@mini-workout/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -23,6 +24,7 @@ export function NavLinks({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const wasMobileMenuOpen = useRef(false);
   const isOnboarding = pathname?.startsWith('/onboarding');
 
   useEffect(() => {
@@ -53,9 +55,13 @@ export function NavLinks({
 
   useEffect(() => {
     if (!isMobileMenuOpen) {
-      triggerRef.current?.focus();
+      if (wasMobileMenuOpen.current) {
+        triggerRef.current?.focus();
+      }
+      wasMobileMenuOpen.current = false;
       return;
     }
+    wasMobileMenuOpen.current = true;
     closeRef.current?.focus();
     function trapFocus(event: KeyboardEvent) {
       if (event.key !== 'Tab' || !dialogRef.current) return;

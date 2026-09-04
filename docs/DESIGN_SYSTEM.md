@@ -33,13 +33,12 @@ Compatibility roles such as `card`, `muted`, `secondary`, `input`, and `ring`
 use `--color-*` Tailwind names registered from theme variables such as `--card`
 and `--ring`. They are explicit aliases, not a second product palette.
 
-## Theme Infrastructure
+## Theme Behavior
 
 Light is the default foundation theme, and dark values are defined under the
-`.dark` selector. Applying that selector and resolving system preference require
-the planned web theme infrastructure; the current web app does not yet provide a
-theme provider or claim to apply `.dark`. Both themes must retain identical
-semantic role coverage as that infrastructure is implemented.
+`.dark` selector. The web app implements `ThemeProvider`, which applies the
+resolved Light or Dark theme and responds to System preference changes. Both
+themes must retain identical semantic role coverage as the provider evolves.
 
 ## Typography
 
@@ -75,7 +74,11 @@ required menuitemradio semantics and keyboard focus behavior.
 
 Storybook imports `src/storybook.css`, its sole design-system CSS entrypoint.
 Shared components should document default, interactive, disabled, invalid, and
-theme-relevant states when applicable.
+theme-relevant states when applicable. The `addon-a11y` configuration is loaded
+with violations set to error; CI runs Storybook lint/static checks and the
+production build. A Storybook runtime test runner is not available in this
+workspace, and `addon-vitest` remains skipped because its browser dependencies
+are incompatible with the current Vite setup.
 
 ## Changing a Token
 
@@ -107,3 +110,7 @@ Tailwind variants. They remain available for consumers that define their own
 Product page styling uses Tailwind utilities and the design-system tokens. The
 current Geist font loading and fallback mapping is intentionally preserved for
 visual parity.
+
+The database-backed routes do not yet have route-level visual baselines. This is
+an explicit limitation; no database snapshots are fabricated until deterministic
+fixture data and reviewable baseline coverage are available.

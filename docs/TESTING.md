@@ -44,7 +44,9 @@ The Storybook 10 `addon-a11y` configuration uses `test: 'error'` for supported
 accessibility runs. The official `addon-vitest` browser integration is
 intentionally not enabled: the current Vite 8 setup has incompatible CommonJS
 browser dependencies. Story coverage therefore stays build-compatible until
-that dependency boundary is upgraded deliberately.
+that dependency boundary is upgraded deliberately. CI runs Storybook lint/static
+checks and the production build; there is no Storybook runtime test runner in
+this workspace.
 
 The design-system foundation has focused contract checks:
 
