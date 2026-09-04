@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  distDir: '.next-build',
+  distDir: '.next',
   reactCompiler: true,
   cacheComponents: true,
   partialPrefetching: true,
