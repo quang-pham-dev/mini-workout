@@ -20,9 +20,13 @@ CSS or DOM dependencies.
 ## Drift controls
 
 - Keep semantic names in `src/tokens.ts` and CSS variables aligned.
+- Keep compatibility aliases explicit in `@theme inline` and both theme files.
+- Keep every named `--animate-*` contract paired with a local keyframe.
 - Keep component variant maps typed with contract variants using TypeScript
   `satisfies` checks.
 - Run package type-check and build when token or contract names change.
+- Run `pnpm check-foundation` when token, theme, consumer, or CSS ownership
+  files change.
 - Prefer a single semantic concept over aliases with different names.
 - When the native project begins, introduce generation or a manifest only if
   manual synchronization becomes a measured maintenance problem.

@@ -41,6 +41,16 @@ pnpm --filter @mini-workout/storybook build
 
 Stories live beside components under `packages/ui/src/components`.
 
+The design-system foundation has focused contract checks:
+
+```bash
+pnpm --filter @mini-workout/design-system test
+pnpm --filter @mini-workout/design-system check-foundation
+```
+
+These cover token registration, Light/Dark parity, shared keyframes, consumer
+token references, and global CSS ownership.
+
 ### End-to-end tests
 
 The `e2e/` workspace contains the Playwright configuration and a runnable

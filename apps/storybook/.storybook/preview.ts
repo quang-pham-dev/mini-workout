@@ -1,4 +1,4 @@
-import '@mini-workout/ui/styles.css';
+import '../src/storybook.css';
 import type { Preview } from '@storybook/react';
 
 const applyThemeClass = (theme: 'light' | 'dark' | 'system') => {

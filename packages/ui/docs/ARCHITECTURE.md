@@ -29,7 +29,8 @@ instead of the main barrel so simple consumers do not pay for table behavior.
 
 Components use semantic design-system utilities. Avoid raw brand colors and
 one-off spacing values when a semantic token exists. Global styles are imported
-by the consuming web application once.
+by the consuming web application once. This package must not export or import a
+global design-system stylesheet.
 
 ## Build and API
 

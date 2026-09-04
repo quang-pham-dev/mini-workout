@@ -34,25 +34,25 @@
   --color-highlight-foreground: oklch(0.16 0.02 60);
 
   /* Component-specific colors (shadcn/ui compatibility) */
-  --color-card: oklch(0.14 0.008 250);
-  --color-card-foreground: oklch(0.99 0 0);
+  --card: oklch(0.14 0.008 250);
+  --card-foreground: oklch(0.99 0 0);
 
-  --color-popover: oklch(0.14 0.008 250);
-  --color-popover-foreground: oklch(0.99 0 0);
+  --popover: oklch(0.14 0.008 250);
+  --popover-foreground: oklch(0.99 0 0);
 
-  --color-secondary: oklch(0.2 0.012 250);
-  --color-secondary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.2 0.012 250);
+  --secondary-foreground: oklch(0.99 0 0);
 
-  --color-muted: oklch(0.2 0.012 250);
-  --color-muted-foreground: oklch(0.73 0.016 250);
+  --muted: oklch(0.2 0.012 250);
+  --muted-foreground: oklch(0.73 0.016 250);
 
-  --color-accent: oklch(0.2 0.012 250);
-  --color-accent-foreground: oklch(0.99 0 0);
+  --accent: oklch(0.2 0.012 250);
+  --accent-foreground: oklch(0.99 0 0);
 
-  --color-destructive: var(--color-error-400);
-  --color-destructive-foreground: oklch(0.99 0 0);
+  --destructive: var(--color-error-400);
+  --destructive-foreground: oklch(0.99 0 0);
 
-  --color-input: oklch(0.28 0.015 250);
-  --color-ring: var(--color-brand-400);
-  --color-ring-offset: oklch(0.14 0.008 250);
+  --input: oklch(0.28 0.015 250);
+  --ring: var(--color-brand-400);
+  --ring-offset: oklch(0.14 0.008 250);
 }

@@ -34,7 +34,9 @@
     "clean": "git clean -xdf .cache .turbo node_modules",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config"
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@tailwindcss/postcss": "catalog:ui-styling",
@@ -48,7 +50,9 @@
     "eslint": "catalog:",
     "prettier": "catalog:",
     "tsup": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "vitest": "catalog:test-unit"
   },
   "prettier": "@mini-workout/prettier-config/base"
 }

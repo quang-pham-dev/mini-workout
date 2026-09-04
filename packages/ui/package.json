@@ -37,16 +37,12 @@
       "types": "./dist/data-table.d.ts",
       "import": "./dist/data-table.mjs",
       "require": "./dist/data-table.js"
-    },
-    "./styles.css": "./src/styles/globals.css"
+    }
   },
   "files": [
-    "dist",
-    "src/styles/globals.css"
+    "dist"
   ],
-  "sideEffects": [
-    "src/styles/globals.css"
-  ],
+  "sideEffects": false,
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

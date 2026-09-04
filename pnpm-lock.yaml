@@ -509,6 +509,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
+      '@vitest/coverage-v8':
+        specifier: catalog:test-unit
+        version: 3.2.7(vitest@3.2.7)
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@2.7.0)
@@ -521,6 +524,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
+      vitest:
+        specifier: catalog:test-unit
+        version: 3.2.7(@types/debug@4.1.13)(@types/node@22.15.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0(@noble/hashes@2.3.0))(lightningcss@1.33.0)(tsx@4.23.12)(yaml@2.9.0)
 
   packages/observability:
     devDependencies:

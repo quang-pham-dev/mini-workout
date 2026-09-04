@@ -29,6 +29,23 @@ export const semanticTokens = {
     highlightForeground: 'highlight-foreground',
     ring: 'ring',
   },
+  compatibilityColor: {
+    card: 'card',
+    cardForeground: 'card-foreground',
+    popover: 'popover',
+    popoverForeground: 'popover-foreground',
+    secondary: 'secondary',
+    secondaryForeground: 'secondary-foreground',
+    muted: 'muted',
+    mutedForeground: 'muted-foreground',
+    accent: 'accent',
+    accentForeground: 'accent-foreground',
+    destructive: 'destructive',
+    destructiveForeground: 'destructive-foreground',
+    input: 'input',
+    ring: 'ring',
+    ringOffset: 'ring-offset',
+  },
   spacing: {
     inline: '4',
     control: '10',
@@ -49,6 +66,9 @@ export const semanticTokens = {
 
 export type SemanticColorToken =
   (typeof semanticTokens.color)[keyof typeof semanticTokens.color];
+export type CompatibilityColorToken =
+  (typeof semanticTokens.compatibilityColor)[keyof typeof semanticTokens.compatibilityColor];
+export type PublicColorToken = SemanticColorToken | CompatibilityColorToken;
 export type SemanticSpacingToken =
   (typeof semanticTokens.spacing)[keyof typeof semanticTokens.spacing];
 export type SemanticRadiusToken =
@@ -56,6 +76,6 @@ export type SemanticRadiusToken =
 export type SemanticTypographyToken =
   (typeof semanticTokens.typography)[keyof typeof semanticTokens.typography];
 
-export function getCssVariable(token: SemanticColorToken): string {
+export function getCssVariable(token: PublicColorToken): string {
   return `var(--color-${token})`;
 }

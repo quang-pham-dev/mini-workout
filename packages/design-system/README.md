@@ -4,6 +4,9 @@ Shared semantic design tokens, component contracts, Tailwind CSS v4 web
 adapters, themes, utilities, and PostCSS configuration for the Mini Workout
 monorepo.
 
+This package owns the styling foundation. Apps import `./globals` once; the UI
+package only supplies React renderers and never imports global CSS.
+
 ## Package exports
 
 - `@mini-workout/design-system` — global CSS entrypoint.
@@ -16,6 +19,10 @@ monorepo.
   and types.
 - `@mini-workout/design-system/contracts` — shared component names, variants,
   and accessibility expectations.
+
+See [`docs/DESIGN_SYSTEM.md`](../../docs/DESIGN_SYSTEM.md) for the monorepo
+contract and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for package
+ownership and drift controls.
 
 ## Usage
 
@@ -104,6 +111,8 @@ dependencies.
   code contracts.
 - Prefer semantic tokens over raw color and spacing values in web components.
 - Update both light and dark themes when adding semantic tokens.
+- Register compatibility aliases in `@theme inline` and both theme files.
+- Pair every named `--animate-*` contract with a local keyframe.
 - Keep Tailwind v4 `@theme`, `@utility`, and `@custom-variant` declarations at
   the appropriate top level.
 - Use `@source` in application CSS when classes are consumed from workspace
