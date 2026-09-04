@@ -1,4 +1,3 @@
-import styles from './app-header.module.css';
 import { NavLinks, NavLinksFallback } from './nav-links';
 import { ThemeToggle } from '@/components/theme/theme';
 import { getInitials } from '@/lib/auth/initials';
@@ -21,13 +20,16 @@ async function HeaderSessionNav() {
 
 export function AppHeader() {
   return (
-    <header className={styles.header}>
-      <div className={styles.container}>
-        <Link className={styles.brand} href="/home">
+    <header className="sticky top-0 z-50 w-full border-b border-border-subtle bg-[color-mix(in_oklch,var(--color-background)_85%,transparent)] backdrop-blur-[16px]">
+      <div className="mx-auto flex max-w-[76rem] items-center justify-between px-[clamp(1rem,5vw,5rem)] py-[0.9rem]">
+        <Link
+          className="font-display text-[1.15rem] font-extrabold tracking-[-0.04em] text-text-primary no-underline transition-opacity hover:opacity-85"
+          href="/home"
+        >
           mini / workout
         </Link>
 
-        <div className={styles.headerActions}>
+        <div className="flex items-center gap-3">
           <ThemeToggle />
           <Suspense fallback={<NavLinksFallback />}>
             <HeaderSessionNav />

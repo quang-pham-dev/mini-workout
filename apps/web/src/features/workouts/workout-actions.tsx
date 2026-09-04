@@ -1,8 +1,7 @@
 'use client';
 
 import { toggleWorkoutFavorite, toggleWorkoutLike } from './actions';
-import styles from './workout-actions.module.css';
-import { Button } from '@mini-workout/ui';
+import { Button, cn } from '@mini-workout/ui';
 import { useState, useTransition } from 'react';
 
 export function WorkoutActions({
@@ -49,9 +48,13 @@ export function WorkoutActions({
   }
 
   return (
-    <div className={styles.actions} aria-label="Workout actions">
+    <div className="mt-4 flex items-center gap-2" aria-label="Workout actions">
       <Button
-        className={`${styles.action} ${isLiked ? styles.active : ''}`}
+        className={cn(
+          'inline-flex min-h-9 items-center gap-[0.35rem] rounded-full border border-border-default bg-surface px-[0.7rem] py-[0.45rem] text-[0.8rem] text-text-secondary transition-[border-color,background-color,color] duration-[160ms] enabled:hover:border-border-strong enabled:hover:text-text-primary disabled:cursor-wait disabled:opacity-65 motion-reduce:transition-none focus-visible:[outline:3px_solid_color-mix(in_oklch,var(--color-ring)_38%,transparent)] focus-visible:outline-offset-2',
+          isLiked &&
+            '!border-highlight !bg-highlight-soft !text-highlight-foreground enabled:hover:!border-highlight enabled:hover:!text-highlight-foreground',
+        )}
         type="button"
         variant="outline"
         size="sm"
@@ -64,7 +67,11 @@ export function WorkoutActions({
         <span>{likes}</span>
       </Button>
       <Button
-        className={`${styles.action} ${isFavorited ? styles.active : ''}`}
+        className={cn(
+          'inline-flex min-h-9 items-center gap-[0.35rem] rounded-full border border-border-default bg-surface px-[0.7rem] py-[0.45rem] text-[0.8rem] text-text-secondary transition-[border-color,background-color,color] duration-[160ms] enabled:hover:border-border-strong enabled:hover:text-text-primary disabled:cursor-wait disabled:opacity-65 motion-reduce:transition-none focus-visible:[outline:3px_solid_color-mix(in_oklch,var(--color-ring)_38%,transparent)] focus-visible:outline-offset-2',
+          isFavorited &&
+            '!border-highlight !bg-highlight-soft !text-highlight-foreground enabled:hover:!border-highlight enabled:hover:!text-highlight-foreground',
+        )}
         type="button"
         variant="outline"
         size="sm"
@@ -78,7 +85,7 @@ export function WorkoutActions({
         <span aria-hidden="true">{isFavorited ? '★' : '☆'}</span>
         <span>{isFavorited ? 'Saved' : 'Save'}</span>
       </Button>
-      <span className={styles.status} aria-live="polite">
+      <span className="min-w-14 text-xs text-text-tertiary" aria-live="polite">
         {isPending ? 'Saving…' : ''}
       </span>
     </div>

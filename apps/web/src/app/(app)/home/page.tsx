@@ -4,36 +4,45 @@ import {
   LatestSection,
   RecommendedSection,
 } from './home-sections';
-import styles from './home.module.css';
 import { HomeFeedSkeleton } from '@/components/skeletons/home-feed-skeleton';
 import { Suspense } from 'react';
 
 export default function HomePage() {
   return (
-    <main className={styles.page}>
-      <div className={styles.shell}>
+    <main className="min-h-[100svh] bg-background px-[clamp(1rem,5vw,5rem)] py-[clamp(2rem,7vw,6rem)] text-text-primary">
+      <div className="mx-auto max-w-[76rem]">
         <Suspense fallback={<HeroFallback />}>
           <Hero />
         </Suspense>
 
-        <section className={styles.section} aria-labelledby="recommended-title">
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle} id="recommended-title">
+        <section className="mt-12" aria-labelledby="recommended-title">
+          <div className="mb-4 flex items-center justify-between">
+            <h2
+              className="m-0 text-[1.35rem] tracking-[-0.03em]"
+              id="recommended-title"
+            >
               For your week
             </h2>
-            <span className={styles.sectionNote}>Based on your focus</span>
+            <span className="text-[0.85rem] text-text-tertiary">
+              Based on your focus
+            </span>
           </div>
           <Suspense fallback={<HomeFeedSkeleton count={3} />}>
             <RecommendedSection />
           </Suspense>
         </section>
 
-        <section className={styles.section} aria-labelledby="latest-title">
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle} id="latest-title">
+        <section className="mt-12" aria-labelledby="latest-title">
+          <div className="mb-4 flex items-center justify-between">
+            <h2
+              className="m-0 text-[1.35rem] tracking-[-0.03em]"
+              id="latest-title"
+            >
               Fresh sessions
             </h2>
-            <span className={styles.sectionNote}>New in the library</span>
+            <span className="text-[0.85rem] text-text-tertiary">
+              New in the library
+            </span>
           </div>
           <Suspense fallback={<HomeFeedSkeleton count={6} />}>
             <LatestSection />

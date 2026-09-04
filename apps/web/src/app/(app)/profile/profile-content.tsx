@@ -1,4 +1,3 @@
-import styles from './profile.module.css';
 import { auth } from '@/auth';
 import { getInitials } from '@/lib/auth/initials';
 import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
@@ -50,73 +49,110 @@ export async function ProfileContent() {
 
   return (
     <>
-      <header className={styles.header}>
-        <div className={styles.avatar} aria-hidden="true">
+      <header className="mb-8 flex items-center gap-6 border-b border-border-subtle pb-8 max-[640px]:flex-col max-[640px]:items-start">
+        <div
+          className="grid size-[4.5rem] shrink-0 place-items-center rounded-full border-2 border-border-subtle bg-surface-sunken font-display text-[1.75rem] font-bold tracking-[-0.02em]"
+          aria-hidden="true"
+        >
           {initials}
         </div>
-        <div className={styles.userInfo}>
-          <h1 className={styles.name}>{userFull.name}</h1>
-          <p className={styles.email}>{userFull.email}</p>
-          <span className={styles.joined}>Member since {memberSince}</span>
+        <div className="flex flex-col gap-1">
+          <h1 className="font-display text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold leading-[1.1] tracking-[-0.04em]">
+            {userFull.name}
+          </h1>
+          <p className="text-[0.95rem] text-text-secondary">{userFull.email}</p>
+          <span className="text-[0.8rem] text-text-tertiary">
+            Member since {memberSince}
+          </span>
         </div>
       </header>
 
-      <div className={styles.grid}>
-        <section className={styles.card} aria-labelledby="activity-title">
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle} id="activity-title">
+      <div className="flex flex-col gap-6">
+        <section
+          className="rounded-[1.25rem] border border-border-subtle bg-surface p-6"
+          aria-labelledby="activity-title"
+        >
+          <div className="mb-5 flex items-center justify-between">
+            <h2
+              className="text-[1.15rem] font-semibold tracking-[-0.02em]"
+              id="activity-title"
+            >
               Your Activity
             </h2>
           </div>
-          <div className={styles.statsRow}>
-            <div className={styles.statBox}>
-              <span className={styles.statValue}>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1 rounded-[0.875rem] bg-surface-sunken p-5">
+              <span className="font-display text-[1.85rem] font-bold tracking-[-0.03em]">
                 {userFull._count.favorites}
               </span>
-              <span className={styles.statLabel}>Saved Sessions</span>
+              <span className="text-[0.825rem] text-text-secondary">
+                Saved Sessions
+              </span>
             </div>
-            <div className={styles.statBox}>
-              <span className={styles.statValue}>{userFull._count.likes}</span>
-              <span className={styles.statLabel}>Liked Workouts</span>
+            <div className="flex flex-col gap-1 rounded-[0.875rem] bg-surface-sunken p-5">
+              <span className="font-display text-[1.85rem] font-bold tracking-[-0.03em]">
+                {userFull._count.likes}
+              </span>
+              <span className="text-[0.825rem] text-text-secondary">
+                Liked Workouts
+              </span>
             </div>
           </div>
         </section>
 
-        <section className={styles.card} aria-labelledby="preferences-title">
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle} id="preferences-title">
+        <section
+          className="rounded-[1.25rem] border border-border-subtle bg-surface p-6"
+          aria-labelledby="preferences-title"
+        >
+          <div className="mb-5 flex items-center justify-between">
+            <h2
+              className="text-[1.15rem] font-semibold tracking-[-0.02em]"
+              id="preferences-title"
+            >
               Movement Focus
             </h2>
-            <Link className={styles.cardAction} href="/onboarding">
+            <Link
+              className="text-[0.85rem] font-semibold text-highlight-foreground no-underline hover:underline"
+              href="/onboarding"
+            >
               Edit
             </Link>
           </div>
 
-          <div className={styles.preferenceRow}>
-            <span className={styles.preferenceLabel}>Experience Level</span>
-            <span className={styles.levelBadge}>
+          <div className="flex items-center justify-between py-3 [&:not(:last-child)]:border-b [&:not(:last-child)]:border-border-subtle">
+            <span className="text-[0.9rem] text-text-secondary">
+              Experience Level
+            </span>
+            <span className="inline-flex items-center rounded-full bg-[color-mix(in_oklch,var(--color-highlight)_15%,transparent)] px-[0.85rem] py-[0.35rem] text-[0.825rem] font-bold capitalize text-highlight-foreground">
               {userFull.experienceLevel?.toLowerCase() || 'beginner'}
             </span>
           </div>
 
-          <div className={styles.preferenceRow}>
-            <span className={styles.preferenceLabel}>Selected Interests</span>
-            <div className={styles.tagGroup}>
+          <div className="flex items-center justify-between py-3 [&:not(:last-child)]:border-b [&:not(:last-child)]:border-border-subtle">
+            <span className="text-[0.9rem] text-text-secondary">
+              Selected Interests
+            </span>
+            <div className="flex flex-wrap gap-2">
               {userFull.interests.length > 0 ? (
                 userFull.interests.map(({ interest }) => (
-                  <span key={interest.id} className={styles.tag}>
+                  <span
+                    key={interest.id}
+                    className="inline-flex items-center rounded-full border border-border-subtle bg-surface-sunken px-[0.85rem] py-[0.35rem] text-[0.825rem] font-medium"
+                  >
                     {interest.name}
                   </span>
                 ))
               ) : (
-                <span className={styles.tag}>None selected</span>
+                <span className="inline-flex items-center rounded-full border border-border-subtle bg-surface-sunken px-[0.85rem] py-[0.35rem] text-[0.825rem] font-medium">
+                  None selected
+                </span>
               )}
             </div>
           </div>
         </section>
 
-        <div className={styles.signOutSection}>
-          <span className={styles.signOutNotice}>
+        <div className="mt-8 flex items-center justify-between border-t border-border-subtle pt-6 max-[640px]:flex-col max-[640px]:items-start max-[640px]:gap-4">
+          <span className="text-[0.85rem] text-text-tertiary">
             Signed in as {userFull.email}
           </span>
           <form
@@ -125,7 +161,10 @@ export async function ProfileContent() {
               await auth.api.signOut({ headers: await headers() });
             }}
           >
-            <button className={styles.signOutBtn} type="submit">
+            <button
+              className="rounded-full border border-border-default bg-surface px-5 py-[0.6rem] text-sm font-medium text-text-secondary transition-[background-color,color,border-color] hover:border-border-strong hover:bg-surface-sunken hover:text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
+              type="submit"
+            >
               Sign out
             </button>
           </form>

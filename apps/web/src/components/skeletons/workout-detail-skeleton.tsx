@@ -1,38 +1,15 @@
-import styles from './skeleton.module.css';
-
 export function WorkoutDetailSkeleton() {
   return (
     <div aria-hidden>
-      <div className={`${styles.shimmer} ${styles.media}`} />
-      <div
-        className={`${styles.shimmer} ${styles.line}`}
-        style={{ width: '30%', marginTop: 24 }}
-      />
-      <div
-        className={`${styles.shimmer} ${styles.titleLine}`}
-        style={{ width: '70%' }}
-      />
-      <div
-        className={`${styles.shimmer} ${styles.line}`}
-        style={{ width: '95%' }}
-      />
-      <div
-        className={`${styles.shimmer} ${styles.line}`}
-        style={{ width: '85%' }}
-      />
-      <div className={`${styles.shimmer} ${styles.metaRow}`}>
-        <div
-          className={`${styles.shimmer} ${styles.line}`}
-          style={{ width: 80 }}
-        />
-        <div
-          className={`${styles.shimmer} ${styles.line}`}
-          style={{ width: 60 }}
-        />
-        <div
-          className={`${styles.shimmer} ${styles.line}`}
-          style={{ width: 100 }}
-        />
+      <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none aspect-[3/2] w-full" />
+      <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none my-2 h-3 w-[30%]" />
+      <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none my-2.5 h-6 w-[70%]" />
+      <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none my-2 h-3 w-[95%]" />
+      <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none my-2 h-3 w-[85%]" />
+      <div className="flex gap-3">
+        <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none my-2 h-3 w-[80px]" />
+        <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none my-2 h-3 w-[60px]" />
+        <div className="animate-shimmer rounded-lg bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none my-2 h-3 w-[100px]" />
       </div>
     </div>
   );

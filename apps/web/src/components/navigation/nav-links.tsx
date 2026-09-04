@@ -1,9 +1,9 @@
 'use client';
 
-import styles from './app-header.module.css';
+import { cn } from '@mini-workout/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 type NavLinksProps = {
@@ -20,6 +20,9 @@ export function NavLinks({
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const isOnboarding = pathname?.startsWith('/onboarding');
 
   useEffect(() => {
@@ -48,6 +51,32 @@ export function NavLinks({
     }
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      triggerRef.current?.focus();
+      return;
+    }
+    closeRef.current?.focus();
+    function trapFocus(event: KeyboardEvent) {
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled])',
+      );
+      if (!focusable.length) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener('keydown', trapFocus);
+    return () => document.removeEventListener('keydown', trapFocus);
+  }, [isMobileMenuOpen]);
+
   if (isOnboarding) {
     return null;
   }
@@ -57,104 +86,140 @@ export function NavLinks({
   const isProfile = pathname?.startsWith('/profile');
 
   const mobileModal =
-    isMobileMenuOpen && mounted ? (
-      createPortal(
-        <div
-          className={styles.fullscreenMenu}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mobile Navigation"
-        >
-          <div className={styles.fullscreenHeader}>
-            <Link
-              className={styles.brand}
-              href="/home"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              mini / workout
-            </Link>
-            <button
-              className={styles.closeBtn}
-              type="button"
-              aria-label="Close navigation menu"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className={styles.menuBody}>
-            <span className={styles.menuLabel}>Menu</span>
-            <nav className={styles.menuList}>
+    isMobileMenuOpen && mounted
+      ? createPortal(
+          <div
+            ref={dialogRef}
+            className="fixed inset-0 z-[9999] flex h-[100dvh] min-h-screen w-screen flex-col justify-between overflow-y-auto overscroll-contain bg-background p-[clamp(1.25rem,5vw,2.5rem)] animate-mobile-menu-in motion-reduce:animate-none"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile Navigation"
+          >
+            <div className="flex items-center justify-between pb-6">
               <Link
-                className={`${styles.menuItem} ${isHome ? styles.active : ''}`}
+                className="font-display text-[1.15rem] font-extrabold tracking-[-0.04em] text-text-primary no-underline"
                 href="/home"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <span>Home</span>
-                <span className={styles.menuChevron} aria-hidden="true">
-                  ›
-                </span>
+                mini / workout
               </Link>
-              <Link
-                className={`${styles.menuItem} ${isFavourites ? styles.active : ''}`}
-                href="/favourites"
+              <button
+                ref={closeRef}
+                className="flex size-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-xl leading-none text-text-primary transition-[background-color,transform] hover:scale-105 hover:bg-surface-sunken focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
+                type="button"
+                aria-label="Close navigation menu"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <span>Favourites</span>
-                <span className={styles.menuChevron} aria-hidden="true">
-                  ›
-                </span>
-              </Link>
+                ✕
+              </button>
+            </div>
+
+            <div className="flex flex-1 flex-col justify-center py-8">
+              <span className="mb-6 text-[0.8rem] font-bold uppercase tracking-[0.14em] text-text-tertiary">
+                Menu
+              </span>
+              <nav className="flex flex-col gap-3">
+                <Link
+                  className={cn(
+                    'group flex items-center justify-between px-0 py-[0.6rem] font-display text-[clamp(2.25rem,8vw,3.25rem)] font-extrabold leading-[1.1] tracking-[-0.05em] text-text-primary no-underline transition-[transform,color]',
+                    isHome && 'translate-x-1 text-highlight-foreground',
+                  )}
+                  href="/home"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>Home</span>
+                  <span
+                    className="text-[1.5rem] font-normal text-text-tertiary transition-transform duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
+                    aria-hidden="true"
+                  >
+                    ›
+                  </span>
+                </Link>
+                <Link
+                  className={cn(
+                    'group flex items-center justify-between px-0 py-[0.6rem] font-display text-[clamp(2.25rem,8vw,3.25rem)] font-extrabold leading-[1.1] tracking-[-0.05em] text-text-primary no-underline transition-[transform,color]',
+                    isFavourites && 'translate-x-1 text-highlight-foreground',
+                  )}
+                  href="/favourites"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>Favourites</span>
+                  <span
+                    className="text-[1.5rem] font-normal text-text-tertiary transition-transform duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
+                    aria-hidden="true"
+                  >
+                    ›
+                  </span>
+                </Link>
+                <Link
+                  className={cn(
+                    'group flex items-center justify-between px-0 py-[0.6rem] font-display text-[clamp(2.25rem,8vw,3.25rem)] font-extrabold leading-[1.1] tracking-[-0.05em] text-text-primary no-underline transition-[transform,color]',
+                    isProfile && 'translate-x-1 text-highlight-foreground',
+                  )}
+                  href="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>Profile</span>
+                  <span
+                    className="text-[1.5rem] font-normal text-text-tertiary transition-transform duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
+                    aria-hidden="true"
+                  >
+                    ›
+                  </span>
+                </Link>
+              </nav>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 border-t border-border-subtle pt-6">
               <Link
-                className={`${styles.menuItem} ${isProfile ? styles.active : ''}`}
+                className="flex items-center gap-[0.85rem] text-text-primary no-underline"
                 href="/profile"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <span>Profile</span>
-                <span className={styles.menuChevron} aria-hidden="true">
-                  ›
-                </span>
+                <div
+                  className="flex size-[2.35rem] items-center justify-center rounded-full border-[1.5px] border-transparent bg-[color-mix(in_oklch,var(--color-highlight)_18%,transparent)] font-display text-[0.85rem] font-bold tracking-[-0.02em] text-highlight-foreground"
+                  aria-hidden="true"
+                >
+                  <span>{userInitials}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[0.95rem] font-bold tracking-[-0.02em]">
+                    {userName || 'Your Account'}
+                  </span>
+                  <span className="text-[0.8rem] text-text-tertiary">
+                    {userEmail || 'Manage Profile'}
+                  </span>
+                </div>
               </Link>
-            </nav>
-          </div>
-
-          <div className={styles.fullscreenFooter}>
-            <Link
-              className={styles.userSummary}
-              href="/profile"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <div className={styles.avatarCircle} aria-hidden="true">
-                <span>{userInitials}</span>
-              </div>
-              <div className={styles.userSummaryText}>
-                <span className={styles.userSummaryName}>
-                  {userName || 'Your Account'}
-                </span>
-                <span className={styles.userSummarySub}>
-                  {userEmail || 'Manage Profile'}
-                </span>
-              </div>
-            </Link>
-          </div>
-        </div>,
-        document.body,
-      )
-    ) : null;
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
     <>
       {/* Desktop Navigation Links */}
-      <nav className={styles.desktopNav} aria-label="Main Navigation">
+      <nav
+        className="flex items-center gap-2 max-[768px]:hidden"
+        aria-label="Main Navigation"
+      >
         <Link
-          className={`${styles.navLink} ${isHome ? styles.active : ''}`}
+          className={cn(
+            'relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline transition-[color,background-color,box-shadow] hover:bg-surface-sunken hover:text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+            isHome &&
+              'bg-surface-raised font-semibold text-text-primary shadow-[0_1px_3px_oklch(0_0_0/0.08)]',
+          )}
           href="/home"
         >
           Home
         </Link>
         <Link
-          className={`${styles.navLink} ${isFavourites ? styles.active : ''}`}
+          className={cn(
+            'relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline transition-[color,background-color,box-shadow] hover:bg-surface-sunken hover:text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+            isFavourites &&
+              'bg-surface-raised font-semibold text-text-primary shadow-[0_1px_3px_oklch(0_0_0/0.08)]',
+          )}
           href="/favourites"
         >
           Favourites
@@ -162,9 +227,13 @@ export function NavLinks({
       </nav>
 
       {/* Desktop Right Action: Circular 2-letter Avatar - Glo style */}
-      <div className={styles.desktopActions}>
+      <div className="flex items-center gap-3 max-[768px]:hidden">
         <Link
-          className={`${styles.avatarCircle} ${isProfile ? styles.active : ''}`}
+          className={cn(
+            'flex size-[2.35rem] items-center justify-center rounded-full border-[1.5px] border-transparent bg-[color-mix(in_oklch,var(--color-highlight)_18%,transparent)] font-display text-[0.85rem] font-bold tracking-[-0.02em] text-highlight-foreground no-underline transition-[transform,border-color,box-shadow] hover:scale-105 hover:border-border-strong hover:shadow-[0_2px_8px_oklch(0_0_0/0.1)] focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+            isProfile &&
+              'border-highlight shadow-[0_0_0_2px_color-mix(in_oklch,var(--color-highlight)_25%,transparent)]',
+          )}
           href="/profile"
           aria-label="View Profile"
           title={userName || 'Profile'}
@@ -175,16 +244,20 @@ export function NavLinks({
 
       {/* Mobile Hamburger Button */}
       <button
-        className={styles.hamburgerBtn}
+        ref={triggerRef}
+        className="hidden size-10 items-center justify-center rounded-lg border border-border-default bg-surface p-0 text-text-primary max-[768px]:inline-flex"
         type="button"
         aria-label="Open navigation menu"
         aria-expanded={isMobileMenuOpen}
         onClick={() => setIsMobileMenuOpen(true)}
       >
-        <span className={styles.hamburgerIcon} aria-hidden="true">
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
+        <span
+          className="flex h-4 w-5 flex-col items-center justify-center gap-1"
+          aria-hidden="true"
+        >
+          <span className="h-0.5 w-full rounded-sm bg-current" />
+          <span className="h-0.5 w-full rounded-sm bg-current" />
+          <span className="h-0.5 w-full rounded-sm bg-current" />
         </span>
       </button>
 
@@ -197,31 +270,46 @@ export function NavLinks({
 export function NavLinksFallback() {
   return (
     <>
-      <nav className={styles.desktopNav} aria-label="Main Navigation">
-        <Link className={styles.navLink} href="/home">
+      <nav
+        className="flex items-center gap-2 max-[768px]:hidden"
+        aria-label="Main Navigation"
+      >
+        <Link
+          className="relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline"
+          href="/home"
+        >
           Home
         </Link>
-        <Link className={styles.navLink} href="/favourites">
+        <Link
+          className="relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline"
+          href="/favourites"
+        >
           Favourites
         </Link>
       </nav>
 
-      <div className={styles.desktopActions}>
-        <div className={styles.avatarCircle} aria-hidden="true">
+      <div className="flex items-center gap-3 max-[768px]:hidden">
+        <div
+          className="flex size-[2.35rem] items-center justify-center rounded-full border-[1.5px] border-transparent bg-[color-mix(in_oklch,var(--color-highlight)_18%,transparent)] font-display text-[0.85rem] font-bold text-highlight-foreground"
+          aria-hidden="true"
+        >
           <span>ME</span>
         </div>
       </div>
 
       <button
-        className={styles.hamburgerBtn}
+        className="hidden size-10 items-center justify-center rounded-lg border border-border-default bg-surface p-0 text-text-primary max-[768px]:inline-flex"
         type="button"
         aria-label="Open navigation menu"
         disabled
       >
-        <span className={styles.hamburgerIcon} aria-hidden="true">
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
-          <span className={styles.hamburgerBar} />
+        <span
+          className="flex h-4 w-5 flex-col items-center justify-center gap-1"
+          aria-hidden="true"
+        >
+          <span className="h-0.5 w-full rounded-sm bg-current" />
+          <span className="h-0.5 w-full rounded-sm bg-current" />
+          <span className="h-0.5 w-full rounded-sm bg-current" />
         </span>
       </button>
     </>

@@ -1,4 +1,3 @@
-import styles from './workout-card.module.css';
 import { formatDuration } from './presentation';
 import { WorkoutActions } from './workout-actions';
 import type { ExperienceLevel } from '@prisma/client';
@@ -22,26 +21,35 @@ export type WorkoutCardData = {
 
 export function WorkoutCard({ workout }: { workout: WorkoutCardData }) {
   return (
-    <article className={styles.workoutCard}>
+    <article className="overflow-hidden rounded-2xl border border-border-subtle bg-surface transition-[border-color,box-shadow,transform] duration-[160ms] ease-[ease] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_1rem_2.5rem_oklch(0.2_0.02_250/0.08)] focus-within:[outline:3px_solid_color-mix(in_oklch,var(--color-ring)_38%,transparent)] focus-within:outline-offset-2 motion-reduce:transition-none">
       <Image
-        className={styles.thumbnail}
+        className="block aspect-[1.35] w-full bg-surface-sunken object-cover"
         src={workout.thumbnailUrl}
         alt=""
         width={1200}
         height={900}
       />
-      <div className={styles.cardBody}>
-        <div className={styles.cardMeta}>
-          <span className={styles.cardCategory}>{workout.category.name}</span>
+      <div className="p-4">
+        <div className="flex items-center justify-between gap-2 text-xs text-text-tertiary">
+          <span className="font-bold text-highlight-foreground">
+            {workout.category.name}
+          </span>
           <span>{formatDuration(workout.durationMinutes)}</span>
         </div>
-        <h3 className={styles.cardTitle}>
-          <Link className={styles.cardLink} href={`/workouts/${workout.slug}`}>
+        <h3 className="mt-[0.55rem] mb-[0.35rem] text-[1.05rem] tracking-[-0.025em]">
+          <Link
+            className="text-inherit no-underline"
+            href={`/workouts/${workout.slug}`}
+          >
             {workout.title}
           </Link>
         </h3>
-        <p className={styles.cardDescription}>{workout.description}</p>
-        <p className={styles.coach}>with {workout.coach.name}</p>
+        <p className="m-0 line-clamp-2 text-[0.85rem] leading-[1.5] text-text-secondary">
+          {workout.description}
+        </p>
+        <p className="mt-4 mb-0 text-[0.78rem] text-text-tertiary">
+          with {workout.coach.name}
+        </p>
         <WorkoutActions
           workoutId={workout.id}
           likeCount={workout._count.likes}
