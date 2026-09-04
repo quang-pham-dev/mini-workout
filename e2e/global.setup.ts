@@ -1,9 +1,5 @@
-import {
-  assertTestDatabase,
-  configureUser,
-  prepareDatabase,
-  testUsers,
-} from './fixtures/database';
+import { configureUser, prepareDatabase, testUsers } from './fixtures/database';
+import { resolveDatabaseUrl } from './fixtures/database-env';
 import { test } from '@playwright/test';
 import { request } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
@@ -14,22 +10,22 @@ const baseURL = 'http://localhost:3000';
 const authDirectory = fileURLToPath(new URL('./.auth', import.meta.url));
 
 test('prepare deterministic database fixtures', async () => {
-  const databaseUrl = process.env.E2E_DATABASE_URL ?? process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error(
-      'E2E setup requires E2E_DATABASE_URL or DATABASE_URL to be set to an approved disposable database',
-    );
-  }
-
-  assertTestDatabase(databaseUrl);
+  const databaseUrl = resolveDatabaseUrl(process.env);
+  const childEnv = {
+    ...process.env,
+    DATABASE_URL: databaseUrl,
+    E2E_DATABASE_URL: databaseUrl,
+  };
   execFileSync(
     'pnpm',
     ['--filter', '@mini-workout/web', 'exec', 'prisma', 'migrate', 'deploy'],
     {
+      env: childEnv,
       stdio: 'inherit',
     },
   );
   execFileSync('pnpm', ['--filter', '@mini-workout/web', 'db:seed'], {
+    env: childEnv,
     stdio: 'inherit',
   });
   await prepareDatabase(databaseUrl);

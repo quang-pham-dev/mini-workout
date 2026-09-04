@@ -1,3 +1,4 @@
+import { assertTestDatabase } from './database-env';
 import { createRequire } from 'node:module';
 
 const requireFromWeb = createRequire(
@@ -17,10 +18,6 @@ type DatabaseClient = {
   };
   $disconnect(): Promise<void>;
 };
-const { PrismaClient } = requireFromWeb('@prisma/client') as {
-  PrismaClient: new (options: { datasourceUrl: string }) => DatabaseClient;
-};
-
 export const testUsers = {
   active: { email: 'active-user@example.test', password: 'VisualTest123!' },
   empty: { email: 'empty-user@example.test', password: 'VisualTest123!' },
@@ -29,35 +26,18 @@ export const testUsers = {
 } as const;
 
 const testEmailDomain = '@example.test';
-const approvedHosts = new Set(['127.0.0.1', '::1', 'localhost']);
-const approvedDatabaseNames = new Set([
-  'e2e',
-  'mini_workout_e2e',
-  'mini_workout_test',
-  'test',
-]);
 
-export function assertTestDatabase(databaseUrl: string): void {
-  try {
-    const url = new URL(databaseUrl);
-    const databaseName = decodeURIComponent(url.pathname.slice(1));
-
-    if (
-      !['postgres:', 'postgresql:'].includes(url.protocol) ||
-      !approvedHosts.has(url.hostname) ||
-      !approvedDatabaseNames.has(databaseName)
-    ) {
-      throw new Error('not approved');
-    }
-  } catch {
-    throw new Error('E2E setup requires a disposable test database');
-  }
+function createPrisma(databaseUrl: string): DatabaseClient {
+  const { PrismaClient } = requireFromWeb('@prisma/client') as {
+    PrismaClient: new (options: { datasourceUrl: string }) => DatabaseClient;
+  };
+  return new PrismaClient({ datasourceUrl: databaseUrl });
 }
 
 export async function prepareDatabase(databaseUrl: string): Promise<void> {
   assertTestDatabase(databaseUrl);
 
-  const prisma = new PrismaClient({ datasourceUrl: databaseUrl });
+  const prisma = createPrisma(databaseUrl);
 
   try {
     await prisma.user.deleteMany({
@@ -79,7 +59,7 @@ export async function configureUser(
   },
 ): Promise<void> {
   assertTestDatabase(databaseUrl);
-  const prisma = new PrismaClient({ datasourceUrl: databaseUrl });
+  const prisma = createPrisma(databaseUrl);
 
   try {
     const user = await prisma.user.findUniqueOrThrow({ where: { email } });

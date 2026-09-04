@@ -1,4 +1,11 @@
+import { resolveDatabaseUrl } from './fixtures/database-env';
 import { defineConfig, devices } from '@playwright/test';
+
+const hasDatabaseEnvironment =
+  Boolean(process.env.E2E_DATABASE_URL) || Boolean(process.env.DATABASE_URL);
+const databaseUrl = hasDatabaseEnvironment
+  ? resolveDatabaseUrl(process.env)
+  : undefined;
 
 export default defineConfig({
   globalTeardown: './global.teardown.ts',
@@ -26,6 +33,17 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     url: 'http://localhost:3000/api/health',
+    env: databaseUrl
+      ? {
+          ...Object.fromEntries(
+            Object.entries(process.env).filter(
+              (entry): entry is [string, string] => entry[1] !== undefined,
+            ),
+          ),
+          DATABASE_URL: databaseUrl,
+          E2E_DATABASE_URL: databaseUrl,
+        }
+      : undefined,
   },
   projects: [
     {
