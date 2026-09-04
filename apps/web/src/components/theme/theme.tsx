@@ -75,6 +75,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key !== THEME_STORAGE_KEY) return;
+      try {
+        if (event.storageArea && event.storageArea !== localStorage) return;
+      } catch {
+        return;
+      }
       setThemeState(isTheme(event.newValue) ? event.newValue : 'light');
     };
     window.addEventListener('storage', handleStorage);
@@ -170,6 +175,7 @@ export function ThemeToggle() {
   }
 
   function moveFocusAfterTab(event: React.KeyboardEvent<HTMLDivElement>) {
+    event.preventDefault();
     const focusable = Array.from(
       document.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',

@@ -53,9 +53,9 @@ token references, and global CSS ownership.
 
 ### End-to-end tests
 
-The `e2e/` workspace contains the Playwright configuration and a runnable
-browser check for the public landing page. The default suite is public-only and
-does not require a database:
+The `e2e/` workspace contains the Playwright configuration and runnable browser
+checks for the public landing page and the DB-free `/theme-preview` route. The
+default suite is public-only and does not require a database:
 
 ```bash
 pnpm test:e2e
@@ -102,6 +102,13 @@ Additional E2E coverage should prioritize user-visible flows such as:
 - A user can navigate the workout discovery flow.
 - A user can view a workout detail page.
 - Authentication and protected routes work once that product scope exists.
+
+Theme visual coverage uses fixed `1280x900` dimensions and a named System
+snapshot on `/theme-preview`; update it only after visual review with:
+
+```bash
+pnpm --filter @mini-workout/e2e test:e2e:update -- --project=public tests/theme.spec.ts -g 'captures the System theme'
+```
 
 ## Required local checks
 

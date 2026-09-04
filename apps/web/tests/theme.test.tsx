@@ -61,6 +61,21 @@ function setSystemTheme(isDark: boolean) {
   };
 }
 
+function createStorageEvent(
+  newValue: string | null,
+  storageArea = localStorage,
+) {
+  const event = new StorageEvent('storage', {
+    key: STORAGE_KEY,
+    newValue,
+  });
+  Object.defineProperty(event, 'storageArea', {
+    configurable: true,
+    value: storageArea,
+  });
+  return event;
+}
+
 beforeEach(() => {
   act(() => {
     mountedRoots.splice(0).forEach((root) => root.unmount());
@@ -242,31 +257,39 @@ it('ignores storage failures while initializing, selecting, and receiving change
   await act(async () => darkButton.click());
   expect(document.documentElement.dataset.theme).toBe('dark');
 
-  await act(async () =>
-    window.dispatchEvent(
-      new StorageEvent('storage', { key: STORAGE_KEY, newValue: 'light' }),
-    ),
-  );
+  await act(async () => window.dispatchEvent(createStorageEvent('light')));
   expect(document.body.dataset.theme).toBe('light:light');
   expect(document.documentElement.dataset.themePreference).toBe('light');
   expect(document.documentElement.dataset.theme).toBe('light');
+});
+
+it('ignores storage events from a different storage area', async () => {
+  localStorage.setItem(STORAGE_KEY, 'dark');
+  renderTheme();
+  await act(async () => {});
+  const event = createStorageEvent('light', window.sessionStorage);
+
+  await act(async () => window.dispatchEvent(event));
+
+  expect(document.body.dataset.theme).toBe('dark:dark');
 });
 
 it.each([null, 'invalid'])(
   'falls back to Light when a storage event has value %s',
   async (newValue) => {
     localStorage.setItem(STORAGE_KEY, 'dark');
-    const { container } = renderTheme(<ThemeToggle />);
+    const { container } = renderTheme(
+      <>
+        <ThemeProbe />
+        <ThemeToggle />
+      </>,
+    );
     await act(async () => {});
     expect(
       container.querySelector('button[aria-label="Theme"]')?.textContent,
     ).toBe('dark');
 
-    await act(async () =>
-      window.dispatchEvent(
-        new StorageEvent('storage', { key: STORAGE_KEY, newValue }),
-      ),
-    );
+    await act(async () => window.dispatchEvent(createStorageEvent(newValue)));
 
     expect(document.body.dataset.theme).toBe('light:light');
     expect(document.documentElement.dataset.themePreference).toBe('light');
@@ -344,18 +367,48 @@ it('closes the menu when Tab is pressed from a menu option', async () => {
     '[role="menuitemradio"]',
   ) as HTMLElement;
 
-  await act(async () =>
-    option.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
-    ),
-  );
+  const event = new KeyboardEvent('keydown', {
+    key: 'Tab',
+    bubbles: true,
+    cancelable: true,
+  });
+  await act(async () => option.dispatchEvent(event));
 
+  expect(event.defaultPrevented).toBe(true);
   expect(container.querySelector('[role="menu"]')).toBeNull();
   expect(document.activeElement).toBe(
     [...container.querySelectorAll('button')].find(
       (button) => button.textContent === 'Next control',
     ),
   );
+});
+
+it('cancels reverse Tab when leaving the first menu option', async () => {
+  const { container } = renderTheme(
+    <>
+      <button type="button">Previous control</button>
+      <ThemeToggle />
+      <button type="button">Next control</button>
+    </>,
+  );
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
+  const option = container.querySelector(
+    '[role="menuitemradio"]',
+  ) as HTMLElement;
+  const event = new KeyboardEvent('keydown', {
+    key: 'Tab',
+    shiftKey: true,
+    bubbles: true,
+    cancelable: true,
+  });
+
+  await act(async () => option.dispatchEvent(event));
+
+  expect(event.defaultPrevented).toBe(true);
+  expect(document.activeElement?.textContent).toBe('Previous control');
 });
 
 it('closes the menu on a pointer outside without stealing outside focus', async () => {

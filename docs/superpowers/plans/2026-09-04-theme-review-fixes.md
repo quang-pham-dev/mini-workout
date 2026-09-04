@@ -16,8 +16,8 @@
 
 - Modify: `apps/web/tests/theme.test.tsx`
 
-- [ ] Add tests for explicit Light remaining Light when `matchMedia` reports dark, server markup staying stable while persisted Dark hydrates, storage reads/writes/listener failures being ignored, and outside/Tab menu dismissal.
-- [ ] Run the focused Vitest file and confirm the new assertions fail for the current implementation.
+- [x] Add tests for explicit Light remaining Light when `matchMedia` reports dark, server markup staying stable while persisted Dark hydrates, storage reads/writes/listener failures being ignored, and outside/Tab menu dismissal.
+- [x] Run the focused Vitest file and confirm the new assertions fail for the current implementation.
 
 ### Task 2: Provider and menu implementation
 
@@ -25,11 +25,11 @@
 
 - Modify: `apps/web/src/components/theme/theme.tsx`
 
-- [ ] Add safe storage accessors and mount state; do not read persisted client state during the initial render.
-- [ ] Synchronize bootstrap/storage preference after mount, apply the resolved theme, and handle storage events without throwing.
-- [ ] Keep the trigger's pre-mount markup stable and implement outside pointer dismissal plus focus-leaving Tab dismissal.
-- [ ] Preserve menuitemradio arrow-key navigation and Escape focus restoration.
-- [ ] Run the focused tests until green.
+- [x] Add safe storage accessors and mount state; do not read persisted client state during the initial render.
+- [x] Synchronize bootstrap/storage preference after mount, apply the resolved theme, and handle storage events without throwing.
+- [x] Keep the trigger's pre-mount markup stable and implement outside pointer dismissal plus focus-leaving Tab dismissal.
+- [x] Preserve menuitemradio arrow-key navigation and Escape focus restoration.
+- [x] Run the focused tests until green.
 
 ### Task 3: Landing selectors and metadata
 
@@ -41,9 +41,9 @@
 - Modify: `apps/web/tests/theme.test.tsx`
 - Modify: `e2e/tests/theme.spec.ts`
 
-- [ ] Replace landing `prefers-color-scheme` rules and unsafe image selectors with CSS Module-safe selectors based on resolved `html.light`/`html.dark` classes.
-- [ ] Use the design-system dark background value for `theme-color` in both bootstrap and runtime metadata.
-- [ ] Update focused and runnable public E2E expectations without adding screenshots because no DB-free screenshot route is required by this fix.
+- [x] Replace landing `prefers-color-scheme` rules and unsafe image selectors with CSS Module-safe selectors based on resolved `html.light`/`html.dark` classes.
+- [x] Use the design-system dark background value for `theme-color` in both bootstrap and runtime metadata.
+- [x] Update focused and runnable public E2E expectations, including a DB-free `/theme-preview` route and an approved deterministic System screenshot.
 
 ### Task 4: Full verification and commit
 
@@ -51,6 +51,6 @@
 
 - No unrelated files.
 
-- [ ] Run web tests, lint, type checking, formatting, production build, docs checks, public E2E, and relevant package tests.
-- [ ] Inspect the final diff and stage only theme-related files.
-- [ ] Commit with `fix: preserve explicit theme visual parity`.
+- [x] Run web tests, lint, type checking, formatting, production build, docs checks, public E2E, and relevant package tests.
+- [x] Inspect the final diff and stage only theme-related files.
+- [x] Commit with `test: finalize theme keyboard and visual coverage`.
