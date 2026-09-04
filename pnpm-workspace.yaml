@@ -2,6 +2,7 @@ packages:
   - apps/*
   - packages/*
   - config/*
+  - e2e
   - scripts/*
   - tools/*
   - '!**/node_modules/**'
@@ -56,6 +57,8 @@ catalogs:
     jsdom: ^27.0.0
     unplugin-swc: ^1.5.1
     vitest: ^3.2.4
+  test-e2e:
+    '@playwright/test': ^1.51.1
   ui-data:
     '@tanstack/react-table': ^8.21.3
   ui-radix:

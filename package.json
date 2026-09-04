@@ -16,6 +16,7 @@
     "format:fix": "turbo run format:fix",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e --filter=@mini-workout/e2e",
     "test:watch": "turbo run test:watch",
     "test:coverage": "turbo run test:coverage",
     "docs:check": "node scripts/check-docs.mjs",

@@ -1,0 +1,17 @@
+{
+  "name": "@mini-workout/e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test:e2e": "playwright test",
+    "test:e2e:update": "playwright test --update-snapshots"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:test-e2e",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

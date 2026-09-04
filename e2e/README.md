@@ -5,20 +5,30 @@ Mini Workout through user-visible workflows.
 
 ## Current status
 
-There is currently no Playwright configuration, test project, or runnable E2E
-script in this repository. This directory is intentionally kept as a future
-integration boundary and should not be treated as an active test suite.
+The Playwright package is available through the workspace. The infrastructure
+spec verifies that the public landing page loads.
+
+Run the focused test with:
+
+```bash
+pnpm --filter @mini-workout/e2e test:e2e
+```
+
+Install the pinned Chromium browser before the first run:
+
+```bash
+pnpm exec playwright install chromium
+```
 
 ## Planned structure
 
-When E2E testing begins, use a structure similar to:
+Use a structure similar to:
 
 ```text
 e2e/
   playwright.config.ts
   tests/
-    web-load.spec.ts
-    workout-discovery.spec.ts
+    infrastructure.spec.ts
   fixtures/
   pages/
 ```
@@ -26,9 +36,8 @@ e2e/
 Tests should describe user behavior, use accessible selectors, remain
 independent, and avoid duplicating unit or component-test coverage.
 
-## Planned workflow
+## Workflow
 
-The eventual workflow should install browsers, start the required app, run the
-Playwright suite, and publish traces/reports on failure. Add the commands to
-the root package scripts and [`docs/TESTING.md`](../docs/TESTING.md) when the
-first E2E test is implemented.
+The Playwright configuration starts the web app, runs the browser suite, and
+publishes an HTML report and traces on failure. The root `test:e2e` script
+delegates to this workspace package through Turbo.
