@@ -6,12 +6,15 @@
     "check-types": "tsc --noEmit",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "lint": "eslint .",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots"
   },
   "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
     "@playwright/test": "catalog:test-e2e",
     "@types/node": "catalog:",
+    "eslint": "catalog:",
     "typescript": "catalog:"
   }
 }

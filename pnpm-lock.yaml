@@ -472,12 +472,18 @@ importers:
 
   e2e:
     devDependencies:
+      '@mini-workout/eslint-config':
+        specifier: workspace:*
+        version: link:../config/eslint-config
       '@playwright/test':
         specifier: catalog:test-e2e
         version: 1.62.1
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.5(jiti@2.7.0)
       typescript:
         specifier: 'catalog:'
         version: 5.9.2

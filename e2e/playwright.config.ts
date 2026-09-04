@@ -13,7 +13,7 @@ export default defineConfig({
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://localhost:3000',
     colorScheme: 'light',
     locale: 'en-US',
     screenshot: 'only-on-failure',
@@ -24,6 +24,6 @@ export default defineConfig({
     command: 'pnpm --filter @mini-workout/web dev',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    url: 'http://127.0.0.1:3000/api/health',
+    url: 'http://localhost:3000/api/health',
   },
 });
