@@ -42,8 +42,8 @@ resolve to `localhost`, `127.0.0.1`, or `[::1]`, and use exactly one of these da
 merely contain `test` or `e2e` are rejected. The canonical URL is propagated to
 Prisma migrate, seed, fixture setup, and the Next web server.
 
-Public-only startup receives an explicit sanitized environment with database
-variables blocked by a loopback port that cannot connect to a real database.
+Public-only startup receives an explicit whitelist-only environment. Inherited
+database, auth, secret, and unrelated variables are not passed to the server.
 
 The E2E server always starts fresh and never reuses an already-running Next
 server, preventing a database-backed run from using a different `DATABASE_URL`.

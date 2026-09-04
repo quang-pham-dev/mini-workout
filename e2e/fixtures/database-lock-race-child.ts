@@ -10,3 +10,7 @@ const lock = acquireDatabaseLock(
   environment.LOCK_DIRECTORY,
 );
 process.stdout.write(lock.token);
+while (!existsSync(environment.LOCK_RELEASE ?? '')) {
+  await new Promise((resolve) => setTimeout(resolve, 1));
+}
+lock.release();

@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import {
+  lstatSync,
   mkdirSync,
   readFileSync,
   readdirSync,
@@ -48,13 +49,22 @@ function parseLockOwner(value: unknown): LockOwner {
 }
 
 function readLockOwner(path: string): LockOwner {
+  if (!lstatSync(path).isDirectory()) {
+    throw new Error('E2E database fixture lock owner is malformed');
+  }
   const entries = readdirSync(path, { withFileTypes: true });
   if (entries.length !== 1 || !entries[0]?.isDirectory()) {
     throw new Error('E2E database fixture lock owner is malformed');
   }
-  const owner = parseLockOwner(
-    JSON.parse(readFileSync(join(path, entries[0].name, 'owner'), 'utf8')),
-  );
+  const ownerDirectory = join(path, entries[0].name);
+  if (!lstatSync(ownerDirectory).isDirectory()) {
+    throw new Error('E2E database fixture lock owner is malformed');
+  }
+  const ownerFile = join(ownerDirectory, 'owner');
+  if (!lstatSync(ownerFile).isFile()) {
+    throw new Error('E2E database fixture lock owner is malformed');
+  }
+  const owner = parseLockOwner(JSON.parse(readFileSync(ownerFile, 'utf8')));
   if (owner.token !== entries[0].name) {
     throw new Error('E2E database fixture lock owner is malformed');
   }
@@ -86,6 +96,21 @@ export function processStatus(
     return (error as NodeJS.ErrnoException).code === 'ESRCH'
       ? 'dead'
       : 'unknown';
+  }
+}
+
+export function isDatabaseLockOwner(
+  databaseUrl: string,
+  token: string,
+  directory = join(tmpdir(), 'mini-workout-e2e-locks'),
+): boolean {
+  assertSafeLockToken(token);
+  const path = lockPathForDatabase(databaseUrl, directory);
+  try {
+    return readLockOwner(path).token === token;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false;
+    throw error;
   }
 }
 
@@ -140,7 +165,9 @@ export function acquireDatabaseLock(
       try {
         const current = readLockOwner(path);
         if (current.token === owner.token) {
-          rmSync(join(path, owner.token), { recursive: true });
+          const claimedPath = `${path}.${randomUUID()}.released`;
+          renameSync(join(path, owner.token), claimedPath);
+          rmSync(claimedPath, { recursive: true });
           try {
             rmdirSync(path);
           } catch (error) {
@@ -179,7 +206,13 @@ export function releaseDatabaseLock(
         renameSync(path, displacedPath);
         rmSync(displacedPath, { recursive: true });
       } else {
-        rmSync(join(path, token), { recursive: true });
+        const ownerPath = join(path, token);
+        if (!lstatSync(ownerPath).isDirectory()) {
+          throw new Error('E2E database fixture lock owner is malformed');
+        }
+        const claimedPath = `${path}.${randomUUID()}.released`;
+        renameSync(ownerPath, claimedPath);
+        rmSync(claimedPath, { recursive: true });
         try {
           rmdirSync(path);
         } catch (error) {

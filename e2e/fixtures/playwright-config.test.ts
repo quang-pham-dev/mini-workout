@@ -107,3 +107,14 @@ test('database server command contains only the explicit database environment', 
   assert.match(command, /E2E_DATABASE_URL='postgresql/);
   assert.doesNotMatch(command, /SECRET_TOKEN/);
 });
+
+test('rejects malicious shell environment keys before constructing a command', () => {
+  assert.throws(
+    () => serverCommand({ 'SAFE=bad command': 'value' }),
+    /environment key/i,
+  );
+  assert.throws(
+    () => serverCommand({ '$(touch /tmp/pwned)': 'value' }),
+    /environment key/i,
+  );
+});

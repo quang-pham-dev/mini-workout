@@ -73,11 +73,12 @@ E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DA
 Approved local hosts include `localhost`, `127.0.0.1`, and `[::1]`. The E2E
 configuration always starts a fresh Next server, so it cannot reuse a server
 started with a different database URL. Public-only startup passes an explicit
-sanitized environment and blocks inherited database and auth settings. Lock,
-auth-state, and metadata paths are keyed by a hash of the canonical database
-URL. Metadata stores only that derived key and the lock run token; it never
-stores database credentials. Teardown reads only metadata for the current
-approved URL.
+whitelist-only environment; inherited database, auth, secret, and unrelated
+variables are not passed to the server. Lock, auth-state, and metadata paths
+are keyed by a hash of the canonical database URL. Metadata stores only that
+derived key and the lock run token; it never stores database credentials.
+Teardown reads only metadata for the current approved URL and cleans database
+records only after confirming ownership of the canonical lock.
 
 Install the pinned Chromium browser before the first run:
 

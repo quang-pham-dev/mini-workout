@@ -49,6 +49,11 @@ function shellQuote(value: string): string {
 }
 
 export function serverCommand(env: Record<string, string>): string {
+  for (const key of Object.keys(env)) {
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) {
+      throw new Error(`Unsafe server environment key: ${key}`);
+    }
+  }
   return [
     'env -i',
     ...Object.entries(env).map(([key, value]) => `${key}=${shellQuote(value)}`),

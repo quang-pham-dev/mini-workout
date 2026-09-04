@@ -1,3 +1,4 @@
+import { cleanupDatabaseIfOwned } from '../global.teardown.ts';
 import { withFixtureSetup, withFixtureTeardown } from './setup-lifecycle.ts';
 import { strict as assert } from 'node:assert';
 import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
@@ -79,4 +80,39 @@ test('teardown attempts every cleanup and preserves the first cleanup error', as
     (error) => error === cleanupError,
   );
   assert.deepEqual(events, ['auth', 'database', 'release', 'metadata']);
+});
+
+test('does not clean database records when another owner holds the canonical lock', async () => {
+  const { acquireDatabaseLock } = await import('./database-lock.ts');
+  const root = mkdtempSync(join(tmpdir(), 'mini-workout-setup-test-'));
+  const databaseUrl =
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
+  let cleaned = false;
+  try {
+    const owner = acquireDatabaseLock(databaseUrl, root);
+    await cleanupDatabaseIfOwned(
+      databaseUrl,
+      '123e4567-e89b-12d3-a456-426614174000',
+      () => {
+        cleaned = true;
+      },
+      root,
+    );
+    assert.equal(cleaned, false);
+    owner.release();
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('does not clean database records when setup never acquired a lock', async () => {
+  let cleaned = false;
+  await cleanupDatabaseIfOwned(
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+    undefined,
+    () => {
+      cleaned = true;
+    },
+  );
+  assert.equal(cleaned, false);
 });
