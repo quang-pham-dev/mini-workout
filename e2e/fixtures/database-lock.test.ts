@@ -4,6 +4,7 @@ import {
   lockPathForDatabase,
   processStatus,
 } from './database-lock.ts';
+import { authStatePath } from './test.ts';
 import { strict as assert } from 'node:assert';
 import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -86,5 +87,14 @@ test('treats permission errors while probing an owner as unknown', () => {
       throw error;
     }),
     'unknown',
+  );
+});
+
+test('keys auth state paths by the canonical database URL', () => {
+  const databaseUrl =
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
+  assert.match(
+    authStatePath('active', databaseUrl),
+    /\.auth\/[^/]+\/active\.json$/,
   );
 });

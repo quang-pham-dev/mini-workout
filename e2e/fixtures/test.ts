@@ -1,3 +1,5 @@
+import { resolveDatabaseUrl } from './database-env.ts';
+import { databaseRunKey } from './database-lock.ts';
 import {
   type Browser,
   type Page,
@@ -26,8 +28,17 @@ async function pageWithStorageState(
   }
 }
 
+export function authStatePath(name: string, databaseUrl: string): string {
+  return fileURLToPath(
+    new URL(
+      `../.auth/${databaseRunKey(databaseUrl)}/${name}.json`,
+      import.meta.url,
+    ),
+  );
+}
+
 function authState(name: string): string {
-  return fileURLToPath(new URL(`../.auth/${name}.json`, import.meta.url));
+  return authStatePath(name, resolveDatabaseUrl(process.env));
 }
 
 export const test = base.extend<Fixtures>({
