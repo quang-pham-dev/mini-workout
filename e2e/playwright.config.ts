@@ -30,7 +30,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'pnpm --filter @mini-workout/web dev',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
     url: 'http://localhost:3000/api/health',
     env: databaseUrl

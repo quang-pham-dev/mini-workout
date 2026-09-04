@@ -1,4 +1,4 @@
-const approvedHosts = new Set(['127.0.0.1', '::1', 'localhost']);
+const approvedHosts = new Set(['127.0.0.1', '[::1]', 'localhost']);
 const approvedDatabaseNames = new Set([
   'e2e',
   'mini_workout_e2e',

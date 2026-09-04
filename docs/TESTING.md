@@ -50,6 +50,17 @@ browser check for the public landing page. Run it with:
 pnpm test:e2e
 ```
 
+Database-backed E2E runs require both environment variables to contain the same
+approved disposable database URL. Use a portable inline environment invocation:
+
+```bash
+E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' pnpm test:e2e
+```
+
+Approved local hosts include `localhost`, `127.0.0.1`, and `[::1]`. The E2E
+configuration always starts a fresh Next server, so it cannot reuse a server
+started with a different database URL.
+
 Install the pinned Chromium browser before the first run:
 
 ```bash

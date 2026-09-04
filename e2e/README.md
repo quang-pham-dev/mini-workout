@@ -26,17 +26,18 @@ pnpm --filter @mini-workout/e2e test:policy
 Run the database-backed fixtures with an explicitly disposable local database:
 
 ```bash
-E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' \
-DATABASE_URL="$E2E_DATABASE_URL" pnpm --filter @mini-workout/e2e test:e2e --project=db
+E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' pnpm test:e2e -- --project=db
 ```
 
-`E2E_DATABASE_URL` is preferred when it is the only variable set, and falls back
-to `DATABASE_URL`. If both are set, they must be identical. The selected URL
-must use the PostgreSQL protocol, resolve to `localhost`, `127.0.0.1`, or
-`::1`, and use exactly one of these database names: `e2e`, `test`,
+Both `E2E_DATABASE_URL` and `DATABASE_URL` are required for database-backed E2E
+runs and must be identical. The selected URL must use the PostgreSQL protocol,
+resolve to `localhost`, `127.0.0.1`, or `[::1]`, and use exactly one of these database names: `e2e`, `test`,
 `mini_workout_e2e`, or `mini_workout_test`. Production hosts and names that
 merely contain `test` or `e2e` are rejected. The canonical URL is propagated to
 Prisma migrate, seed, fixture setup, and the Next web server.
+
+The E2E server always starts fresh and never reuses an already-running Next
+server, preventing a database-backed run from using a different `DATABASE_URL`.
 
 Install the pinned Chromium browser before the first run:
 

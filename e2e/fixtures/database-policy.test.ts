@@ -10,6 +10,14 @@ test('rejects an e2e-named database on a production-looking host', () => {
   );
 });
 
+test('accepts a disposable database on the normalized IPv6 loopback host', () => {
+  assert.doesNotThrow(() =>
+    assertTestDatabase(
+      'postgresql://user:password@[::1]:5432/mini_workout_e2e',
+    ),
+  );
+});
+
 test('requires matching database environment variables', () => {
   assert.equal(
     resolveDatabaseUrl({
