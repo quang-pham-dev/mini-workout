@@ -243,9 +243,36 @@ it('ignores storage failures while initializing, selecting, and receiving change
   expect(document.documentElement.dataset.theme).toBe('dark');
 
   await act(async () =>
-    window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY })),
+    window.dispatchEvent(
+      new StorageEvent('storage', { key: STORAGE_KEY, newValue: 'light' }),
+    ),
   );
+  expect(document.body.dataset.theme).toBe('light:light');
+  expect(document.documentElement.dataset.themePreference).toBe('light');
+  expect(document.documentElement.dataset.theme).toBe('light');
 });
+
+it.each([null, 'invalid'])(
+  'falls back to Light when a storage event has value %s',
+  async (newValue) => {
+    localStorage.setItem(STORAGE_KEY, 'dark');
+    const { container } = renderTheme(<ThemeToggle />);
+    await act(async () => {});
+    expect(
+      container.querySelector('button[aria-label="Theme"]')?.textContent,
+    ).toBe('dark');
+
+    await act(async () =>
+      window.dispatchEvent(
+        new StorageEvent('storage', { key: STORAGE_KEY, newValue }),
+      ),
+    );
+
+    expect(document.body.dataset.theme).toBe('light:light');
+    expect(document.documentElement.dataset.themePreference).toBe('light');
+    expect(document.documentElement.dataset.theme).toBe('light');
+  },
+);
 
 it('exposes an accessible Theme menu with keyboard navigation', async () => {
   const { container } = renderTheme(<ThemeToggle />);
@@ -302,7 +329,13 @@ it('closes the menu when focus leaves it with Tab', async () => {
 });
 
 it('closes the menu when Tab is pressed from a menu option', async () => {
-  const { container } = renderTheme(<ThemeToggle />);
+  const { container } = renderTheme(
+    <>
+      <button type="button">Previous control</button>
+      <ThemeToggle />
+      <button type="button">Next control</button>
+    </>,
+  );
   const trigger = container.querySelector(
     'button[aria-label="Theme"]',
   ) as HTMLButtonElement;
@@ -318,6 +351,11 @@ it('closes the menu when Tab is pressed from a menu option', async () => {
   );
 
   expect(container.querySelector('[role="menu"]')).toBeNull();
+  expect(document.activeElement).toBe(
+    [...container.querySelectorAll('button')].find(
+      (button) => button.textContent === 'Next control',
+    ),
+  );
 });
 
 it('closes the menu on a pointer outside without stealing outside focus', async () => {

@@ -75,7 +75,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key !== THEME_STORAGE_KEY) return;
-      if (isTheme(event.newValue)) setThemeState(event.newValue);
+      setThemeState(isTheme(event.newValue) ? event.newValue : 'light');
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
@@ -169,6 +169,31 @@ export function ThemeToggle() {
     triggerRef.current?.focus();
   }
 
+  function moveFocusAfterTab(event: React.KeyboardEvent<HTMLDivElement>) {
+    const focusable = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    const currentIndex = focusable.indexOf(event.target as HTMLElement);
+    const direction = event.shiftKey ? -1 : 1;
+    let nextElement: HTMLElement | undefined;
+    for (
+      let index = currentIndex + direction;
+      index >= 0 && index < focusable.length;
+      index += direction
+    ) {
+      const candidate = focusable[index];
+      if (candidate && !toggleRef.current?.contains(candidate)) {
+        nextElement = candidate;
+        break;
+      }
+    }
+
+    setOpen(false);
+    nextElement?.focus();
+  }
+
   function selectTheme(value: Theme) {
     setTheme(value);
     closeMenu();
@@ -187,7 +212,7 @@ export function ThemeToggle() {
 
   function handleMenuKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'Tab') {
-      setOpen(false);
+      moveFocusAfterTab(event);
       return;
     }
     if (event.key === 'Escape') {

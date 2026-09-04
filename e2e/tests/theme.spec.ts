@@ -44,6 +44,17 @@ test('keeps explicit Light visual state when the operating system is dark', asyn
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
 
+test('uses the matching landing logo image in Light and Dark themes', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('main')).toHaveScreenshot('landing-light.png');
+
+  await page.evaluate(() => localStorage.setItem('mini-workout-theme', 'dark'));
+  await page.reload();
+  await expect(page.locator('main')).toHaveScreenshot('landing-dark.png');
+});
+
 test('follows System changes but explicit themes ignore system changes', async ({
   page,
 }) => {

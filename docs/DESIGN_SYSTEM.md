@@ -64,6 +64,13 @@ reduced motion; Accordion also opts out of its utility animations explicitly.
 Use semantic tokens, composition, accessible HTML, and typed variant contracts.
 Add behavior-focused tests and stories for meaningful visual states.
 
+The web theme menu intentionally uses native semantic `button` elements instead
+of `@mini-workout/ui` `Button`. Its existing CSS Module contract requires a
+2.25rem control height, pill radius, and menu-specific focus outline; the shared
+component's fixed size variants and utility focus ring would change that
+computed geometry or visual focus treatment. The native controls retain the
+required menuitemradio semantics and keyboard focus behavior.
+
 ## Storybook Requirements
 
 Storybook imports `src/storybook.css`, its sole design-system CSS entrypoint.
