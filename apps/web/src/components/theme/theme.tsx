@@ -5,12 +5,14 @@ import * as React from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 export const THEME_STORAGE_KEY = 'mini-workout-theme';
+const DARK_THEME_COLOR = 'oklch(0.14 0.008 250)';
 export type Theme = 'light' | 'dark' | 'system';
 export type ResolvedTheme = Exclude<Theme, 'system'>;
 
 type ThemeContextValue = {
   theme: Theme;
   resolvedTheme: ResolvedTheme;
+  mounted: boolean;
   setTheme: (theme: Theme) => void;
 };
 
@@ -29,41 +31,54 @@ function applyTheme(theme: ResolvedTheme) {
     meta.setAttribute('name', 'theme-color');
     document.head.append(meta);
   }
-  meta.setAttribute('content', theme === 'dark' ? '#111318' : '#ffffff');
+  meta.setAttribute('content', theme === 'dark' ? DARK_THEME_COLOR : '#ffffff');
 }
 
 function isTheme(value: string | null | undefined): value is Theme {
   return value === 'light' || value === 'dark' || value === 'system';
 }
 
-function initialTheme(): Theme {
-  if (typeof document === 'undefined') return 'light';
-  const bootstrapPreference = document.documentElement.dataset.themePreference;
-  if (isTheme(bootstrapPreference)) return bootstrapPreference;
-  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  return isTheme(storedTheme) ? storedTheme : 'light';
+function readStoredTheme(): Theme | null {
+  try {
+    const value = localStorage.getItem(THEME_STORAGE_KEY);
+    return isTheme(value) ? value : null;
+  } catch {
+    return null;
+  }
 }
 
-function initialSystemTheme(): ResolvedTheme {
-  if (typeof document === 'undefined') return 'light';
-  const bootstrapTheme = document.documentElement.dataset.theme;
-  if (bootstrapTheme === 'dark' || bootstrapTheme === 'light') {
-    return bootstrapTheme;
+function persistTheme(theme: Theme) {
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // Storage can be disabled or unavailable in privacy-restricted contexts.
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(initialTheme);
-  const [systemTheme, setSystemTheme] =
-    useState<ResolvedTheme>(initialSystemTheme);
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>('light');
+  const [mounted, setMounted] = useState(false);
   const resolvedTheme = theme === 'system' ? systemTheme : theme;
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-    if (isTheme(storedTheme)) setThemeState(storedTheme);
+    const bootstrapPreference =
+      document.documentElement.dataset.themePreference;
+    const storedTheme = readStoredTheme();
+    const preference = isTheme(bootstrapPreference)
+      ? bootstrapPreference
+      : isTheme(storedTheme)
+        ? storedTheme
+        : 'light';
+    setThemeState(preference);
+    setMounted(true);
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== THEME_STORAGE_KEY) return;
+      if (isTheme(event.newValue)) setThemeState(event.newValue);
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   useEffect(() => {
@@ -83,17 +98,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
+    if (!mounted) return;
     root.dataset.themePreference = theme;
     applyTheme(resolvedTheme);
-  }, [resolvedTheme, theme]);
+  }, [mounted, resolvedTheme, theme]);
 
   function setTheme(nextTheme: Theme) {
     setThemeState(nextTheme);
-    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    persistTheme(nextTheme);
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, mounted, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -112,13 +128,14 @@ const options: { value: Theme; label: string }[] = [
 ];
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, mounted, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(() =>
     options.findIndex((option) => option.value === theme),
   );
   const triggerRef = useRef<HTMLButtonElement>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const toggleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setActiveIndex(options.findIndex((option) => option.value === theme));
@@ -127,6 +144,25 @@ export function ThemeToggle() {
   useEffect(() => {
     if (open) optionRefs.current[activeIndex]?.focus();
   }, [activeIndex, open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!toggleRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+
+    function handleFocusIn(event: FocusEvent) {
+      if (!toggleRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('focusin', handleFocusIn);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('focusin', handleFocusIn);
+    };
+  }, [open]);
 
   function closeMenu() {
     setOpen(false);
@@ -150,6 +186,10 @@ export function ThemeToggle() {
   }
 
   function handleMenuKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Tab') {
+      setOpen(false);
+      return;
+    }
     if (event.key === 'Escape') {
       event.preventDefault();
       closeMenu();
@@ -177,7 +217,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className={styles.toggle}>
+    <div ref={toggleRef} className={styles.toggle}>
       <button
         ref={triggerRef}
         className={styles.trigger}
@@ -188,7 +228,7 @@ export function ThemeToggle() {
         onClick={() => setOpen((isOpen) => !isOpen)}
         onKeyDown={handleTriggerKeyDown}
       >
-        {theme}
+        {mounted ? theme : 'Theme'}
       </button>
       {open ? (
         <div

@@ -17,6 +17,6 @@ test('applies the persisted theme before the page paints', async ({ page }) => {
   await expect(page.locator('html')).toHaveClass(/dark/);
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
     'content',
-    '#111318',
+    'oklch(0.14 0.008 250)',
   );
 });

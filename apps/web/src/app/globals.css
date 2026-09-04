@@ -13,15 +13,3 @@ body {
   background: var(--color-background);
   font-family: var(--font-sans);
 }
-
-.imgDark {
-  display: none;
-}
-
-.dark .imgLight {
-  display: none;
-}
-
-.dark .imgDark {
-  display: unset;
-}

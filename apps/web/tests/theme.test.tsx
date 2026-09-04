@@ -4,6 +4,7 @@ import * as React from 'react';
 import { act } from 'react';
 import { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 const STORAGE_KEY = 'mini-workout-theme';
@@ -119,7 +120,7 @@ it('defaults to Light and persists a selected theme with document metadata', asy
   expect(document.documentElement.style.colorScheme).toBe('dark');
   expect(
     document.querySelector('meta[name="theme-color"]')?.getAttribute('content'),
-  ).toBe('#111318');
+  ).toBe('oklch(0.14 0.008 250)');
   expect(document.documentElement.dataset.themePreference).toBe('dark');
 });
 
@@ -184,6 +185,68 @@ it('does not change an explicit theme when the system preference changes', async
   expect(document.documentElement.dataset.themePreference).toBe('dark');
 });
 
+it('keeps explicit Light resolved when the operating system is dark', async () => {
+  setSystemTheme(true);
+  localStorage.setItem(STORAGE_KEY, 'light');
+
+  renderTheme();
+  await act(async () => {});
+
+  expect(document.documentElement.dataset.theme).toBe('light');
+  expect(document.documentElement.classList).toContain('light');
+  expect(document.documentElement.classList).not.toContain('dark');
+});
+
+it('renders stable server markup before adopting a persisted theme', async () => {
+  localStorage.setItem(STORAGE_KEY, 'dark');
+  document.documentElement.dataset.theme = 'dark';
+  document.documentElement.dataset.themePreference = 'dark';
+
+  expect(
+    renderToString(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>,
+    ),
+  ).toContain('>Theme<');
+
+  const { container } = renderTheme(<ThemeToggle />);
+  await act(async () => {});
+  expect(
+    container.querySelector('button[aria-label="Theme"]')?.textContent,
+  ).toBe('dark');
+});
+
+it('ignores storage failures while initializing, selecting, and receiving changes', async () => {
+  Object.defineProperty(window, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: () => {
+        throw new Error('blocked');
+      },
+      setItem: () => {
+        throw new Error('blocked');
+      },
+    },
+  });
+
+  const { container } = renderTheme(<ThemeToggle />);
+  await act(async () => {});
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
+  const darkButton = container.querySelector(
+    '[data-theme-option="dark"]',
+  ) as HTMLButtonElement;
+  await act(async () => darkButton.click());
+  expect(document.documentElement.dataset.theme).toBe('dark');
+
+  await act(async () =>
+    window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY })),
+  );
+});
+
 it('exposes an accessible Theme menu with keyboard navigation', async () => {
   const { container } = renderTheme(<ThemeToggle />);
   const trigger = container.querySelector(
@@ -222,4 +285,55 @@ it('exposes an accessible Theme menu with keyboard navigation', async () => {
   );
   expect(localStorage.getItem(STORAGE_KEY)).toBe('dark');
   expect(document.activeElement).toBe(trigger);
+});
+
+it('closes the menu when focus leaves it with Tab', async () => {
+  const { container } = renderTheme(<ThemeToggle />);
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
+  const outside = document.createElement('button');
+  document.body.append(outside);
+
+  await act(async () => outside.focus());
+
+  expect(container.querySelector('[role="menu"]')).toBeNull();
+});
+
+it('closes the menu when Tab is pressed from a menu option', async () => {
+  const { container } = renderTheme(<ThemeToggle />);
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
+  const option = container.querySelector(
+    '[role="menuitemradio"]',
+  ) as HTMLElement;
+
+  await act(async () =>
+    option.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
+    ),
+  );
+
+  expect(container.querySelector('[role="menu"]')).toBeNull();
+});
+
+it('closes the menu on a pointer outside without stealing outside focus', async () => {
+  const { container } = renderTheme(<ThemeToggle />);
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
+  const outside = document.createElement('button');
+  document.body.append(outside);
+
+  await act(async () => {
+    outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    outside.focus();
+  });
+
+  expect(container.querySelector('[role="menu"]')).toBeNull();
+  expect(document.activeElement).toBe(outside);
 });

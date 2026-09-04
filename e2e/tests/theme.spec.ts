@@ -23,12 +23,25 @@ test('applies persisted Dark at startup and persists menu selection', async ({
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
     'content',
-    '#111318',
+    'oklch(0.14 0.008 250)',
   );
   await expect(page.locator('html')).toHaveAttribute(
     'data-theme-preference',
     'dark',
   );
+});
+
+test('keeps explicit Light visual state when the operating system is dark', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.addInitScript(() =>
+    localStorage.setItem('mini-workout-theme', 'light'),
+  );
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveClass(/light/);
+  await expect(page.locator('html')).not.toHaveClass(/dark/);
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
 
 test('follows System changes but explicit themes ignore system changes', async ({
