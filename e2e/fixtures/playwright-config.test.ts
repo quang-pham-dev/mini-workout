@@ -4,6 +4,7 @@ import {
   projectDefinitions,
   publicBaseURL,
   publicServerEnv,
+  serverCommand,
 } from '../playwright.config.ts';
 import { strict as assert } from 'node:assert';
 import test from 'node:test';
@@ -20,7 +21,7 @@ test('always exposes a public project and sanitizes its server environment', () 
   });
 
   assert.notEqual(env.DATABASE_URL, 'postgresql://real.example/db');
-  assert.equal(env.E2E_DATABASE_URL, '');
+  assert.equal(env.E2E_DATABASE_URL, undefined);
   assert.notEqual(env.BETTER_AUTH_SECRET, 'production-secret');
 });
 
@@ -36,8 +37,6 @@ test('does not merge unrelated inherited environment variables into public start
   assert.deepEqual(Object.keys(env).sort(), [
     'BETTER_AUTH_SECRET',
     'BETTER_AUTH_URL',
-    'DATABASE_URL',
-    'E2E_DATABASE_URL',
     'HOME',
     'NEXT_TELEMETRY_DISABLED',
     'NODE_ENV',
@@ -86,4 +85,25 @@ test('uses the public server only for public tests and the database server for D
     ).DATABASE_URL,
     'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
   );
+});
+
+test('starts servers through env -i so Playwright cannot reintroduce secrets', () => {
+  const command = serverCommand(
+    publicServerEnv({ SECRET_TOKEN: 'secret', DATABASE_URL: 'real-db' }),
+  );
+  assert.match(command, /^env -i /);
+  assert.doesNotMatch(command, /SECRET_TOKEN|real-db/);
+  assert.match(command, /pnpm --filter @mini-workout\/web dev$/);
+});
+
+test('database server command contains only the explicit database environment', () => {
+  const command = serverCommand(
+    databaseServerEnv(
+      { SECRET_TOKEN: 'secret' },
+      'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+    ),
+  );
+  assert.match(command, /DATABASE_URL='postgresql/);
+  assert.match(command, /E2E_DATABASE_URL='postgresql/);
+  assert.doesNotMatch(command, /SECRET_TOKEN/);
 });

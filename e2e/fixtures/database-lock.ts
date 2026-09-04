@@ -3,6 +3,7 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  renameSync,
   rmSync,
   rmdirSync,
   writeFileSync,
@@ -12,6 +13,14 @@ import { join } from 'node:path';
 
 type LockOwner = { pid: number; token: string };
 export type DatabaseLock = { release: () => void; token: string };
+const lockTokenPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function assertSafeLockToken(token: string): void {
+  if (!lockTokenPattern.test(token)) {
+    throw new Error('E2E database fixture lock token is malformed');
+  }
+}
 
 function parseLockOwner(value: unknown): LockOwner {
   if (
@@ -29,12 +38,12 @@ function parseLockOwner(value: unknown): LockOwner {
     !Object.hasOwn(owner, 'token') ||
     !Number.isSafeInteger(owner.pid) ||
     (owner.pid as number) <= 0 ||
-    typeof owner.token !== 'string' ||
-    owner.token.trim() === ''
+    typeof owner.token !== 'string'
   ) {
     throw new Error('E2E database fixture lock owner is malformed');
   }
 
+  assertSafeLockToken(owner.token);
   return { pid: owner.pid as number, token: owner.token };
 }
 
@@ -43,9 +52,13 @@ function readLockOwner(path: string): LockOwner {
   if (entries.length !== 1 || !entries[0]?.isDirectory()) {
     throw new Error('E2E database fixture lock owner is malformed');
   }
-  return parseLockOwner(
+  const owner = parseLockOwner(
     JSON.parse(readFileSync(join(path, entries[0].name, 'owner'), 'utf8')),
   );
+  if (owner.token !== entries[0].name) {
+    throw new Error('E2E database fixture lock owner is malformed');
+  }
+  return owner;
 }
 
 export function databaseRunKey(databaseUrl: string): string {
@@ -84,32 +97,40 @@ export function acquireDatabaseLock(
   const path = lockPathForDatabase(databaseUrl, directory);
   const owner: LockOwner = { pid: process.pid, token: randomUUID() };
 
-  try {
-    mkdirSync(path);
-    mkdirSync(join(path, owner.token));
-    writeFileSync(join(path, owner.token, 'owner'), JSON.stringify(owner));
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
-      throw error;
-    }
+  while (true) {
     try {
-      const existing = readLockOwner(path);
-      const status = processStatus(existing.pid);
-      if (status !== 'dead') {
-        throw new Error('E2E database fixture run is already in use');
+      mkdirSync(path);
+      mkdirSync(join(path, owner.token));
+      writeFileSync(join(path, owner.token, 'owner'), JSON.stringify(owner));
+      break;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+      try {
+        const existing = readLockOwner(path);
+        if (processStatus(existing.pid) !== 'dead') {
+          throw new Error('E2E database fixture run is already in use');
+        }
+        const displacedPath = `${path}.${randomUUID()}.stale`;
+        try {
+          renameSync(path, displacedPath);
+        } catch (renameError) {
+          if ((renameError as NodeJS.ErrnoException).code === 'ENOENT')
+            continue;
+          throw renameError;
+        }
+        rmSync(displacedPath, { recursive: true });
+      } catch (readError) {
+        if ((readError as NodeJS.ErrnoException).code === 'ENOENT') continue;
+        if (
+          readError instanceof Error &&
+          /already in use/.test(readError.message)
+        ) {
+          throw readError;
+        }
+        throw new Error('E2E database fixture run is already in use', {
+          cause: readError,
+        });
       }
-      rmSync(path, { recursive: true });
-      return acquireDatabaseLock(databaseUrl, directory);
-    } catch (readError) {
-      if (
-        readError instanceof Error &&
-        /already in use/.test(readError.message)
-      ) {
-        throw readError;
-      }
-      throw new Error('E2E database fixture run is already in use', {
-        cause: readError,
-      });
     }
   }
 
@@ -142,23 +163,33 @@ export function acquireDatabaseLock(
 
 export function releaseDatabaseLock(
   databaseUrl: string,
-  token: string,
+  token: string | undefined,
   directory = join(tmpdir(), 'mini-workout-e2e-locks'),
 ): void {
+  if (token !== undefined) assertSafeLockToken(token);
   const path = lockPathForDatabase(databaseUrl, directory);
   try {
     const owner = readLockOwner(path);
-    if (owner.token === token) {
-      rmSync(join(path, token), { recursive: true });
-      try {
-        rmdirSync(path);
-      } catch (error) {
-        if (
-          !['ENOENT', 'ENOTEMPTY'].includes(
-            (error as NodeJS.ErrnoException).code ?? '',
-          )
-        ) {
-          throw error;
+    if (
+      (token !== undefined && owner.token === token) ||
+      (token === undefined && processStatus(owner.pid) === 'dead')
+    ) {
+      if (token === undefined) {
+        const displacedPath = `${path}.${randomUUID()}.released`;
+        renameSync(path, displacedPath);
+        rmSync(displacedPath, { recursive: true });
+      } else {
+        rmSync(join(path, token), { recursive: true });
+        try {
+          rmdirSync(path);
+        } catch (error) {
+          if (
+            !['ENOENT', 'ENOTEMPTY'].includes(
+              (error as NodeJS.ErrnoException).code ?? '',
+            )
+          ) {
+            throw error;
+          }
         }
       }
     }

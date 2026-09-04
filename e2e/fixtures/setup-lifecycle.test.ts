@@ -53,7 +53,7 @@ test('attempts metadata removal and release even when earlier cleanup fails', as
     ),
     (error) => error === setupError,
   );
-  assert.deepEqual(events, ['metadata', 'release']);
+  assert.deepEqual(events, ['release', 'metadata']);
 });
 
 test('teardown attempts every cleanup and preserves the first cleanup error', async () => {
@@ -66,16 +66,17 @@ test('teardown attempts every cleanup and preserves the first cleanup error', as
         events.push('auth');
         throw cleanupError;
       },
-      () => {
-        events.push('metadata');
-        throw new Error('metadata cleanup failed');
-      },
+      () => events.push('database'),
       () => {
         events.push('release');
         throw new Error('release failed');
       },
+      () => {
+        events.push('metadata');
+        throw new Error('metadata cleanup failed');
+      },
     ),
     (error) => error === cleanupError,
   );
-  assert.deepEqual(events, ['auth', 'metadata', 'release']);
+  assert.deepEqual(events, ['auth', 'database', 'release', 'metadata']);
 });

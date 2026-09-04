@@ -4,6 +4,7 @@ import {
   releaseDatabaseLock,
 } from './fixtures/database-lock.ts';
 import { cleanupDatabase } from './fixtures/database.ts';
+import { parseFixtureMetadata } from './fixtures/metadata.ts';
 import { withFixtureTeardown } from './fixtures/setup-lifecycle.ts';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -22,13 +23,10 @@ export default async function globalTeardown() {
   let metadataError: unknown;
   if (existsSync(lockFile)) {
     try {
-      const metadata = JSON.parse(readFileSync(lockFile, 'utf8')) as {
-        key: string;
-        token: string;
-      };
-      if (metadata.key !== key)
-        throw new Error('E2E metadata does not match this run');
-      token = metadata.token;
+      token = parseFixtureMetadata(
+        JSON.parse(readFileSync(lockFile, 'utf8')),
+        key,
+      ).token;
     } catch (error) {
       metadataError = error;
     }
@@ -37,17 +35,10 @@ export default async function globalTeardown() {
   let cleanupError: unknown;
   try {
     await withFixtureTeardown(
-      async () => {
-        try {
-          if (token) await cleanupDatabase(databaseUrl);
-        } finally {
-          rmSync(authDirectory, { recursive: true, force: true });
-        }
-      },
+      () => rmSync(authDirectory, { recursive: true, force: true }),
+      () => cleanupDatabase(databaseUrl),
+      () => releaseDatabaseLock(databaseUrl, token),
       () => rmSync(lockFile, { force: true }),
-      () => {
-        if (token) releaseDatabaseLock(databaseUrl, token);
-      },
     );
   } catch (error) {
     cleanupError = error;

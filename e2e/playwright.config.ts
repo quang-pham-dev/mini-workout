@@ -28,8 +28,6 @@ export function publicServerEnv(
     NEXT_TELEMETRY_DISABLED: '1',
     BETTER_AUTH_URL: publicBaseURL,
     BETTER_AUTH_SECRET: 'e2e-public-only-secret',
-    DATABASE_URL: 'postgresql://127.0.0.1:1/public_only_blocked',
-    E2E_DATABASE_URL: '',
   };
 }
 
@@ -44,6 +42,18 @@ export function databaseServerEnv(
     DATABASE_URL: databaseUrl,
     E2E_DATABASE_URL: databaseUrl,
   };
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
+export function serverCommand(env: Record<string, string>): string {
+  return [
+    'env -i',
+    ...Object.entries(env).map(([key, value]) => `${key}=${shellQuote(value)}`),
+    'pnpm --filter @mini-workout/web dev',
+  ].join(' ');
 }
 
 export function projectDefinitions(env: NodeJS.ProcessEnv) {
@@ -103,14 +113,14 @@ export default defineConfig({
   webServer: databaseUrl
     ? [
         {
-          command: 'pnpm --filter @mini-workout/web dev',
+          command: serverCommand(publicServerEnv(process.env)),
           reuseExistingServer: false,
           timeout: 120_000,
           url: `${publicBaseURL}/api/health`,
           env: publicServerEnv(process.env),
         },
         {
-          command: 'pnpm --filter @mini-workout/web dev',
+          command: serverCommand(databaseServerEnv(process.env, databaseUrl)),
           reuseExistingServer: false,
           timeout: 120_000,
           url: `${databaseBaseURL}/api/health`,
@@ -118,7 +128,7 @@ export default defineConfig({
         },
       ]
     : {
-        command: 'pnpm --filter @mini-workout/web dev',
+        command: serverCommand(publicServerEnv(process.env)),
         reuseExistingServer: false,
         timeout: 120_000,
         url: `${publicBaseURL}/api/health`,

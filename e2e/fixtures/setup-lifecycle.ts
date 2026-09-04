@@ -11,8 +11,9 @@ export async function withFixtureSetup<T>(
   } catch (error) {
     await withFixtureTeardown(
       () => rmSync(authDirectory, { recursive: true, force: true }),
-      removeMetadata,
+      () => undefined,
       release,
+      removeMetadata,
     ).catch(() => undefined);
     throw error;
   }
@@ -20,11 +21,17 @@ export async function withFixtureSetup<T>(
 
 export async function withFixtureTeardown(
   removeAuth: () => void | Promise<void>,
-  removeMetadata: () => void | Promise<void>,
+  cleanupDatabase: () => void | Promise<void>,
   release: () => void | Promise<void>,
+  removeMetadata: () => void | Promise<void>,
 ): Promise<void> {
   let firstError: unknown;
-  for (const cleanup of [removeAuth, removeMetadata, release]) {
+  for (const cleanup of [
+    removeAuth,
+    cleanupDatabase,
+    release,
+    removeMetadata,
+  ]) {
     try {
       await cleanup();
     } catch (error) {
