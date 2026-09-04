@@ -8,6 +8,9 @@ Mini Workout through user-visible workflows.
 The Playwright package is available through the workspace. The infrastructure
 spec verifies that the public landing page loads.
 
+The installed Playwright version does not expose `reducedMotion` as a context
+option, so tests set `no-preference` through `page.emulateMedia` instead.
+
 Run the focused test with:
 
 ```bash
