@@ -61,6 +61,10 @@ function setSystemTheme(isDark: boolean) {
 }
 
 beforeEach(() => {
+  act(() => {
+    mountedRoots.splice(0).forEach((root) => root.unmount());
+  });
+  document.body.replaceChildren();
   const values = new Map<string, string>();
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
@@ -74,6 +78,7 @@ beforeEach(() => {
   localStorage.clear();
   document.documentElement.className = '';
   document.documentElement.removeAttribute('data-theme');
+  document.documentElement.removeAttribute('data-theme-preference');
   document.documentElement.style.colorScheme = '';
   document.querySelector('meta[name="theme-color"]')?.remove();
   setSystemTheme(false);
@@ -93,13 +98,18 @@ it('defaults to Light and persists a selected theme with document metadata', asy
   await act(async () => {});
 
   expect(document.body.dataset.theme).toBe('light:light');
+  expect(document.documentElement.classList).toContain('light');
   expect(document.documentElement.className).not.toContain('dark');
   expect(document.documentElement.dataset.theme).toBe('light');
   expect(document.documentElement.style.colorScheme).toBe('light');
 
   const toggle = renderTheme(<ThemeToggle />).container;
+  const trigger = toggle.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
   const darkButton = toggle.querySelector(
-    '[data-theme-option="dark"]',
+    '[role="menuitemradio"][data-theme-option="dark"]',
   ) as HTMLButtonElement;
   await act(async () => darkButton.click());
 
@@ -110,38 +120,106 @@ it('defaults to Light and persists a selected theme with document metadata', asy
   expect(
     document.querySelector('meta[name="theme-color"]')?.getAttribute('content'),
   ).toBe('#111318');
+  expect(document.documentElement.dataset.themePreference).toBe('dark');
+});
+
+it('hydrates a persisted Dark preference without resetting through Light', async () => {
+  localStorage.setItem(STORAGE_KEY, 'dark');
+  document.documentElement.classList.add('dark');
+  document.documentElement.dataset.theme = 'dark';
+  document.documentElement.dataset.themePreference = 'dark';
+
+  const { container } = renderTheme(<ThemeToggle />);
+  await act(async () => {});
+
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  await act(async () => trigger.click());
+  expect(
+    container
+      .querySelector('[aria-checked="true"]')
+      ?.getAttribute('data-theme-option'),
+  ).toBe('dark');
+  expect(document.documentElement.dataset.theme).toBe('dark');
 });
 
 it('follows system changes only while System is selected', async () => {
   const system = setSystemTheme(false);
   const { container } = renderTheme(<ThemeToggle />);
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
   const systemButton = container.querySelector(
     '[data-theme-option="system"]',
   ) as HTMLButtonElement;
-
   await act(async () => systemButton.click());
   expect(document.documentElement.dataset.theme).toBe('light');
+  expect(document.documentElement.dataset.themePreference).toBe('system');
 
   await act(async () => system.setDark(true));
   expect(document.documentElement.dataset.theme).toBe('dark');
   expect(document.documentElement.className).toContain('dark');
+
+  await act(async () => system.setDark(false));
+  expect(document.documentElement.dataset.theme).toBe('light');
 });
 
-it('exposes three labelled radio options with one selected', () => {
+it('does not change an explicit theme when the system preference changes', async () => {
+  const system = setSystemTheme(false);
   const { container } = renderTheme(<ThemeToggle />);
-  const group = container.querySelector('[role="radiogroup"]');
-  const options = container.querySelectorAll('[role="radio"]');
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+  await act(async () => trigger.click());
+  const darkButton = container.querySelector(
+    '[data-theme-option="dark"]',
+  ) as HTMLButtonElement;
+  await act(async () => darkButton.click());
 
-  expect(group?.getAttribute('aria-label')).toBe('Color theme');
-  expect(options).toHaveLength(3);
+  await act(async () => system.setDark(false));
+  expect(document.documentElement.dataset.theme).toBe('dark');
+  expect(document.documentElement.dataset.themePreference).toBe('dark');
+});
+
+it('exposes an accessible Theme menu with keyboard navigation', async () => {
+  const { container } = renderTheme(<ThemeToggle />);
+  const trigger = container.querySelector(
+    'button[aria-label="Theme"]',
+  ) as HTMLButtonElement;
+
+  expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+  expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  await act(async () =>
+    trigger.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+    ),
+  );
+
+  const menu = container.querySelector('[role="menu"]') as HTMLElement;
+  const options = container.querySelectorAll('[role="menuitemradio"]');
+  expect(menu).toBeTruthy();
   expect([...options].map((option) => option.textContent)).toEqual([
     'Light',
     'Dark',
     'System',
   ]);
-  expect(
-    container
-      .querySelector('[aria-checked="true"]')
-      ?.getAttribute('data-theme-option'),
-  ).toBe('light');
+  expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  expect(document.activeElement).toBe(options[0]);
+
+  await act(async () =>
+    options[0]!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+    ),
+  );
+  expect(document.activeElement).toBe(options[1]);
+  await act(async () =>
+    options[1]!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+    ),
+  );
+  expect(localStorage.getItem(STORAGE_KEY)).toBe('dark');
+  expect(document.activeElement).toBe(trigger);
 });
