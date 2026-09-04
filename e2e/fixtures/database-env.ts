@@ -27,17 +27,16 @@ export function resolveDatabaseUrl(env: NodeJS.ProcessEnv): string {
   const e2eDatabaseUrl = env.E2E_DATABASE_URL;
   const databaseUrl = env.DATABASE_URL;
 
-  if (e2eDatabaseUrl && databaseUrl && e2eDatabaseUrl !== databaseUrl) {
-    throw new Error('E2E_DATABASE_URL and DATABASE_URL must match');
-  }
-
-  const resolvedDatabaseUrl = e2eDatabaseUrl ?? databaseUrl;
-  if (!resolvedDatabaseUrl) {
+  if (!e2eDatabaseUrl || !databaseUrl) {
     throw new Error(
-      'E2E setup requires E2E_DATABASE_URL or DATABASE_URL to be set to an approved disposable database',
+      'E2E setup requires both E2E_DATABASE_URL and DATABASE_URL to be set',
     );
   }
 
-  assertTestDatabase(resolvedDatabaseUrl);
-  return resolvedDatabaseUrl;
+  if (e2eDatabaseUrl !== databaseUrl) {
+    throw new Error('E2E_DATABASE_URL and DATABASE_URL must match');
+  }
+
+  assertTestDatabase(databaseUrl);
+  return databaseUrl;
 }

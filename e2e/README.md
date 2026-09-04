@@ -11,10 +11,16 @@ spec verifies that the public landing page loads.
 The installed Playwright version does not expose `reducedMotion` as a context
 option, so tests set `no-preference` through `page.emulateMedia` instead.
 
-Run the public infrastructure test without a database:
+Run the default public-only suite without a database:
 
 ```bash
-pnpm --filter @mini-workout/e2e test:e2e --project=public
+pnpm test:e2e
+```
+
+To select the public project explicitly, run:
+
+```bash
+pnpm --filter @mini-workout/e2e test:e2e -- --project=public
 ```
 
 Run the database safety policy without an app or database:

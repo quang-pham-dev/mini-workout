@@ -44,10 +44,17 @@ Stories live beside components under `packages/ui/src/components`.
 ### End-to-end tests
 
 The `e2e/` workspace contains the Playwright configuration and a runnable
-browser check for the public landing page. Run it with:
+browser check for the public landing page. The default suite is public-only and
+does not require a database:
 
 ```bash
 pnpm test:e2e
+```
+
+Run the public project explicitly with:
+
+```bash
+pnpm --filter @mini-workout/e2e test:e2e -- --project=public
 ```
 
 Database-backed E2E runs require both environment variables to contain the same
@@ -55,6 +62,12 @@ approved disposable database URL. Use a portable inline environment invocation:
 
 ```bash
 E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' pnpm test:e2e
+```
+
+To run only the database-backed project:
+
+```bash
+E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' pnpm test:e2e -- --project=db
 ```
 
 Approved local hosts include `localhost`, `127.0.0.1`, and `[::1]`. The E2E

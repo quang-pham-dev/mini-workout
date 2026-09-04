@@ -2,7 +2,7 @@ import { resolveDatabaseUrl } from './fixtures/database-env';
 import { defineConfig, devices } from '@playwright/test';
 
 const hasDatabaseEnvironment =
-  Boolean(process.env.E2E_DATABASE_URL) || Boolean(process.env.DATABASE_URL);
+  Boolean(process.env.E2E_DATABASE_URL) && Boolean(process.env.DATABASE_URL);
 const databaseUrl = hasDatabaseEnvironment
   ? resolveDatabaseUrl(process.env)
   : undefined;
@@ -46,18 +46,16 @@ export default defineConfig({
       : undefined,
   },
   projects: [
-    {
-      name: 'public',
-      testMatch: /tests\/infrastructure\.spec\.ts/,
-    },
-    {
-      name: 'db-setup',
-      testMatch: /global\.setup\.ts/,
-    },
-    {
-      name: 'db',
-      dependencies: ['db-setup'],
-      testMatch: /tests\/fixtures\.spec\.ts/,
-    },
+    { name: 'public', testMatch: /tests\/infrastructure\.spec\.ts/ },
+    ...(hasDatabaseEnvironment
+      ? [
+          { name: 'db-setup', testMatch: /global\.setup\.ts/ },
+          {
+            name: 'db',
+            dependencies: ['db-setup'],
+            testMatch: /tests\/fixtures\.spec\.ts/,
+          },
+        ]
+      : []),
   ],
 });

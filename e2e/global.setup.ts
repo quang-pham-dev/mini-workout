@@ -1,9 +1,10 @@
 import { configureUser, prepareDatabase, testUsers } from './fixtures/database';
 import { resolveDatabaseUrl } from './fixtures/database-env';
+import { acquireDatabaseLock } from './fixtures/database-lock';
 import { test } from '@playwright/test';
 import { request } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, rmSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const baseURL = 'http://localhost:3000';
@@ -11,6 +12,12 @@ const authDirectory = fileURLToPath(new URL('./.auth', import.meta.url));
 
 test('prepare deterministic database fixtures', async () => {
   const databaseUrl = resolveDatabaseUrl(process.env);
+  const lock = acquireDatabaseLock(databaseUrl);
+  mkdirSync(authDirectory, { recursive: true });
+  writeFileSync(
+    fileURLToPath(new URL('./.auth/database-lock.json', import.meta.url)),
+    JSON.stringify({ databaseUrl, token: lock.token }),
+  );
   const childEnv = {
     ...process.env,
     DATABASE_URL: databaseUrl,
@@ -30,7 +37,6 @@ test('prepare deterministic database fixtures', async () => {
   });
   await prepareDatabase(databaseUrl);
 
-  mkdirSync(authDirectory, { recursive: true });
   const api = await request.newContext({ baseURL });
   let setupSucceeded = false;
 
@@ -80,6 +86,7 @@ test('prepare deterministic database fixtures', async () => {
     await api.dispose();
     if (!setupSucceeded) {
       rmSync(authDirectory, { recursive: true, force: true });
+      lock.release();
     }
   }
 });

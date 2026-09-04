@@ -39,3 +39,25 @@ test('requires matching database environment variables', () => {
     /must match/,
   );
 });
+
+test('rejects a missing E2E_DATABASE_URL', () => {
+  assert.throws(
+    () =>
+      resolveDatabaseUrl({
+        DATABASE_URL:
+          'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+      }),
+    /both.*required|E2E_DATABASE_URL/i,
+  );
+});
+
+test('rejects a missing DATABASE_URL', () => {
+  assert.throws(
+    () =>
+      resolveDatabaseUrl({
+        E2E_DATABASE_URL:
+          'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+      }),
+    /both.*required|DATABASE_URL/i,
+  );
+});

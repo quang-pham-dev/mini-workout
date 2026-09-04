@@ -48,6 +48,19 @@ export async function prepareDatabase(databaseUrl: string): Promise<void> {
   }
 }
 
+export async function cleanupDatabase(databaseUrl: string): Promise<void> {
+  assertTestDatabase(databaseUrl);
+  const prisma = createPrisma(databaseUrl);
+
+  try {
+    await prisma.user.deleteMany({
+      where: { email: { endsWith: testEmailDomain } },
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function configureUser(
   databaseUrl: string,
   email: string,
