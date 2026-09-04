@@ -9,11 +9,11 @@ font loading, route composition, and content-specific breakpoints.
 
 ## Public Entry Points
 
-- `@mini-workout/design-system/globals` is the app CSS foundation.
-- `@mini-workout/design-system/tokens` exposes platform-neutral token names.
-- `@mini-workout/design-system/contracts` exposes component contracts.
-- `@mini-workout/ui` exposes shared React components.
-- Storybook is the visual component inventory.
+- [`@mini-workout/design-system/globals`](../packages/design-system/globals.css) is the app CSS foundation.
+- [`@mini-workout/design-system/tokens`](../packages/design-system/src/tokens.ts) exposes platform-neutral token names.
+- [`@mini-workout/design-system/contracts`](../packages/design-system/src/contracts.ts) exposes component contracts.
+- [`@mini-workout/ui`](../packages/ui/README.md) exposes shared React components.
+- [Storybook](../apps/storybook) is the visual component inventory.
 
 ## CSS Import Order
 
@@ -54,7 +54,8 @@ global token scale and should remain local arbitrary variants where required.
 ## Motion
 
 Reusable accordion, shimmer, and mobile-menu animations live in the foundation.
-Non-essential motion must provide a reduced-motion path.
+The foundation reduces animation and transition duration for users who prefer
+reduced motion; Accordion also opts out of its utility animations explicitly.
 
 ## Component Conventions
 
@@ -89,6 +90,10 @@ pnpm docs:check
 ```
 
 ## Known Legacy Exceptions
+
+The `theme-ocean`, `theme-forest`, and `theme-sunset` variants are selector-only
+Tailwind variants. They remain available for consumers that define their own
+`[data-theme]` palettes; this package does not ship palette values for them.
 
 Product page CSS Modules remain during the staged migration. The current Geist
 font loading and fallback mapping is intentionally preserved for visual parity.

@@ -75,6 +75,10 @@ const missingCompatibility = compatibilityColors.filter(
     !themeRoles[0].has(token) ||
     !themeRoles[1].has(token),
 );
+const inlineTheme = cssSources[3].match(/@theme inline\s*\{([\s\S]*?)\}/)?.[1] ?? '';
+const missingInlineRegistration = compatibilityColors.filter(
+  (token) => !inlineTheme.includes(`--color-${token}: var(--${token})`),
+);
 const animationNames = [
   ...cssSource.matchAll(/--animate-[\w-]+:\s*([\w-]+)/g),
 ].map(([, name]) => name);
@@ -103,7 +107,7 @@ const publicColorNames = new Set(
   [...cssSource.matchAll(/--color-([\w-]+)\s*:/g)].map(([, name]) => name),
 );
 const undefinedConsumerTokens = consumerSources.flatMap((source) =>
-  [...source.matchAll(/--color-([\w-]+)/g)]
+  [...source.matchAll(/var\(--color-([\w-]+)\)/g)]
     .map(([, name]) => name)
     .filter((name) => !publicColorNames.has(name)),
 );
@@ -114,6 +118,7 @@ const result = {
   ),
   themeDrift,
   missingCompatibility,
+  missingInlineRegistration,
   missingKeyframes,
   uiGlobalImport,
   undefinedConsumerTokens,

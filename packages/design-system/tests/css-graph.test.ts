@@ -1,5 +1,7 @@
+import tailwindcss from '@tailwindcss/postcss';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import postcss from 'postcss';
 import { describe, expect, it } from 'vitest';
 
 const root = resolve(import.meta.dirname, '../../..');
@@ -31,5 +33,19 @@ describe('CSS foundation graph', () => {
     expect(tokenCss).toContain('--animate-accordion-down');
     expect(tokenCss).toContain('--animate-shimmer');
     expect(tokenCss).toContain('--animate-mobile-menu-in');
+  });
+
+  it('compiles representative UI utilities into generated CSS', async () => {
+    const result = await postcss([tailwindcss()]).process(
+      `@import "${resolve(root, 'packages/design-system/globals.css')}";
+       @source inline("bg-card border-input ring-ring animate-accordion-down");`,
+      { from: resolve(root, 'packages/design-system/tests/css-graph.test.ts') },
+    );
+
+    expect(result.css).toMatch(/\.bg-card\s*\{/);
+    expect(result.css).toMatch(/\.border-input\s*\{/);
+    expect(result.css).toMatch(/\.ring-ring\s*\{/);
+    expect(result.css).toMatch(/\.animate-accordion-down\s*\{/);
+    expect(result.css).toContain('animation: var(--animate-accordion-down)');
   });
 });

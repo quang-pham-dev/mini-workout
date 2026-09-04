@@ -43,10 +43,10 @@ import { Button } from '@mini-workout/ui';
 import { Button as ButtonEntry } from '@mini-workout/ui/button';
 ```
 
-Import shared styles once in the consuming web application:
+Import the design-system foundation once in the consuming web application:
 
 ```css
-@import '@mini-workout/ui/styles.css';
+@import '@mini-workout/design-system/globals';
 ```
 
 ## Development

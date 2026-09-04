@@ -56,7 +56,7 @@ implementation is deliberately deferred until a mobile application exists.
 
 - `@mini-workout/ui` — public component barrel.
 - `@mini-workout/ui/button` — compiled Button entrypoint.
-- `@mini-workout/ui/styles.css` — shared UI styles.
+- `@mini-workout/design-system/globals` — shared Tailwind foundation and UI styles.
 
 The package is compiled by tsup into `dist/`. Add a new public entrypoint to
 both `packages/ui/tsup.config.ts` and `packages/ui/package.json` exports.

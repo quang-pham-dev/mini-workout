@@ -418,5 +418,8 @@
 /* Dark mode variant using class-based approach */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Data attribute theme variants for multi-theme support */
+/* Selector-only variants retained for consumers that provide their own palettes. */
+@custom-variant theme-ocean (&:where([data-theme="ocean"], [data-theme="ocean"] *));
+@custom-variant theme-forest (&:where([data-theme="forest"], [data-theme="forest"] *));
+@custom-variant theme-sunset (&:where([data-theme="sunset"], [data-theme="sunset"] *));
 @custom-variant pointer-fine (@media (hover: hover) and (pointer: fine));

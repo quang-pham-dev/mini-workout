@@ -10,6 +10,10 @@ const lightCss = read('packages/design-system/theme-light.css');
 const darkCss = read('packages/design-system/theme-dark.css');
 const globalsCss = read('packages/design-system/globals.css');
 const uiSource = read('packages/ui/src/index.ts');
+const uiSources = [
+  uiSource,
+  read('packages/ui/src/components/accordion/accordion.tsx'),
+];
 
 const compatibilityColors = [
   'card',
@@ -66,6 +70,12 @@ describe('design-system foundation contract', () => {
       expect(lightVariables).toContain(color);
       expect(darkVariables).toContain(color);
     }
+
+    const inlineTheme =
+      globalsCss.match(/@theme inline\s*\{([\s\S]*?)\}/)?.[1] ?? '';
+    for (const color of compatibilityColors) {
+      expect(inlineTheme).toContain(`--color-${color}: var(--${color})`);
+    }
   });
 
   it('defines a keyframe for every named animation', () => {
@@ -82,5 +92,36 @@ describe('design-system foundation contract', () => {
   it('does not let UI components import global CSS', () => {
     expect(uiSource).not.toContain('@mini-workout/design-system');
     expect(uiSource).not.toContain('.css');
+  });
+
+  it('does not let consumers reference undefined public color variables', () => {
+    const publicColorNames = new Set(
+      [...`${tokenCss}\n${globalsCss}`.matchAll(/--color-([\w-]+)\s*:/g)].map(
+        ([, name]) => name,
+      ),
+    );
+    const undefinedVariables = uiSources.flatMap((source) =>
+      [...source.matchAll(/var\(--color-([\w-]+)\)/g)]
+        .map(([, name]) => name)
+        .filter((name) => !publicColorNames.has(name)),
+    );
+
+    expect(undefinedVariables).toEqual([]);
+  });
+
+  it('preserves selector-only theme variants and reduced-motion behavior', () => {
+    expect(tokenCss).toContain(
+      '@custom-variant theme-ocean (&:where([data-theme="ocean"], [data-theme="ocean"] *));',
+    );
+    expect(tokenCss).toContain(
+      '@custom-variant theme-forest (&:where([data-theme="forest"], [data-theme="forest"] *));',
+    );
+    expect(tokenCss).toContain(
+      '@custom-variant theme-sunset (&:where([data-theme="sunset"], [data-theme="sunset"] *));',
+    );
+    expect(globalsCss).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(
+      read('packages/ui/src/components/accordion/accordion.tsx'),
+    ).toContain('motion-reduce:transition-none');
   });
 });
