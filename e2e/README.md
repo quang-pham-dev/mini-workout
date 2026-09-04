@@ -58,6 +58,10 @@ Install the pinned Chromium browser before the first run:
 pnpm --filter @mini-workout/e2e exec playwright install chromium
 ```
 
+CI runs the database-backed project against a disposable PostgreSQL 16 service
+using the approved `mini_workout_e2e` database name, then uploads the Playwright
+report and test results when a browser gate fails. CI does not update snapshots.
+
 ## Structure
 
 The current infrastructure uses:

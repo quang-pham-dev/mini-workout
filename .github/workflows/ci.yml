@@ -24,6 +24,23 @@ jobs:
   quality:
     name: Turborepo quality checks
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
+      E2E_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: mini_workout_e2e
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     permissions:
       contents: read
       id-token: write # Required only for the optional Turborepo OIDC cache setup.
@@ -52,6 +69,9 @@ jobs:
       - name: Prepare
         uses: ./.github/composite-actions/prepare
 
+      - name: Install Chromium for browser gates
+        run: pnpm --filter @mini-workout/e2e exec playwright install --with-deps chromium
+
       - name: Check package boundaries
         run: pnpm exec turbo boundaries
 
@@ -60,3 +80,19 @@ jobs:
 
       - name: Run affected quality checks
         run: pnpm exec turbo run build lint check-types test --affected
+
+      - name: Build Storybook
+        run: pnpm --filter @mini-workout/storybook build
+
+      - name: Run browser and visual gates
+        run: pnpm test:e2e
+
+      - name: Upload Playwright artifacts on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          if-no-files-found: ignore

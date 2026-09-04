@@ -34,3 +34,14 @@ export const Default: Story = {
     </Accordion>
   ),
 };
+
+export const Open: Story = {
+  render: () => (
+    <Accordion type="single" collapsible defaultValue="item-1">
+      <AccordionItem value="item-1">
+        <AccordionTrigger>What is included?</AccordionTrigger>
+        <AccordionContent>A short, equipment-free workout.</AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  ),
+};

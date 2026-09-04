@@ -40,6 +40,11 @@ pnpm --filter @mini-workout/storybook build
 ```
 
 Stories live beside components under `packages/ui/src/components`.
+The Storybook 10 `addon-a11y` configuration uses `test: 'error'` for supported
+accessibility runs. The official `addon-vitest` browser integration is
+intentionally not enabled: the current Vite 8 setup has incompatible CommonJS
+browser dependencies. Story coverage therefore stays build-compatible until
+that dependency boundary is upgraded deliberately.
 
 The design-system foundation has focused contract checks:
 
@@ -121,6 +126,10 @@ pnpm build
 pnpm exec turbo boundaries
 pnpm docs:check
 ```
+
+CI additionally starts disposable PostgreSQL 16, installs Chromium, builds
+Storybook, and runs the public and database-backed Playwright projects. CI never
+updates snapshots; visual changes must be reviewed and committed locally.
 
 For pull requests, CI runs the equivalent affected task set:
 

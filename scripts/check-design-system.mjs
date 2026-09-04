@@ -158,15 +158,18 @@ const registeredUtilities = new Set([
 ]);
 const ignoredUtilitySuffixes = new Set([
   'auto',
+  'balance',
   'black',
   'b',
   'base',
   'center',
+  'color',
   'current',
   'dashed',
   'dotted',
   'double',
   'end',
+  'fill',
   'inherit',
   'left',
   'none',
@@ -175,6 +178,7 @@ const ignoredUtilitySuffixes = new Set([
   'solid',
   'start',
   'transparent',
+  'transform',
   'white',
   'xs',
   'md',
@@ -200,6 +204,9 @@ const requiredUtilities = unique(
         ),
       ].flatMap(([, utility, colorName]) => {
         if (
+          !colorName ||
+          utility.endsWith('-') ||
+          colorName.startsWith('[') ||
           ignoredUtilitySuffixes.has(colorName) ||
           /^(?:[trblxyse]-)?\d+$/.test(colorName) ||
           /^(?:t|b|l|r|x|y|s|e)(?:-\d+)?$/.test(colorName)

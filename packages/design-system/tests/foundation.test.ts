@@ -19,6 +19,8 @@ const darkCss = read('packages/design-system/theme-dark.css');
 const globalsCss = read('packages/design-system/globals.css');
 const uiFiles = readTree('packages/ui/src');
 const uiSources = uiFiles.map(read);
+const webFiles = readTree('apps/web/src');
+const webSources = webFiles.map(read);
 
 const compatibilityColors = [
   'card',
@@ -115,6 +117,13 @@ describe('design-system foundation contract', () => {
     );
 
     expect(undefinedVariables).toEqual([]);
+  });
+
+  it('keeps CSS Modules out of the web source tree and imports', () => {
+    expect(webFiles.filter((path) => path.endsWith('.module.css'))).toEqual([]);
+    expect(webSources.filter((source) => /module\.css/.test(source))).toEqual(
+      [],
+    );
   });
 
   it('preserves selector-only theme variants and reduced-motion behavior', () => {

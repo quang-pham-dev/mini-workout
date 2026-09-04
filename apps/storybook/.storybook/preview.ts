@@ -19,7 +19,7 @@ const preview: Preview = {
     theme: {
       name: 'Theme',
       description: 'Global theme for components',
-      defaultValue: 'system',
+      defaultValue: 'light',
       toolbar: {
         icon: 'mirror',
         dynamicTitle: true,

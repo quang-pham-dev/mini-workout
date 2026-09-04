@@ -10,11 +10,7 @@
         "DATABASE_URL",
         "NEXT_PUBLIC_API_URL"
       ],
-      "outputs": [
-        ".next-build/**",
-        "!.next-build/cache/**",
-        "!.next-build/dev/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "format": {
       "extends": false
