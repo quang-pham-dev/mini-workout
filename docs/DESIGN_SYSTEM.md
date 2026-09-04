@@ -104,7 +104,6 @@ The `theme-ocean`, `theme-forest`, and `theme-sunset` variants are selector-only
 Tailwind variants. They remain available for consumers that define their own
 `[data-theme]` palettes; this package does not ship palette values for them.
 
-Product page CSS Modules remain during the staged migration. The current Geist
-font loading and fallback mapping is intentionally preserved for visual parity.
-The drift check excludes those staged modules until their separately reviewed
-token corrections are applied.
+Product page styling uses Tailwind utilities and the design-system tokens. The
+current Geist font loading and fallback mapping is intentionally preserved for
+visual parity.

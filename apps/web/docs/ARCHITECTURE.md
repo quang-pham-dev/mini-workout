@@ -53,12 +53,9 @@ web app. Do not create speculative domain packages.
   Button, Input, Label, Card, and future shadcn-style primitives.
 - Use semantic Tailwind utilities for common spacing, color, typography, and
   state styling.
-- Use a CSS Module only for a feature's composition rules that would become
-  difficult to read as utilities: a page-specific responsive grid, a complex
-  pseudo-state, or a small visual system that has no second consumer. Do not
-  create a package component for one-off product copy or layout.
-- CSS Modules must still consume design-system variables; they must not invent
-  raw product colors or bypass accessibility states.
+- Use Tailwind utilities for page-specific composition, responsive grids,
+  pseudo-states, and small visual systems. Do not create a package component
+  for one-off product copy or layout.
 
 ### Type safety
 
