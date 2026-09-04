@@ -1,19 +1,24 @@
 import { semanticTokens } from '../src/tokens';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const root = resolve(import.meta.dirname, '../../..');
 const read = (path: string) => readFileSync(resolve(root, path), 'utf8');
+const readTree = (directory: string): string[] =>
+  readdirSync(resolve(root, directory), { withFileTypes: true }).flatMap(
+    (entry) => {
+      const path = `${directory}/${entry.name}`;
+      if (entry.isDirectory()) return readTree(path);
+      return /\.(css|scss|js|jsx|ts|tsx)$/.test(entry.name) ? [path] : [];
+    },
+  );
 const tokenCss = read('packages/design-system/design-tokens.css');
 const lightCss = read('packages/design-system/theme-light.css');
 const darkCss = read('packages/design-system/theme-dark.css');
 const globalsCss = read('packages/design-system/globals.css');
-const uiSource = read('packages/ui/src/index.ts');
-const uiSources = [
-  uiSource,
-  read('packages/ui/src/components/accordion/accordion.tsx'),
-];
+const uiFiles = readTree('packages/ui/src');
+const uiSources = uiFiles.map(read);
 
 const compatibilityColors = [
   'card',
@@ -90,8 +95,11 @@ describe('design-system foundation contract', () => {
   });
 
   it('does not let UI components import global CSS', () => {
-    expect(uiSource).not.toContain('@mini-workout/design-system');
-    expect(uiSource).not.toContain('.css');
+    for (const source of uiSources) {
+      expect(source).not.toMatch(
+        /@import[^;]*(design-system|globals\.css|ui\/styles\.css)/,
+      );
+    }
   });
 
   it('does not let consumers reference undefined public color variables', () => {

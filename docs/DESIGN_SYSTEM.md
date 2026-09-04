@@ -33,11 +33,13 @@ Compatibility roles such as `card`, `muted`, `secondary`, `input`, and `ring`
 use `--color-*` Tailwind names registered from theme variables such as `--card`
 and `--ring`. They are explicit aliases, not a second product palette.
 
-## Theme Behavior
+## Theme Infrastructure
 
-Light is the default. Dark values use the `.dark` selector. System preference
-resolution is provided by the web app theme infrastructure; both themes must
-retain identical semantic role coverage.
+Light is the default foundation theme, and dark values are defined under the
+`.dark` selector. Applying that selector and resolving system preference require
+the planned web theme infrastructure; the current web app does not yet provide a
+theme provider or claim to apply `.dark`. Both themes must retain identical
+semantic role coverage as that infrastructure is implemented.
 
 ## Typography
 
