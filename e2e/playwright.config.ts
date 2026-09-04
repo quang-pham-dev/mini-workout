@@ -67,7 +67,7 @@ export function projectDefinitions(env: NodeJS.ProcessEnv) {
   return [
     {
       name: 'public',
-      testMatch: /tests\/infrastructure\.spec\.ts/,
+      testMatch: /tests\/(infrastructure|theme)\.spec\.ts/,
       use: { baseURL: publicBaseURL },
     },
     ...(hasDatabaseEnvironment

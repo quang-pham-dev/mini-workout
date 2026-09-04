@@ -18,16 +18,10 @@ body {
   display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.dark .imgLight {
+  display: none;
+}
 
-  .imgLight {
-    display: none;
-  }
-
-  .imgDark {
-    display: unset;
-  }
+.dark .imgDark {
+  display: unset;
 }

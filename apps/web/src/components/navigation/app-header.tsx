@@ -1,5 +1,6 @@
 import styles from './app-header.module.css';
 import { NavLinks, NavLinksFallback } from './nav-links';
+import { ThemeToggle } from '@/components/theme/theme';
 import { getInitials } from '@/lib/auth/initials';
 import { getCurrentSession } from '@/lib/auth/session';
 import Link from 'next/link';
@@ -26,9 +27,12 @@ export function AppHeader() {
           mini / workout
         </Link>
 
-        <Suspense fallback={<NavLinksFallback />}>
-          <HeaderSessionNav />
-        </Suspense>
+        <div className={styles.headerActions}>
+          <ThemeToggle />
+          <Suspense fallback={<NavLinksFallback />}>
+            <HeaderSessionNav />
+          </Suspense>
+        </div>
       </div>
     </header>
   );

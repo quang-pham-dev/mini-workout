@@ -1,0 +1,30 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 9999px;
+  background: var(--color-surface-sunken);
+}
+
+.option {
+  min-width: 2.75rem;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 9999px;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.option[aria-checked='true'] {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.12);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
