@@ -20,20 +20,18 @@ pnpm --filter @mini-workout/e2e test:e2e
 Install the pinned Chromium browser before the first run:
 
 ```bash
-pnpm exec playwright install chromium
+pnpm --filter @mini-workout/e2e exec playwright install chromium
 ```
 
-## Planned structure
+## Structure
 
-Use a structure similar to:
+The current infrastructure uses:
 
 ```text
 e2e/
   playwright.config.ts
   tests/
     infrastructure.spec.ts
-  fixtures/
-  pages/
 ```
 
 Tests should describe user behavior, use accessible selectors, remain

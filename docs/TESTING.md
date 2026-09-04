@@ -43,12 +43,20 @@ Stories live beside components under `packages/ui/src/components`.
 
 ### End-to-end tests
 
-The `e2e/` directory is reserved for Playwright browser flows, but the project
-does not currently contain a Playwright configuration or runnable E2E suite.
-Do not document E2E commands as available until the runner and at least one
-critical user journey are implemented.
+The `e2e/` workspace contains the Playwright configuration and a runnable
+browser check for the public landing page. Run it with:
 
-When E2E work begins, prioritize user-visible flows such as:
+```bash
+pnpm test:e2e
+```
+
+Install the pinned Chromium browser before the first run:
+
+```bash
+pnpm --filter @mini-workout/e2e exec playwright install chromium
+```
+
+Additional E2E coverage should prioritize user-visible flows such as:
 
 - The web app loads successfully.
 - A user can navigate the workout discovery flow.

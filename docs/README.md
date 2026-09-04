@@ -7,8 +7,7 @@ guidance, testing strategy, and product roadmap.
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — workspace structure, package
   boundaries, Turborepo tasks, and caching.
-- [`TESTING.md`](TESTING.md) — unit, component, Storybook, and planned E2E
-  testing.
+- [`TESTING.md`](TESTING.md) — unit, component, Storybook, and E2E testing.
 - [`OBSERVABILITY.md`](OBSERVABILITY.md) — logging, errors, tracing, Web
   Vitals, health, and alerting contracts.
 - [`NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) —

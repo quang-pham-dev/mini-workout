@@ -66,6 +66,7 @@ pnpm --filter @mini-workout/storybook dev
 | `pnpm format:fix`            | Apply Prettier formatting.                               |
 | `pnpm check-types`           | Run workspace TypeScript checks.                         |
 | `pnpm test`                  | Run workspace tests.                                     |
+| `pnpm test:e2e`              | Run the Playwright browser checks.                       |
 | `pnpm test:coverage`         | Run tests with coverage reporting.                       |
 | `pnpm exec turbo boundaries` | Check package boundary violations.                       |
 | `pnpm docs:check`            | Check local documentation links and stale template text. |
