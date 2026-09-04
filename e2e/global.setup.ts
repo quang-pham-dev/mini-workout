@@ -15,7 +15,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const baseURL = 'http://localhost:3000';
+const baseURL = 'http://localhost:3001';
 
 function writeJsonAtomically(path: string, value: unknown): void {
   const temporaryPath = `${path}.${process.pid}.tmp`;

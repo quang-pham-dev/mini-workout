@@ -1,4 +1,10 @@
-import { projectDefinitions, publicServerEnv } from '../playwright.config.ts';
+import {
+  databaseBaseURL,
+  databaseServerEnv,
+  projectDefinitions,
+  publicBaseURL,
+  publicServerEnv,
+} from '../playwright.config.ts';
 import { strict as assert } from 'node:assert';
 import test from 'node:test';
 
@@ -61,5 +67,23 @@ test('gates database projects on both matching database variables', () => {
       DATABASE_URL: databaseUrl,
     }).map(({ name }) => name),
     ['public', 'db-setup', 'db'],
+  );
+});
+
+test('uses the public server only for public tests and the database server for DB tests', () => {
+  const projects = projectDefinitions({
+    E2E_DATABASE_URL:
+      'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+    DATABASE_URL: 'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+  });
+
+  assert.equal(projects[0]?.use?.baseURL, publicBaseURL);
+  assert.equal(projects[2]?.use?.baseURL, databaseBaseURL);
+  assert.equal(
+    databaseServerEnv(
+      {},
+      'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+    ).DATABASE_URL,
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
   );
 });

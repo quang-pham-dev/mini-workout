@@ -1,7 +1,8 @@
 import { resolveDatabaseUrl } from './fixtures/database-env.ts';
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = 'http://localhost:3000';
+export const publicBaseURL = 'http://localhost:3000';
+export const databaseBaseURL = 'http://localhost:3001';
 const preservedEnvironmentKeys = [
   'CI',
   'HOME',
@@ -25,10 +26,23 @@ export function publicServerEnv(
     ...safeEnvironment,
     NODE_ENV: 'development',
     NEXT_TELEMETRY_DISABLED: '1',
-    BETTER_AUTH_URL: baseURL,
+    BETTER_AUTH_URL: publicBaseURL,
     BETTER_AUTH_SECRET: 'e2e-public-only-secret',
     DATABASE_URL: 'postgresql://127.0.0.1:1/public_only_blocked',
     E2E_DATABASE_URL: '',
+  };
+}
+
+export function databaseServerEnv(
+  env: NodeJS.ProcessEnv,
+  databaseUrl: string,
+): Record<string, string> {
+  return {
+    ...publicServerEnv(env),
+    PORT: '3001',
+    BETTER_AUTH_URL: databaseBaseURL,
+    DATABASE_URL: databaseUrl,
+    E2E_DATABASE_URL: databaseUrl,
   };
 }
 
@@ -36,14 +50,23 @@ export function projectDefinitions(env: NodeJS.ProcessEnv) {
   const hasDatabaseEnvironment =
     Boolean(env.E2E_DATABASE_URL) && Boolean(env.DATABASE_URL);
   return [
-    { name: 'public', testMatch: /tests\/infrastructure\.spec\.ts/ },
+    {
+      name: 'public',
+      testMatch: /tests\/infrastructure\.spec\.ts/,
+      use: { baseURL: publicBaseURL },
+    },
     ...(hasDatabaseEnvironment
       ? [
-          { name: 'db-setup', testMatch: /global\.setup\.ts/ },
+          {
+            name: 'db-setup',
+            testMatch: /global\.setup\.ts/,
+            use: { baseURL: databaseBaseURL },
+          },
           {
             name: 'db',
             dependencies: ['db-setup'],
             testMatch: /tests\/fixtures\.spec\.ts/,
+            use: { baseURL: databaseBaseURL },
           },
         ]
       : []),
@@ -70,25 +93,36 @@ export default defineConfig({
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
   use: {
     ...devices['Desktop Chrome'],
-    baseURL,
+    baseURL: publicBaseURL,
     colorScheme: 'light',
     locale: 'en-US',
     screenshot: 'only-on-failure',
     timezoneId: 'UTC',
     trace: 'retain-on-failure',
   },
-  webServer: {
-    command: 'pnpm --filter @mini-workout/web dev',
-    reuseExistingServer: false,
-    timeout: 120_000,
-    url: 'http://localhost:3000/api/health',
-    env: databaseUrl
-      ? {
-          ...publicServerEnv(process.env),
-          DATABASE_URL: databaseUrl,
-          E2E_DATABASE_URL: databaseUrl,
-        }
-      : publicServerEnv(process.env),
-  },
+  webServer: databaseUrl
+    ? [
+        {
+          command: 'pnpm --filter @mini-workout/web dev',
+          reuseExistingServer: false,
+          timeout: 120_000,
+          url: `${publicBaseURL}/api/health`,
+          env: publicServerEnv(process.env),
+        },
+        {
+          command: 'pnpm --filter @mini-workout/web dev',
+          reuseExistingServer: false,
+          timeout: 120_000,
+          url: `${databaseBaseURL}/api/health`,
+          env: databaseServerEnv(process.env, databaseUrl),
+        },
+      ]
+    : {
+        command: 'pnpm --filter @mini-workout/web dev',
+        reuseExistingServer: false,
+        timeout: 120_000,
+        url: `${publicBaseURL}/api/health`,
+        env: publicServerEnv(process.env),
+      },
   projects: projectDefinitions(process.env),
 });

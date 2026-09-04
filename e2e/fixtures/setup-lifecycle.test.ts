@@ -1,4 +1,4 @@
-import { withFixtureSetup } from './setup-lifecycle.ts';
+import { withFixtureSetup, withFixtureTeardown } from './setup-lifecycle.ts';
 import { strict as assert } from 'node:assert';
 import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -54,4 +54,28 @@ test('attempts metadata removal and release even when earlier cleanup fails', as
     (error) => error === setupError,
   );
   assert.deepEqual(events, ['metadata', 'release']);
+});
+
+test('teardown attempts every cleanup and preserves the first cleanup error', async () => {
+  const events: string[] = [];
+  const cleanupError = new Error('auth cleanup failed');
+
+  await assert.rejects(
+    withFixtureTeardown(
+      () => {
+        events.push('auth');
+        throw cleanupError;
+      },
+      () => {
+        events.push('metadata');
+        throw new Error('metadata cleanup failed');
+      },
+      () => {
+        events.push('release');
+        throw new Error('release failed');
+      },
+    ),
+    (error) => error === cleanupError,
+  );
+  assert.deepEqual(events, ['auth', 'metadata', 'release']);
 });

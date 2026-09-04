@@ -6,7 +6,13 @@ import {
 } from './database-lock.ts';
 import { authStatePath } from './test.ts';
 import { strict as assert } from 'node:assert';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -51,7 +57,9 @@ test('does not remove an incomplete lock', () => {
   const path = lockPathForDatabase(databaseUrl, lockDirectory);
 
   try {
-    writeFileSync(path, '{"pid":', 'utf8');
+    mkdirSync(path);
+    mkdirSync(join(path, 'token'));
+    writeFileSync(join(path, 'token', 'owner'), '{"pid":', 'utf8');
     assert.throws(() => acquireDatabaseLock(databaseUrl, lockDirectory));
     assert.equal(existsSync(path), true);
   } finally {
@@ -75,7 +83,13 @@ for (const [name, owner] of [
     const path = lockPathForDatabase(databaseUrl, lockDirectory);
 
     try {
-      writeFileSync(path, JSON.stringify(owner), 'utf8');
+      mkdirSync(path);
+      mkdirSync(join(path, 'token'));
+      writeFileSync(
+        join(path, 'token', 'owner'),
+        JSON.stringify(owner),
+        'utf8',
+      );
       assert.throws(() => acquireDatabaseLock(databaseUrl, lockDirectory));
       assert.equal(existsSync(path), true);
     } finally {
@@ -91,8 +105,10 @@ test('does not take over a valid lock when its owner is still running', () => {
   const path = lockPathForDatabase(databaseUrl, lockDirectory);
 
   try {
+    mkdirSync(path);
+    mkdirSync(join(path, 'token'));
     writeFileSync(
-      path,
+      join(path, 'token', 'owner'),
       JSON.stringify({ pid: process.pid, token: 'token' }),
       'utf8',
     );
@@ -110,8 +126,10 @@ test('takes over a stale lock only when its owner is definitely dead', () => {
   const path = lockPathForDatabase(databaseUrl, lockDirectory);
 
   try {
+    mkdirSync(path);
+    mkdirSync(join(path, 'stale-token'));
     writeFileSync(
-      path,
+      join(path, 'stale-token', 'owner'),
       JSON.stringify({ pid: 2_147_483_647, token: 'stale-token' }),
       'utf8',
     );
@@ -123,15 +141,37 @@ test('takes over a stale lock only when its owner is definitely dead', () => {
   }
 });
 
-test('treats permission errors while probing an owner as unknown', () => {
-  assert.equal(
-    processStatus(123, () => {
-      const error = new Error('permission denied') as NodeJS.ErrnoException;
-      error.code = 'EPERM';
-      throw error;
-    }),
-    'unknown',
-  );
+for (const code of ['EPERM', 'EACCES', 'EINVAL', 'EIO'] as const) {
+  test(`treats ${code} while probing an owner as unknown`, () => {
+    assert.equal(
+      processStatus(123, () => {
+        const error = new Error('probe failed') as NodeJS.ErrnoException;
+        error.code = code;
+        throw error;
+      }),
+      'unknown',
+    );
+  });
+}
+
+test('does not remove a replacement lock during release', () => {
+  const lockDirectory = mkdtempSync(join(tmpdir(), 'mini-workout-lock-test-'));
+  const databaseUrl =
+    'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
+  const path = lockPathForDatabase(databaseUrl, lockDirectory);
+
+  try {
+    const first = acquireDatabaseLock(databaseUrl, lockDirectory);
+    rmSync(path, { recursive: true, force: true });
+    const replacement = acquireDatabaseLock(databaseUrl, lockDirectory);
+
+    first.release();
+    assert.equal(existsSync(path), true);
+    replacement.release();
+    assert.equal(existsSync(path), false);
+  } finally {
+    rmSync(lockDirectory, { recursive: true, force: true });
+  }
 });
 
 test('keys auth state paths by the canonical database URL', () => {

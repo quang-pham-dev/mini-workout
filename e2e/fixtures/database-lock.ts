@@ -1,13 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto';
 import {
-  closeSync,
-  fsyncSync,
   mkdirSync,
-  openSync,
   readFileSync,
-  renameSync,
+  readdirSync,
   rmSync,
-  writeSync,
+  rmdirSync,
+  writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -41,7 +39,13 @@ function parseLockOwner(value: unknown): LockOwner {
 }
 
 function readLockOwner(path: string): LockOwner {
-  return parseLockOwner(JSON.parse(readFileSync(path, 'utf8')));
+  const entries = readdirSync(path, { withFileTypes: true });
+  if (entries.length !== 1 || !entries[0]?.isDirectory()) {
+    throw new Error('E2E database fixture lock owner is malformed');
+  }
+  return parseLockOwner(
+    JSON.parse(readFileSync(join(path, entries[0].name, 'owner'), 'utf8')),
+  );
 }
 
 export function databaseRunKey(databaseUrl: string): string {
@@ -66,8 +70,9 @@ export function processStatus(
     probe(pid, 0);
     return 'alive';
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'EPERM') return 'unknown';
-    return 'dead';
+    return (error as NodeJS.ErrnoException).code === 'ESRCH'
+      ? 'dead'
+      : 'unknown';
   }
 }
 
@@ -78,35 +83,12 @@ export function acquireDatabaseLock(
   mkdirSync(directory, { recursive: true });
   const path = lockPathForDatabase(databaseUrl, directory);
   const owner: LockOwner = { pid: process.pid, token: randomUUID() };
-  let descriptor: number | undefined;
-  let reserved = false;
-  let temporaryPath: string | undefined;
 
   try {
-    descriptor = openSync(path, 'wx');
-    reserved = true;
-    closeSync(descriptor);
-    descriptor = undefined;
-    temporaryPath = `${path}.${owner.token}.tmp`;
-    const temporaryDescriptor = openSync(temporaryPath, 'wx');
-    try {
-      const contents = Buffer.from(JSON.stringify(owner));
-      writeSync(temporaryDescriptor, contents, 0, contents.length, 0);
-      fsyncSync(temporaryDescriptor);
-    } finally {
-      closeSync(temporaryDescriptor);
-    }
-    renameSync(temporaryPath, path);
+    mkdirSync(path);
+    mkdirSync(join(path, owner.token));
+    writeFileSync(join(path, owner.token, 'owner'), JSON.stringify(owner));
   } catch (error) {
-    if (descriptor !== undefined) closeSync(descriptor);
-    if (temporaryPath !== undefined) rmSync(temporaryPath, { force: true });
-    if (
-      reserved &&
-      (error as NodeJS.ErrnoException).code !== 'EPERM' &&
-      (error as NodeJS.ErrnoException).code !== 'EACCES'
-    ) {
-      rmSync(path, { force: true });
-    }
     if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
       throw error;
     }
@@ -116,7 +98,7 @@ export function acquireDatabaseLock(
       if (status !== 'dead') {
         throw new Error('E2E database fixture run is already in use');
       }
-      rmSync(path);
+      rmSync(path, { recursive: true });
       return acquireDatabaseLock(databaseUrl, directory);
     } catch (readError) {
       if (
@@ -136,7 +118,20 @@ export function acquireDatabaseLock(
     release: () => {
       try {
         const current = readLockOwner(path);
-        if (current.token === owner.token) rmSync(path);
+        if (current.token === owner.token) {
+          rmSync(join(path, owner.token), { recursive: true });
+          try {
+            rmdirSync(path);
+          } catch (error) {
+            if (
+              !['ENOENT', 'ENOTEMPTY'].includes(
+                (error as NodeJS.ErrnoException).code ?? '',
+              )
+            ) {
+              throw error;
+            }
+          }
+        }
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
         throw error;
@@ -153,7 +148,20 @@ export function releaseDatabaseLock(
   const path = lockPathForDatabase(databaseUrl, directory);
   try {
     const owner = readLockOwner(path);
-    if (owner.token === token) rmSync(path);
+    if (owner.token === token) {
+      rmSync(join(path, token), { recursive: true });
+      try {
+        rmdirSync(path);
+      } catch (error) {
+        if (
+          !['ENOENT', 'ENOTEMPTY'].includes(
+            (error as NodeJS.ErrnoException).code ?? '',
+          )
+        ) {
+          throw error;
+        }
+      }
+    }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
     throw error;
