@@ -30,17 +30,21 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@mini-workout/design-system": "workspace:*",
     "@mini-workout/eslint-config": "workspace:*",
     "@mini-workout/typescript-config": "workspace:*",
     "@mini-workout/vitest-config": "workspace:*",
+    "@tailwindcss/postcss": "catalog:ui-styling",
     "@vitest/coverage-v8": "catalog:test-unit",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "prisma": "6.19.3",
     "eslint": "catalog:",
-    "typescript": "catalog:",
+    "postcss": "catalog:ui-styling",
+    "prisma": "6.19.3",
+    "tailwindcss": "catalog:ui-styling",
     "tsx": "^4.19.2",
+    "typescript": "catalog:",
     "vitest": "catalog:test-unit"
   },
   "prisma": {

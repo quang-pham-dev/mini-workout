@@ -249,11 +249,11 @@ export function ThemeToggle() {
   return (
     <div
       ref={toggleRef}
-      className="relative inline-flex items-center gap-[0.15rem] rounded-full border border-border-subtle bg-surface-sunken p-[0.2rem]"
+      className="relative inline-flex items-center gap-[0.15rem] rounded-full border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] p-[0.2rem]"
     >
       <button
         ref={triggerRef}
-        className="min-h-9 min-w-[4.25rem] rounded-full p-[0.35rem_0.65rem] text-xs font-semibold capitalize text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
+        className="min-h-9 min-w-[4.25rem] rounded-full p-[0.35rem_0.65rem] text-[12px] font-semibold capitalize text-[var(--color-text-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-ring)] focus-visible:outline-offset-2"
         type="button"
         aria-label="Theme"
         aria-haspopup="menu"
@@ -265,7 +265,7 @@ export function ThemeToggle() {
       </button>
       {open ? (
         <div
-          className="absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex min-w-32 max-w-[calc(100vw-2rem)] flex-col gap-[0.15rem] rounded-xl border border-border-subtle bg-surface p-[0.3rem] shadow-[0_8px_24px_oklch(0_0_0/0.14)]"
+          className="absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex min-w-32 max-w-[calc(100vw-2rem)] flex-col gap-[0.15rem] rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-[0.3rem] shadow-[0_8px_24px_oklch(0_0_0/0.14)]"
           role="menu"
           aria-label="Theme options"
           onKeyDown={handleMenuKeyDown}
@@ -276,7 +276,7 @@ export function ThemeToggle() {
               ref={(element) => {
                 optionRefs.current[index] = element;
               }}
-              className="min-h-9 w-full min-w-0 rounded-full p-[0.35rem_0.55rem] text-left text-xs font-semibold text-text-secondary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 aria-checked:bg-surface aria-checked:text-text-primary aria-checked:shadow-[0_1px_3px_oklch(0_0_0/0.12)]"
+              className="min-h-9 w-full min-w-0 rounded-full p-[0.35rem_0.55rem] text-left text-[12px] font-semibold text-[var(--color-text-secondary)] focus-visible:outline-2 focus-visible:outline-[var(--color-ring)] focus-visible:outline-offset-2 aria-checked:bg-[var(--color-surface)] aria-checked:text-[var(--color-text-primary)] aria-checked:shadow-[0_1px_3px_oklch(0_0_0/0.12)]"
               type="button"
               role="menuitemradio"
               aria-checked={theme === option.value}
