@@ -29,17 +29,27 @@ export const testUsers = {
 } as const;
 
 const testEmailDomain = '@example.test';
+const approvedHosts = new Set(['127.0.0.1', '::1', 'localhost']);
+const approvedDatabaseNames = new Set([
+  'e2e',
+  'mini_workout_e2e',
+  'mini_workout_test',
+  'test',
+]);
 
 export function assertTestDatabase(databaseUrl: string): void {
-  let databaseName: string;
-
   try {
-    databaseName = new URL(databaseUrl).pathname.toLowerCase();
-  } catch {
-    throw new Error('E2E setup requires a disposable test database');
-  }
+    const url = new URL(databaseUrl);
+    const databaseName = decodeURIComponent(url.pathname.slice(1));
 
-  if (!databaseName.includes('test') && !databaseName.includes('e2e')) {
+    if (
+      !['postgres:', 'postgresql:'].includes(url.protocol) ||
+      !approvedHosts.has(url.hostname) ||
+      !approvedDatabaseNames.has(databaseName)
+    ) {
+      throw new Error('not approved');
+    }
+  } catch {
     throw new Error('E2E setup requires a disposable test database');
   }
 }
@@ -73,23 +83,31 @@ export async function configureUser(
 
   try {
     const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+    const interestSlugs = input.interestSlugs ?? [];
     const interests = input.interestSlugs
       ? await prisma.interest.findMany({
-          where: { slug: { in: input.interestSlugs } },
+          where: { slug: { in: interestSlugs } },
           select: { id: true },
         })
       : [];
+    if (interests.length !== new Set(interestSlugs).size) {
+      throw new Error(`E2E setup references an unknown interest slug`);
+    }
+
+    const favoriteWorkoutSlugs = input.favoriteWorkoutSlugs ?? [];
+    const likeWorkoutSlugs = input.likeWorkoutSlugs ?? [];
+    const workoutSlugs = [
+      ...new Set([...favoriteWorkoutSlugs, ...likeWorkoutSlugs]),
+    ];
     const workouts = await prisma.workout.findMany({
       where: {
-        slug: {
-          in: [
-            ...(input.favoriteWorkoutSlugs ?? []),
-            ...(input.likeWorkoutSlugs ?? []),
-          ],
-        },
+        slug: { in: workoutSlugs },
       },
       select: { id: true, slug: true },
     });
+    if (workouts.length !== workoutSlugs.length) {
+      throw new Error(`E2E setup references an unknown workout slug`);
+    }
     const workoutIds = new Map(
       workouts.map((workout) => [workout.slug, workout.id]),
     );
@@ -99,15 +117,18 @@ export async function configureUser(
       data: {
         onboardingCompleted: input.onboardingCompleted,
         interests: {
+          deleteMany: {},
           create: interests.map(({ id }) => ({ interestId: id })),
         },
         favorites: {
-          create: (input.favoriteWorkoutSlugs ?? []).map((slug) => ({
+          deleteMany: {},
+          create: favoriteWorkoutSlugs.map((slug) => ({
             workoutId: workoutIds.get(slug)!,
           })),
         },
         likes: {
-          create: (input.likeWorkoutSlugs ?? []).map((slug) => ({
+          deleteMany: {},
+          create: likeWorkoutSlugs.map((slug) => ({
             workoutId: workoutIds.get(slug)!,
           })),
         },

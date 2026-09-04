@@ -4,6 +4,7 @@ import {
   test as base,
   expect,
 } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 
 type Fixtures = {
   activePage: Page;
@@ -25,15 +26,19 @@ async function pageWithStorageState(
   }
 }
 
+function authState(name: string): string {
+  return fileURLToPath(new URL(`../.auth/${name}.json`, import.meta.url));
+}
+
 export const test = base.extend<Fixtures>({
   activePage: async ({ browser }, use) =>
-    pageWithStorageState(browser, 'e2e/.auth/active.json', use),
+    pageWithStorageState(browser, authState('active'), use),
   emptyPage: async ({ browser }, use) =>
-    pageWithStorageState(browser, 'e2e/.auth/empty.json', use),
+    pageWithStorageState(browser, authState('empty'), use),
   longPage: async ({ browser }, use) =>
-    pageWithStorageState(browser, 'e2e/.auth/long.json', use),
+    pageWithStorageState(browser, authState('long'), use),
   newUserPage: async ({ browser }, use) =>
-    pageWithStorageState(browser, 'e2e/.auth/new-user.json', use),
+    pageWithStorageState(browser, authState('new-user'), use),
 });
 
 export { expect };

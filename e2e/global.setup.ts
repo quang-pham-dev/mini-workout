@@ -4,17 +4,20 @@ import {
   prepareDatabase,
   testUsers,
 } from './fixtures/database';
+import { test } from '@playwright/test';
 import { request } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, rmSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const baseURL = 'http://localhost:3000';
+const authDirectory = fileURLToPath(new URL('./.auth', import.meta.url));
 
-export default async function globalSetup() {
-  const databaseUrl = process.env.DATABASE_URL;
+test('prepare deterministic database fixtures', async () => {
+  const databaseUrl = process.env.E2E_DATABASE_URL ?? process.env.DATABASE_URL;
   if (!databaseUrl) {
     throw new Error(
-      'E2E setup requires DATABASE_URL to be explicitly set to a disposable test database',
+      'E2E setup requires E2E_DATABASE_URL or DATABASE_URL to be set to an approved disposable database',
     );
   }
 
@@ -31,8 +34,9 @@ export default async function globalSetup() {
   });
   await prepareDatabase(databaseUrl);
 
-  mkdirSync('e2e/.auth', { recursive: true });
+  mkdirSync(authDirectory, { recursive: true });
   const api = await request.newContext({ baseURL });
+  let setupSucceeded = false;
 
   try {
     for (const [name, user] of Object.entries(testUsers)) {
@@ -67,10 +71,19 @@ export default async function globalSetup() {
         );
       }
       await api.storageState({
-        path: `e2e/.auth/${name === 'newUser' ? 'new-user' : name}.json`,
+        path: fileURLToPath(
+          new URL(
+            `.auth/${name === 'newUser' ? 'new-user' : name}.json`,
+            import.meta.url,
+          ),
+        ),
       });
     }
+    setupSucceeded = true;
   } finally {
     await api.dispose();
+    if (!setupSucceeded) {
+      rmSync(authDirectory, { recursive: true, force: true });
+    }
   }
-}
+});

@@ -1,12 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  globalSetup: './global.setup.ts',
-  testDir: './tests',
+  globalTeardown: './global.teardown.ts',
+  testDir: '.',
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
@@ -27,4 +27,19 @@ export default defineConfig({
     timeout: 120_000,
     url: 'http://localhost:3000/api/health',
   },
+  projects: [
+    {
+      name: 'public',
+      testMatch: /tests\/infrastructure\.spec\.ts/,
+    },
+    {
+      name: 'db-setup',
+      testMatch: /global\.setup\.ts/,
+    },
+    {
+      name: 'db',
+      dependencies: ['db-setup'],
+      testMatch: /tests\/fixtures\.spec\.ts/,
+    },
+  ],
 });

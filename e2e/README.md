@@ -11,11 +11,26 @@ spec verifies that the public landing page loads.
 The installed Playwright version does not expose `reducedMotion` as a context
 option, so tests set `no-preference` through `page.emulateMedia` instead.
 
-Run the focused test with:
+Run the public infrastructure test without a database:
 
 ```bash
-pnpm --filter @mini-workout/e2e test:e2e
+pnpm --filter @mini-workout/e2e test:e2e --project=public
 ```
+
+Run the database-backed fixtures with an explicitly disposable local database:
+
+```bash
+E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' \
+DATABASE_URL="$E2E_DATABASE_URL" pnpm --filter @mini-workout/e2e test:e2e --project=db
+```
+
+`E2E_DATABASE_URL` is preferred and falls back to `DATABASE_URL`. The selected
+URL must use the PostgreSQL protocol, resolve to `localhost`, `127.0.0.1`, or
+`::1`, and use exactly one of these database names: `e2e`, `test`,
+`mini_workout_e2e`, or `mini_workout_test`. Production hosts and names that
+merely contain `test` or `e2e` are rejected. `DATABASE_URL` should be set to the
+same disposable URL so the web app uses the database prepared by the fixture
+setup.
 
 Install the pinned Chromium browser before the first run:
 
@@ -30,6 +45,8 @@ The current infrastructure uses:
 ```text
 e2e/
   playwright.config.ts
+  global.setup.ts
+  global.teardown.ts
   tests/
     infrastructure.spec.ts
 ```

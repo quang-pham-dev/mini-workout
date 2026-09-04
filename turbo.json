@@ -5,6 +5,7 @@
     "NODE_ENV",
     "BETTER_AUTH_SECRET",
     "DATABASE_URL",
+    "E2E_DATABASE_URL",
     "BETTER_AUTH_URL"
   ],
   "globalPassThroughEnv": ["CI"],
