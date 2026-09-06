@@ -207,7 +207,7 @@ export function NavLinks({
     <>
       {/* Desktop Navigation Links */}
       <nav
-        className="flex items-center gap-2 max-[768px]:hidden"
+        className="flex items-center gap-2 max-[768px]:hidden md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
         aria-label="Main Navigation"
       >
         <Link
@@ -277,7 +277,7 @@ export function NavLinksFallback() {
   return (
     <>
       <nav
-        className="flex items-center gap-2 max-[768px]:hidden"
+        className="flex items-center gap-2 max-[768px]:hidden md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
         aria-label="Main Navigation"
       >
         <Link

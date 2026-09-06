@@ -15,6 +15,7 @@ export function ProfileSkeleton() {
 
       <div className="animate-shimmer h-[140px] w-full rounded-[1.25rem] bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none" />
       <div className="animate-shimmer h-[180px] w-full rounded-[1.25rem] bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none" />
+      <div className="animate-shimmer h-[160px] w-full rounded-[1.25rem] bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none" />
     </div>
   );
 }

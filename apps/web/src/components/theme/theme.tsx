@@ -1,5 +1,9 @@
 'use client';
 
+import { MoonIcon } from './moon-icon';
+import { SunIcon } from './sun-icon';
+import { SystemIcon } from './system-icon';
+import { cn } from '@mini-workout/ui';
 import * as React from 'react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
@@ -125,13 +129,13 @@ export function useTheme() {
   return context;
 }
 
-const options: { value: Theme; label: string }[] = [
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-  { value: 'system', label: 'System' },
+const options: { value: Theme; label: string; icon: React.ReactNode }[] = [
+  { value: 'light', label: 'Light', icon: <SunIcon className="size-4" /> },
+  { value: 'dark', label: 'Dark', icon: <MoonIcon className="size-4" /> },
+  { value: 'system', label: 'System', icon: <SystemIcon className="size-4" /> },
 ];
 
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string } = {}) {
   const { theme, mounted, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(() =>
@@ -246,14 +250,28 @@ export function ThemeToggle() {
     }
   }
 
+  const currentIcon = !mounted ? (
+    <SunIcon className="size-4.5" />
+  ) : theme === 'dark' ? (
+    <MoonIcon className="size-4.5" />
+  ) : theme === 'system' ? (
+    <SystemIcon className="size-4.5" />
+  ) : (
+    <SunIcon className="size-4.5" />
+  );
+
   return (
     <div
       ref={toggleRef}
-      className="relative inline-flex items-center gap-[0.15rem] rounded-full border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] p-[0.2rem]"
+      className={cn('relative inline-flex items-center', className)}
     >
       <button
         ref={triggerRef}
-        className="min-h-9 min-w-[4.25rem] rounded-full p-[0.35rem_0.65rem] text-[12px] font-semibold capitalize text-[var(--color-text-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-ring)] focus-visible:outline-offset-2"
+        className={cn(
+          'flex size-9 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary transition-[color,background-color,border-color,box-shadow,transform] hover:border-border-strong hover:bg-surface-sunken hover:text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 active:scale-95 sm:size-10',
+          open &&
+            'border-border-strong bg-surface-sunken text-text-primary shadow-[0_1px_3px_oklch(0_0_0/0.08)]',
+        )}
         type="button"
         aria-label="Theme"
         aria-haspopup="menu"
@@ -261,11 +279,12 @@ export function ThemeToggle() {
         onClick={() => setOpen((isOpen) => !isOpen)}
         onKeyDown={handleTriggerKeyDown}
       >
-        {mounted ? theme : 'Theme'}
+        {currentIcon}
+        <span className="sr-only capitalize">{mounted ? theme : 'Theme'}</span>
       </button>
       {open ? (
         <div
-          className="absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex min-w-32 max-w-[calc(100vw-2rem)] flex-col gap-[0.15rem] rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-[0.3rem] shadow-[0_8px_24px_oklch(0_0_0/0.14)]"
+          className="absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex min-w-36 max-w-[calc(100vw-2rem)] flex-col gap-1 rounded-2xl border border-border-subtle bg-surface p-1.5 shadow-[0_12px_32px_oklch(0_0_0/0.14)] backdrop-blur-md"
           role="menu"
           aria-label="Theme options"
           onKeyDown={handleMenuKeyDown}
@@ -276,7 +295,12 @@ export function ThemeToggle() {
               ref={(element) => {
                 optionRefs.current[index] = element;
               }}
-              className="min-h-9 w-full min-w-0 rounded-full p-[0.35rem_0.55rem] text-left text-[12px] font-semibold text-[var(--color-text-secondary)] focus-visible:outline-2 focus-visible:outline-[var(--color-ring)] focus-visible:outline-offset-2 aria-checked:bg-[var(--color-surface)] aria-checked:text-[var(--color-text-primary)] aria-checked:shadow-[0_1px_3px_oklch(0_0_0/0.12)]"
+              className={cn(
+                'flex min-h-9 w-full min-w-0 items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-[13px] font-medium transition-[background-color,color] focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+                theme === option.value
+                  ? 'bg-surface-raised font-semibold text-text-primary shadow-[0_1px_3px_oklch(0_0_0/0.08)]'
+                  : 'text-text-secondary hover:bg-surface-sunken hover:text-text-primary',
+              )}
               type="button"
               role="menuitemradio"
               aria-checked={theme === option.value}
@@ -284,7 +308,16 @@ export function ThemeToggle() {
               data-theme-option={option.value}
               onClick={() => selectTheme(option.value)}
             >
-              {option.label}
+              <span className="flex items-center gap-2">
+                <span className="text-text-secondary">{option.icon}</span>
+                <span>{option.label}</span>
+              </span>
+              {theme === option.value ? (
+                <span
+                  className="size-1.5 rounded-full bg-highlight"
+                  aria-hidden="true"
+                />
+              ) : null}
             </button>
           ))}
         </div>

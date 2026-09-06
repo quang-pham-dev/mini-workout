@@ -9,7 +9,7 @@ import { Suspense } from 'react';
 
 export default function HomePage() {
   return (
-    <main className="min-h-[100svh] bg-background px-[clamp(1rem,5vw,5rem)] py-[clamp(2rem,7vw,6rem)] text-text-primary">
+    <main className="min-h-[100svh] bg-background px-[clamp(1rem,5vw,5rem)] text-text-primary">
       <div className="mx-auto max-w-[76rem]">
         <Suspense fallback={<HeroFallback />}>
           <Hero />

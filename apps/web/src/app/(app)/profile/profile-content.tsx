@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { ThemeSelector } from '@/components/theme/theme-selector';
 import { getInitials } from '@/lib/auth/initials';
 import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
 import { prisma } from '@/lib/db/prisma';
@@ -134,14 +135,20 @@ export async function ProfileContent() {
             </span>
             <div className="flex flex-wrap gap-2">
               {userFull.interests.length > 0 ? (
-                userFull.interests.map(({ interest }) => (
-                  <span
-                    key={interest.id}
-                    className="inline-flex items-center rounded-full border border-border-subtle bg-surface-sunken px-[0.85rem] py-[0.35rem] text-[0.825rem] font-medium"
-                  >
-                    {interest.name}
-                  </span>
-                ))
+                userFull.interests.map(
+                  ({
+                    interest,
+                  }: {
+                    interest: { id: string; name: string };
+                  }) => (
+                    <span
+                      key={interest.id}
+                      className="inline-flex items-center rounded-full border border-border-subtle bg-surface-sunken px-[0.85rem] py-[0.35rem] text-[0.825rem] font-medium"
+                    >
+                      {interest.name}
+                    </span>
+                  ),
+                )
               ) : (
                 <span className="inline-flex items-center rounded-full border border-border-subtle bg-surface-sunken px-[0.85rem] py-[0.35rem] text-[0.825rem] font-medium">
                   None selected
@@ -149,6 +156,25 @@ export async function ProfileContent() {
               )}
             </div>
           </div>
+        </section>
+
+        <section
+          className="rounded-[1.25rem] border border-border-subtle bg-surface p-6"
+          aria-labelledby="appearance-title"
+        >
+          <div className="mb-5 flex flex-col gap-1">
+            <h2
+              className="text-[1.15rem] font-semibold tracking-[-0.02em]"
+              id="appearance-title"
+            >
+              Appearance
+            </h2>
+            <p className="text-[0.85rem] text-text-secondary">
+              Choose how Mini Workout looks to you. Select a theme or sync with
+              your system.
+            </p>
+          </div>
+          <ThemeSelector />
         </section>
 
         <div className="mt-8 flex items-center justify-between border-t border-border-subtle pt-6 max-[640px]:flex-col max-[640px]:items-start max-[640px]:gap-4">

@@ -10,6 +10,7 @@
     "lint": "eslint --max-warnings 0",
     "postinstall": "prisma generate",
     "check-types": "next typegen && tsc --noEmit",
+    "clean": "rm -rf .next && rm -rf node_modules",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "auth:generate": "pnpm dlx auth@latest generate --output prisma/schema.prisma",
