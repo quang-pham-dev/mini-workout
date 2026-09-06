@@ -41,6 +41,7 @@ test('does not merge unrelated inherited environment variables into public start
     'NEXT_TELEMETRY_DISABLED',
     'NODE_ENV',
     'PATH',
+    'PORT',
   ]);
   assert.equal(env.SECRET_TOKEN, undefined);
   assert.equal(env.NODE_OPTIONS, undefined);
@@ -85,15 +86,23 @@ test('uses the public server only for public tests and the database server for D
     ).DATABASE_URL,
     'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
   );
+  assert.equal(publicServerEnv({}).PORT, '3000');
+  assert.equal(
+    databaseServerEnv(
+      {},
+      'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e',
+    ).PORT,
+    '3001',
+  );
 });
 
-test('starts servers through env -i so Playwright cannot reintroduce secrets', () => {
+test('starts production servers through env -i so Playwright cannot reintroduce secrets', () => {
   const command = serverCommand(
     publicServerEnv({ SECRET_TOKEN: 'secret', DATABASE_URL: 'real-db' }),
   );
   assert.match(command, /^env -i /);
   assert.doesNotMatch(command, /SECRET_TOKEN|real-db/);
-  assert.match(command, /pnpm --filter @mini-workout\/web dev$/);
+  assert.match(command, /pnpm --filter @mini-workout\/web start$/);
 });
 
 test('database server command contains only the explicit database environment', () => {

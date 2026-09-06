@@ -45,8 +45,10 @@ Prisma migrate, seed, fixture setup, and the Next web server.
 Public-only startup receives an explicit whitelist-only environment. Inherited
 database, auth, secret, and unrelated variables are not passed to the server.
 
-The E2E server always starts fresh and never reuses an already-running Next
-server, preventing a database-backed run from using a different `DATABASE_URL`.
+The E2E servers use the production web build, always start fresh, and never
+reuse already-running Next servers. The public server uses port `3000`, while
+the database-backed server uses port `3001`, preventing a run from colliding
+with or using a server configured for a different `DATABASE_URL`.
 
 Lock, auth-state, and metadata paths are keyed by a SHA-256 hash of the
 canonical database URL. Teardown reads only the metadata for its own run.

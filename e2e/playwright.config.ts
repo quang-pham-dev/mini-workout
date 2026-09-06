@@ -24,8 +24,9 @@ export function publicServerEnv(
 
   return {
     ...safeEnvironment,
-    NODE_ENV: 'development',
+    NODE_ENV: 'production',
     NEXT_TELEMETRY_DISABLED: '1',
+    PORT: '3000',
     BETTER_AUTH_URL: publicBaseURL,
     BETTER_AUTH_SECRET: 'e2e-public-only-secret',
   };
@@ -57,7 +58,7 @@ export function serverCommand(env: Record<string, string>): string {
   return [
     'env -i',
     ...Object.entries(env).map(([key, value]) => `${key}=${shellQuote(value)}`),
-    'pnpm --filter @mini-workout/web dev',
+    'pnpm --filter @mini-workout/web start',
   ].join(' ');
 }
 
