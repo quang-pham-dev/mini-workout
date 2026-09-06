@@ -2,7 +2,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["@mini-workout/ui#build"],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_EXTENDS$", ".env", ".env.*"],
       "env": [
         "BETTER_AUTH_SECRET",

@@ -7,7 +7,7 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint": "eslint .",
-    "test:policy": "node --test --experimental-strip-types fixtures/auth-request.test.ts fixtures/database-policy.test.ts fixtures/database-lock.test.ts fixtures/playwright-config.test.ts fixtures/setup-lifecycle.test.ts fixtures/metadata.test.ts",
+    "test:policy": "node --test --experimental-strip-types fixtures/auth-request.test.ts fixtures/database-policy.test.ts fixtures/database-lock.test.ts fixtures/playwright-config.test.ts fixtures/setup-lifecycle.test.ts fixtures/metadata.test.ts fixtures/turbo-config.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots"
   },
