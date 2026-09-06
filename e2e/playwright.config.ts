@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export const publicBaseURL = 'http://localhost:3000';
 export const databaseBaseURL = 'http://localhost:3001';
+export const visualSnapshotOptions = { maxDiffPixelRatio: 0.05 };
 const preservedEnvironmentKeys = [
   'CI',
   'HOME',
@@ -28,7 +29,7 @@ export function publicServerEnv(
     NEXT_TELEMETRY_DISABLED: '1',
     PORT: '3000',
     BETTER_AUTH_URL: publicBaseURL,
-    BETTER_AUTH_SECRET: 'e2e-public-only-secret',
+    BETTER_AUTH_SECRET: 'V7c9pQ2mL8xR4nK6sT1wY5zA3dF0hJ9uB2eG7iN4oP6',
   };
 }
 
@@ -81,7 +82,7 @@ export function projectDefinitions(env: NodeJS.ProcessEnv) {
           {
             name: 'db',
             dependencies: ['db-setup'],
-            testMatch: /tests\/fixtures\.spec\.ts/,
+            testMatch: /tests\/(fixtures|authenticated-theme)\.spec\.ts/,
             use: { baseURL: databaseBaseURL },
           },
         ]
@@ -107,6 +108,9 @@ export default defineConfig({
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
   ],
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
+  expect: {
+    toHaveScreenshot: visualSnapshotOptions,
+  },
   use: {
     ...devices['Desktop Chrome'],
     baseURL: publicBaseURL,

@@ -111,27 +111,3 @@ test('follows System changes but explicit themes ignore system changes', async (
   await page.emulateMedia({ colorScheme: 'light' });
   await expect(page.locator('html')).toHaveClass(/dark/);
 });
-
-test.describe('authenticated theme control', () => {
-  test.skip(
-    !process.env.E2E_DATABASE_URL || !process.env.DATABASE_URL,
-    'requires the disposable authenticated E2E database',
-  );
-
-  test('keeps the Theme menu in the authenticated header and supports keyboard selection', async ({
-    activePage,
-  }) => {
-    await activePage.goto('/home');
-    const trigger = activePage.getByRole('button', { name: 'Theme' });
-    await expect(trigger).toHaveCount(1);
-    await trigger.press('Enter');
-    await expect(activePage.getByRole('menu')).toBeVisible();
-    await activePage.getByRole('menuitemradio', { name: 'Dark' }).focus();
-    await activePage.keyboard.press('Enter');
-    await expect(activePage.locator('html')).toHaveClass(/dark/);
-    await expect(activePage.locator('html')).toHaveAttribute(
-      'data-theme-preference',
-      'dark',
-    );
-  });
-});

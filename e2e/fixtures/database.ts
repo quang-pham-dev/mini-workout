@@ -22,7 +22,6 @@ export const testUsers = {
   active: { email: 'active-user@example.test', password: 'VisualTest123!' },
   empty: { email: 'empty-user@example.test', password: 'VisualTest123!' },
   newUser: { email: 'new-user@example.test', password: 'VisualTest123!' },
-  long: { email: 'long-user@example.test', password: 'VisualTest123!' },
 } as const;
 
 export const fixtureUserWhere = {

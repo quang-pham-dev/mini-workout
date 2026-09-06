@@ -11,7 +11,6 @@ import { fileURLToPath } from 'node:url';
 type Fixtures = {
   activePage: Page;
   emptyPage: Page;
-  longPage: Page;
   newUserPage: Page;
 };
 
@@ -46,8 +45,6 @@ export const test = base.extend<Fixtures>({
     pageWithStorageState(browser, authState('active'), use),
   emptyPage: async ({ browser }, use) =>
     pageWithStorageState(browser, authState('empty'), use),
-  longPage: async ({ browser }, use) =>
-    pageWithStorageState(browser, authState('long'), use),
   newUserPage: async ({ browser }, use) =>
     pageWithStorageState(browser, authState('new-user'), use),
 });

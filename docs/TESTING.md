@@ -112,8 +112,10 @@ Additional E2E coverage should prioritize user-visible flows such as:
 - A user can view a workout detail page.
 - Authentication and protected routes work once that product scope exists.
 
-Theme visual coverage uses fixed `1280x900` dimensions and a named System
-snapshot on `/theme-preview`; update it only after visual review with:
+Theme visual coverage uses the production server, fixed `1280x900` dimensions,
+and a named System snapshot on `/theme-preview`. Comparisons allow at most a 5%
+pixel difference for Chromium rasterization differences between macOS and the
+Ubuntu CI runner. Update a baseline only after visual review with:
 
 ```bash
 pnpm --filter @mini-workout/e2e test:e2e:update -- --project=public tests/theme.spec.ts -g 'captures the System theme'

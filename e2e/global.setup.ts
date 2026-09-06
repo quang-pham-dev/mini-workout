@@ -1,3 +1,4 @@
+import { authRequestOptions } from './fixtures/auth-request.ts';
 import { resolveDatabaseUrl } from './fixtures/database-env.ts';
 import {
   acquireDatabaseLock,
@@ -70,7 +71,7 @@ test('prepare deterministic database fixtures', async () => {
       });
       await prepareDatabase(databaseUrl);
 
-      const api = await request.newContext({ baseURL });
+      const api = await request.newContext(authRequestOptions(baseURL));
       try {
         for (const [name, user] of Object.entries(testUsers)) {
           const response = await api.post('/api/auth/sign-up/email', {
@@ -91,7 +92,6 @@ test('prepare deterministic database fixtures', async () => {
             },
             empty: { onboardingCompleted: true },
             newUser: { onboardingCompleted: false },
-            long: { onboardingCompleted: true, interestSlugs: ['mobility'] },
           }[name as keyof typeof testUsers];
           await configureUser(databaseUrl, user.email, configuration);
 

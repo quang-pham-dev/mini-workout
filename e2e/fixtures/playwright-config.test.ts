@@ -5,9 +5,14 @@ import {
   publicBaseURL,
   publicServerEnv,
   serverCommand,
+  visualSnapshotOptions,
 } from '../playwright.config.ts';
 import { strict as assert } from 'node:assert';
 import test from 'node:test';
+
+test('keeps cross-platform visual tolerance narrowly bounded', () => {
+  assert.equal(visualSnapshotOptions.maxDiffPixelRatio, 0.05);
+});
 
 test('always exposes a public project and sanitizes its server environment', () => {
   assert.equal(
@@ -79,6 +84,7 @@ test('uses the public server only for public tests and the database server for D
 
   assert.equal(projects[0]?.use?.baseURL, publicBaseURL);
   assert.equal(projects[2]?.use?.baseURL, databaseBaseURL);
+  assert.match(projects[2]?.testMatch?.toString() ?? '', /authenticated-theme/);
   assert.equal(
     databaseServerEnv(
       {},
