@@ -5,6 +5,9 @@ import { nextCookies } from 'better-auth/next-js';
 
 const authOptions: BetterAuthOptions = {
   baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: process.env.BETTER_AUTH_URL
+    ? [process.env.BETTER_AUTH_URL]
+    : undefined,
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),

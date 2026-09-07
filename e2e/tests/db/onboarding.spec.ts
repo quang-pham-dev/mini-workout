@@ -1,3 +1,4 @@
+import { assertAuthResponse } from '../../fixtures/auth-request.ts';
 import { expect, test } from '../../fixtures/user.ts';
 import { databaseBaseURL } from '../../playwright.config.ts';
 
@@ -17,7 +18,7 @@ test('@critical onboarding requires an interest when a level is selected', async
       },
     },
   );
-  expect(signup.ok()).toBeTruthy();
+  await assertAuthResponse(signup, 'Onboarding signup');
 
   await mutationUser.page.goto('/onboarding');
   await mutationUser.page.getByLabel(/Beginner/).check();
@@ -44,7 +45,7 @@ test('@critical onboarding requires a level when an interest is selected', async
       },
     },
   );
-  expect(signup.ok()).toBeTruthy();
+  await assertAuthResponse(signup, 'Onboarding signup');
 
   await mutationUser.page.goto('/onboarding');
   await mutationUser.page.getByLabel(/Mobility/).check();
@@ -71,7 +72,7 @@ test('@critical onboarding persists a completed personalized profile', async ({
       },
     },
   );
-  expect(signup.ok()).toBeTruthy();
+  await assertAuthResponse(signup, 'Onboarding signup');
 
   await mutationUser.page.goto('/onboarding');
 

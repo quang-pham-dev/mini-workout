@@ -1,3 +1,4 @@
+import { assertAuthResponse } from '../../fixtures/auth-request.ts';
 import { configureUser } from '../../fixtures/database.ts';
 import { type MutationUserSession, expect, test } from '../../fixtures/user.ts';
 import { databaseBaseURL } from '../../playwright.config.ts';
@@ -11,7 +12,7 @@ async function createCompletedPrerequisite(user: MutationUserSession) {
     headers: { Origin: origin },
     data: { name: user.name, email: user.email, password: user.password },
   });
-  expect(response.ok()).toBeTruthy();
+  await assertAuthResponse(response, `Workout signup ${user.email}`);
   await configureUser(process.env.DATABASE_URL!, user.email, {
     onboardingCompleted: true,
     experienceLevel: 'BEGINNER',

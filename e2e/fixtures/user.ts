@@ -3,6 +3,7 @@ import {
   requestMutationUserClaim,
 } from '../coordinator.setup.ts';
 import { databaseBaseURL } from '../playwright.config.ts';
+import { authContextOptions } from './auth-request.ts';
 import { resolveDatabaseUrl } from './database-env.ts';
 import {
   assertOwnedMutationUserEmail,
@@ -171,7 +172,9 @@ export async function runMutationUserFixture({
         const user = identityForTest(runToken, testInfo, identity);
         await claimMutationUser(runToken, user.email);
         claim(user.email);
-        const context = await browser.newContext({ baseURL: databaseBaseURL });
+        const context = await browser.newContext(
+          authContextOptions(databaseBaseURL),
+        );
         contexts.push(context);
         return { ...user, context, page: await context.newPage() };
       }

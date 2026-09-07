@@ -9,7 +9,11 @@ type AuthApi = {
   post: (
     path: string,
     options: { data: Record<string, unknown> },
-  ) => Promise<{ ok: () => boolean; status: () => number }>;
+  ) => Promise<{
+    ok: () => boolean;
+    status: () => number;
+    text: () => Promise<string>;
+  }>;
   storageState: (options: { path: string }) => Promise<unknown>;
   dispose: () => Promise<void>;
 };
@@ -27,7 +31,9 @@ export async function prepareAuthState(
       });
       if (!response.ok())
         throw new Error(
-          `E2E setup could not register ${user.email}: ${response.status()}`,
+          `E2E setup could not register ${user.email}: ${response.status()} ${(
+            await response.text()
+          ).slice(0, 500)}`,
         );
       const configurations: Record<keyof typeof testUsers, ConfigureUserInput> =
         {
@@ -52,7 +58,9 @@ export async function prepareAuthState(
       });
       if (!signIn.ok())
         throw new Error(
-          `E2E setup could not sign in ${user.email}: ${signIn.status()}`,
+          `E2E setup could not sign in ${user.email}: ${signIn.status()} ${(
+            await signIn.text()
+          ).slice(0, 500)}`,
         );
       await api.storageState({
         path: authStatePath(

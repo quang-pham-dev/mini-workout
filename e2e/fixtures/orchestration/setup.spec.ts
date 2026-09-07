@@ -57,7 +57,7 @@ test('setup worker acquires coordinator ownership', async () => {
     {
       post: async (path) => {
         stage(path.includes('sign-up') ? 'signup' : 'signin');
-        return { ok: () => true, status: () => 200 };
+        return { ok: () => true, status: () => 200, text: async () => '' };
       },
       storageState: async () => {
         stage('storage-state');

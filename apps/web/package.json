@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "postinstall": "prisma generate",
+    "analyze": "next build && next experimental-analyze",
     "check-types": "next typegen && tsc --noEmit",
     "clean": "rm -rf .next && rm -rf node_modules",
     "test": "vitest run",

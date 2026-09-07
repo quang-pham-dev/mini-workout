@@ -15,7 +15,11 @@ test('completed fixture users satisfy the onboarding contract', async () => {
     input: ConfigureUserInput;
   }> = [];
   const api = {
-    post: async () => ({ ok: () => true, status: () => 200 }),
+    post: async () => ({
+      ok: () => true,
+      status: () => 200,
+      text: async () => '',
+    }),
     storageState: async () => undefined,
     dispose: async () => undefined,
   };
