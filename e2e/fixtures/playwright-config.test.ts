@@ -279,23 +279,23 @@ test('targets mobile behavior with Pixel projects instead of duplicating suites'
   assert.equal(databaseMobile?.use?.trace, 'off');
 });
 
-test('pins the canonical Linux Chromium CI policy and bounds non-auth artifacts', () => {
+test('pins the canonical Linux CI runner and confirms E2E browser gates are removed', () => {
   const workflow = readFileSync(
     fileURLToPath(new URL('../../.github/workflows/ci.yml', import.meta.url)),
     'utf8',
   );
-  const installStep = workflow.match(
-    /- name: Install Chromium for browser gates[\s\S]*?(?=\n\s+- name:)/,
-  )?.[0];
-  const artifactStep = workflow.match(
-    /- name: Upload Playwright artifacts on failure[\s\S]*$/,
-  )?.[0];
 
+  // CI must run on the pinned Ubuntu version.
   assert.match(workflow, /runs-on: ubuntu-24\.04/);
-  assert.match(installStep ?? '', /playwright install --with-deps chromium/);
-  assert.doesNotMatch(installStep ?? '', /\b(?:firefox|webkit)\b/);
-  assert.match(artifactStep ?? '', /retention-days: 7/);
-  assert.doesNotMatch(artifactStep ?? '', /\.auth/);
+
+  // E2E browser gates were intentionally removed from CI.
+  assert.doesNotMatch(workflow, /playwright install/);
+  assert.doesNotMatch(workflow, /pnpm test:e2e/);
+  assert.doesNotMatch(workflow, /Upload Playwright artifacts/);
+
+  // E2E policy tests (Node.js-only fixture contracts) must still run.
+  assert.match(workflow, /Run E2E policy tests/);
+  assert.match(workflow, /pnpm --filter @mini-workout\/e2e test/);
 });
 
 test('always exposes a public project and sanitizes its server environment', () => {

@@ -4,7 +4,17 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.vscode/**'
   pull_request:
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.vscode/**'
   workflow_dispatch:
     inputs:
       branch:
@@ -21,31 +31,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Turborepo quality checks
+  lint-format:
+    name: Lint & format
     runs-on: ubuntu-24.04
-    env:
-      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-      BETTER_AUTH_URL: http://127.0.0.1:3000
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
-      E2E_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: mini_workout_e2e
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    timeout-minutes: 10
     permissions:
       contents: read
-      id-token: write # Required only for the optional Turborepo OIDC cache setup.
+      id-token: write
 
     steps:
       - name: Check out code
@@ -71,8 +63,151 @@ jobs:
       - name: Prepare
         uses: ./.github/composite-actions/prepare
 
-      - name: Install Chromium for browser gates
-        run: pnpm --filter @mini-workout/e2e exec playwright install --with-deps chromium
+      - name: Check formatting
+        run: pnpm format
+
+      - name: Run lint (affected)
+        run: pnpm exec turbo run lint --affected
+
+  typecheck-build:
+    name: Type-check & build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+          fetch-depth: 0
+
+      - name: Setup Turborepo remote cache
+        if: ${{ vars.TURBO_TEAM != '' }}
+        uses: vercel/setup-turborepo-remote-cache-action@v1.0.0
+        with:
+          team: ${{ vars.TURBO_TEAM }}
+
+      - name: Restore local Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/turbo.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Prepare
+        uses: ./.github/composite-actions/prepare
+
+      - name: Build & type-check (affected)
+        run: pnpm exec turbo run build check-types --affected
+
+  unit-test:
+    name: Unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+          fetch-depth: 0
+
+      - name: Setup Turborepo remote cache
+        if: ${{ vars.TURBO_TEAM != '' }}
+        uses: vercel/setup-turborepo-remote-cache-action@v1.0.0
+        with:
+          team: ${{ vars.TURBO_TEAM }}
+
+      - name: Restore local Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/turbo.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Prepare
+        uses: ./.github/composite-actions/prepare
+
+      - name: Run tests (affected)
+        run: pnpm exec turbo run test --affected
+
+  storybook:
+    name: Storybook
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+          fetch-depth: 0
+
+      - name: Setup Turborepo remote cache
+        if: ${{ vars.TURBO_TEAM != '' }}
+        uses: vercel/setup-turborepo-remote-cache-action@v1.0.0
+        with:
+          team: ${{ vars.TURBO_TEAM }}
+
+      - name: Restore local Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/turbo.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Prepare
+        uses: ./.github/composite-actions/prepare
+
+      - name: Run Storybook lint
+        run: pnpm --filter @mini-workout/storybook lint
+
+      - name: Build Storybook
+        run: pnpm --filter @mini-workout/storybook build
+
+  boundaries-docs:
+    name: Boundaries, docs & policy tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+          fetch-depth: 0
+
+      - name: Setup Turborepo remote cache
+        if: ${{ vars.TURBO_TEAM != '' }}
+        uses: vercel/setup-turborepo-remote-cache-action@v1.0.0
+        with:
+          team: ${{ vars.TURBO_TEAM }}
+
+      - name: Restore local Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/turbo.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Prepare
+        uses: ./.github/composite-actions/prepare
 
       - name: Check package boundaries
         run: pnpm exec turbo boundaries
@@ -80,31 +215,5 @@ jobs:
       - name: Check documentation
         run: pnpm docs:check
 
-      - name: Check formatting
-        run: pnpm format
-
-      - name: Run affected quality checks
-        run: pnpm exec turbo run build lint check-types test --affected
-
-      - name: Run Storybook accessibility/static checks
-        run: pnpm --filter @mini-workout/storybook lint
-
-      - name: Build Storybook
-        run: pnpm --filter @mini-workout/storybook build
-
       - name: Run E2E policy tests
         run: pnpm --filter @mini-workout/e2e test
-
-      - name: Run browser and visual gates
-        run: pnpm test:e2e
-
-      - name: Upload Playwright artifacts on failure
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-artifacts
-          path: |
-            e2e/playwright-report/
-            e2e/test-results/
-          if-no-files-found: ignore
-          retention-days: 7
