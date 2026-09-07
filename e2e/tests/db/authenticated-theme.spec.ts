@@ -1,4 +1,4 @@
-import { expect, test } from '../fixtures/test';
+import { expect, test } from '../../fixtures/test';
 
 test('keeps the Theme menu in the authenticated header and supports keyboard selection', async ({
   activePage,

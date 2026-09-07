@@ -1,5 +1,18 @@
-import { databaseRunKey } from './database-lock.ts';
+import { assertSafeLockToken, databaseRunKey } from './database-lock.ts';
 import { readFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+export function fixtureArtifactPaths(
+  databaseUrl: string,
+  token: string,
+  authRoot = fileURLToPath(new URL('../.auth/', import.meta.url)),
+) {
+  assertSafeLockToken(token);
+  const key = databaseRunKey(databaseUrl);
+  const authDirectory = join(authRoot, key, token);
+  return { key, authDirectory, metadataPath: `${authDirectory}.json` };
+}
 
 export type FixtureMetadata = { key: string; token: string };
 const keyPattern = /^[0-9a-f]{64}$/;

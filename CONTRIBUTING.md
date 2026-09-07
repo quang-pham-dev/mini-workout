@@ -8,10 +8,11 @@ preserve clear ownership between apps and packages.
 
 Requirements:
 
-- Node.js `>=20`.
+- Node.js `>=22.6.0`; use `nvm use` to select the version in `.nvmrc`.
 - pnpm `10.30.0` or a compatible pnpm 10 release.
 
 ```bash
+nvm use
 pnpm install
 pnpm dev
 ```

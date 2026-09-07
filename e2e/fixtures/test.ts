@@ -1,5 +1,6 @@
+import { requestFixtureRunToken } from '../coordinator.setup.ts';
 import { resolveDatabaseUrl } from './database-env.ts';
-import { databaseRunKey } from './database-lock.ts';
+import { assertSafeLockToken, databaseRunKey } from './database-lock.ts';
 import {
   type Browser,
   type Page,
@@ -27,26 +28,37 @@ async function pageWithStorageState(
   }
 }
 
-export function authStatePath(name: string, databaseUrl: string): string {
+export function authStatePath(
+  name: string,
+  databaseUrl: string,
+  token?: string,
+): string {
+  assertSafeLockToken(token);
+  if (!['active', 'empty', 'new-user'].includes(name))
+    throw new Error('Invalid auth state name');
   return fileURLToPath(
     new URL(
-      `../.auth/${databaseRunKey(databaseUrl)}/${name}.json`,
+      `../.auth/${databaseRunKey(databaseUrl)}/${token}/${name}.json`,
       import.meta.url,
     ),
   );
 }
 
-function authState(name: string): string {
-  return authStatePath(name, resolveDatabaseUrl(process.env));
+async function authState(name: string): Promise<string> {
+  return authStatePath(
+    name,
+    resolveDatabaseUrl(process.env),
+    await requestFixtureRunToken(),
+  );
 }
 
 export const test = base.extend<Fixtures>({
   activePage: async ({ browser }, use) =>
-    pageWithStorageState(browser, authState('active'), use),
+    pageWithStorageState(browser, await authState('active'), use),
   emptyPage: async ({ browser }, use) =>
-    pageWithStorageState(browser, authState('empty'), use),
+    pageWithStorageState(browser, await authState('empty'), use),
   newUserPage: async ({ browser }, use) =>
-    pageWithStorageState(browser, authState('new-user'), use),
+    pageWithStorageState(browser, await authState('new-user'), use),
 });
 
 export { expect };

@@ -82,9 +82,15 @@ validating the whole repository.
 Application imports use the `@/*` alias for `src/*`. Keep relative imports for
 same-folder files such as a page's CSS Module or a feature's local action.
 
-Current authentication and product routes are `/login`, `/register`,
-`/onboarding`, `/home`, and `/api/auth/[...all]`. Unauthenticated access to
-protected routes is redirected to `/login`; users who have not completed
-onboarding are redirected from `/home` to `/onboarding`. Workout domain routes
-are available at `/workouts/[slug]`; video playback, interaction mutations,
-and browser E2E coverage remain planned work.
+Current authentication and product routes include `/login`, `/register`,
+`/onboarding`, `/home`, `/favourites`, `/profile`, `/workouts/[slug]`, and
+`/api/auth/[...all]`. Unauthenticated access to protected routes is redirected
+to `/login`; users who have not completed onboarding are redirected to
+`/onboarding`. Saving favourites and liking workouts are implemented with
+database persistence and per-user state.
+
+Playwright currently covers public themes, authentication, onboarding, route
+guards, saved/liked workout interactions, responsive mobile navigation, and
+profile theme preferences. Real video playback and workout completion remain
+planned product work. Profile preference editing and replacement of the current
+root starter entry also require separate product decisions.

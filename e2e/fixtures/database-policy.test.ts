@@ -2,6 +2,19 @@ import { assertTestDatabase, resolveDatabaseUrl } from './database-env.ts';
 import { strict as assert } from 'node:assert';
 import test from 'node:test';
 
+for (const url of [
+  'postgresql://localhost:0/test',
+  'postgresql://localhost/test?host=remote.example',
+  'postgresql://localhost/test?hostaddr=192.0.2.1',
+  'postgresql://localhost/test?port=5433',
+  'postgresql://localhost/test?dbname=production',
+  'postgresql://localhost/test?database=production',
+]) {
+  test(`rejects endpoint overrides or invalid ports: ${url}`, () => {
+    assert.throws(() => assertTestDatabase(url), /disposable/);
+  });
+}
+
 test('rejects an e2e-named database on a production-looking host', () => {
   assert.throws(() =>
     assertTestDatabase(
@@ -63,13 +76,23 @@ test('rejects a missing DATABASE_URL', () => {
 });
 
 test('limits cleanup to the three exercised fixture users', async () => {
-  const { fixtureUserWhere } = await import('./database.ts');
+  const { cleanupUserWhere, fixtureUserWhere } = await import('./database.ts');
   assert.deepEqual(fixtureUserWhere, {
     email: {
       in: [
         'active-user@example.test',
         'empty-user@example.test',
         'new-user@example.test',
+      ],
+    },
+  });
+  assert.deepEqual(cleanupUserWhere(['exact@example.test']), {
+    email: {
+      in: [
+        'active-user@example.test',
+        'empty-user@example.test',
+        'new-user@example.test',
+        'exact@example.test',
       ],
     },
   });

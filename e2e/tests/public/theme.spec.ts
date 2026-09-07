@@ -1,4 +1,4 @@
-import { expect, test } from '../fixtures/test';
+import { expect, test } from '../../fixtures/test';
 
 test('uses Light by default and keeps the theme control out of public pages', async ({
   page,
@@ -12,7 +12,7 @@ test('uses Light by default and keeps the theme control out of public pages', as
   await expect(page.getByRole('button', { name: 'Theme' })).toHaveCount(0);
 });
 
-test('applies persisted Dark at startup and persists menu selection', async ({
+test('persists Dark selected through the UI across reload', async ({
   page,
 }) => {
   await page.goto('/theme-preview');
@@ -25,6 +25,16 @@ test('applies persisted Dark at startup and persists menu selection', async ({
     'content',
     'oklch(0.14 0.008 250)',
   );
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-theme-preference',
+    'dark',
+  );
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('mini-workout-theme')))
+    .toBe('dark');
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('html')).toHaveAttribute(
     'data-theme-preference',
     'dark',

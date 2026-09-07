@@ -7,13 +7,31 @@ test('loads the public landing page', async ({ page }) => {
   await expect(page.locator('body')).toBeVisible();
 });
 
-test('applies the persisted theme before the page paints', async ({ page }) => {
+test('applies the stored theme through the inline bootstrap before hydration', async ({
+  page,
+}) => {
+  let blockedHydrationScripts = 0;
   await page.addInitScript(() =>
     localStorage.setItem('mini-workout-theme', 'dark'),
   );
+  await page.route('**/*', async (route) => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname;
+    if (request.resourceType() === 'script' && pathname.startsWith('/_next/')) {
+      blockedHydrationScripts += 1;
+      await route.abort();
+      return;
+    }
+    await route.continue();
+  });
   await page.goto('/');
 
+  expect(blockedHydrationScripts).toBeGreaterThan(0);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-theme-preference',
+    'dark',
+  );
   await expect(page.locator('html')).toHaveClass(/dark/);
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
     'content',

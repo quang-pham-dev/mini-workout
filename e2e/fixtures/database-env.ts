@@ -14,7 +14,13 @@ export function assertTestDatabase(databaseUrl: string): void {
     if (
       !['postgres:', 'postgresql:'].includes(url.protocol) ||
       !approvedHosts.has(url.hostname) ||
-      !approvedDatabaseNames.has(databaseName)
+      !approvedDatabaseNames.has(databaseName) ||
+      (url.port !== '' && Number(url.port) < 1) ||
+      [...url.searchParams.keys()].some((key) =>
+        ['host', 'hostaddr', 'port', 'dbname', 'database'].includes(
+          key.toLowerCase(),
+        ),
+      )
     ) {
       throw new Error('not approved');
     }

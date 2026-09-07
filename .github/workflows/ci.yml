@@ -23,7 +23,7 @@ concurrency:
 jobs:
   quality:
     name: Turborepo quality checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
       BETTER_AUTH_URL: http://127.0.0.1:3000
@@ -92,6 +92,9 @@ jobs:
       - name: Build Storybook
         run: pnpm --filter @mini-workout/storybook build
 
+      - name: Run E2E policy tests
+        run: pnpm --filter @mini-workout/e2e test
+
       - name: Run browser and visual gates
         run: pnpm test:e2e
 
@@ -104,3 +107,4 @@ jobs:
             e2e/playwright-report/
             e2e/test-results/
           if-no-files-found: ignore
+          retention-days: 7

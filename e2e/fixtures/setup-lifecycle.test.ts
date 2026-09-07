@@ -21,18 +21,28 @@ test('failure removes generated auth files and releases the lock', async () => {
   let released = false;
 
   try {
+    const setupError = new Error('seed failed');
     await assert.rejects(
       withFixtureSetup(
-        authDirectory,
-        () => undefined,
-        () => {
-          released = true;
+        {
+          ownsLock: () => true,
+          removeAuth: () =>
+            rmSync(authDirectory, { recursive: true, force: true }),
+          cleanupDatabase: () => undefined,
+          removeMetadata: () => undefined,
+          release: () => {
+            released = true;
+          },
         },
         async () => {
-          throw new Error('seed failed');
+          throw setupError;
         },
       ),
-      /seed failed/,
+      (error) =>
+        error instanceof AggregateError &&
+        error.cause === setupError &&
+        error.errors.length === 1 &&
+        error.errors[0] === setupError,
     );
     assert.equal(existsSync(authDirectory), false);
     assert.equal(released, true);
@@ -44,48 +54,71 @@ test('failure removes generated auth files and releases the lock', async () => {
 test('attempts metadata removal and release even when earlier cleanup fails', async () => {
   const events: string[] = [];
   const setupError = new Error('seed failed');
+  const metadataError = new Error('metadata cleanup failed');
+  const releaseError = new Error('release failed');
 
   await assert.rejects(
     withFixtureSetup(
-      '/unused-auth-directory',
-      () => {
-        events.push('metadata');
-        throw new Error('metadata cleanup failed');
-      },
-      () => {
-        events.push('release');
-        throw new Error('release failed');
+      {
+        ownsLock: () => true,
+        removeAuth: () => undefined,
+        cleanupDatabase: () => {
+          events.push('database');
+        },
+        removeMetadata: () => {
+          events.push('metadata');
+          throw metadataError;
+        },
+        release: () => {
+          events.push('release');
+          throw releaseError;
+        },
       },
       async () => {
         throw setupError;
       },
     ),
-    (error) => error === setupError,
+    (error) =>
+      error instanceof AggregateError &&
+      error.cause === setupError &&
+      error.errors[0] === setupError &&
+      error.errors[1] === metadataError &&
+      error.errors[2] === releaseError,
   );
-  assert.deepEqual(events, ['metadata', 'release']);
+  assert.deepEqual(events, ['database', 'metadata', 'release']);
 });
 
 test('teardown attempts every cleanup and preserves the first cleanup error', async () => {
   const events: string[] = [];
   const cleanupError = new Error('auth cleanup failed');
+  const metadataError = new Error('metadata cleanup failed');
+  const releaseError = new Error('release failed');
 
   await assert.rejects(
-    withFixtureTeardown(
-      () => {
+    withFixtureTeardown({
+      ownsLock: () => true,
+      removeAuth: () => {
         events.push('auth');
         throw cleanupError;
       },
-      () => events.push('database'),
-      () => {
+      cleanupDatabase: () => {
+        events.push('database');
+      },
+      release: () => {
         events.push('release');
-        throw new Error('release failed');
+        throw releaseError;
       },
-      () => {
+      removeMetadata: () => {
         events.push('metadata');
-        throw new Error('metadata cleanup failed');
+        throw metadataError;
       },
-    ),
-    (error) => error === cleanupError,
+    }),
+    (error) =>
+      error instanceof AggregateError &&
+      error.cause === cleanupError &&
+      error.errors[0] === cleanupError &&
+      error.errors[1] === metadataError &&
+      error.errors[2] === releaseError,
   );
   assert.deepEqual(events, ['auth', 'database', 'metadata', 'release']);
 });
@@ -158,15 +191,17 @@ test('does not remove newer metadata published after owned cleanup', async () =>
 
   try {
     writeFileSync(metadataPath, JSON.stringify({ key, token: oldToken }));
-    await withFixtureTeardown(
-      () => undefined,
-      () => undefined,
-      () => {
+    await withFixtureTeardown({
+      ownsLock: () => true,
+      removeAuth: () => undefined,
+      cleanupDatabase: () => undefined,
+      release: () => {
         assert.equal(existsSync(metadataPath), false);
         writeFileSync(metadataPath, JSON.stringify({ key, token: newToken }));
       },
-      () => removeFixtureMetadataIfOwned(metadataPath, key, oldToken),
-    );
+      removeMetadata: () =>
+        removeFixtureMetadataIfOwned(metadataPath, key, oldToken),
+    });
     assert.deepEqual(JSON.parse(readFileSync(metadataPath, 'utf8')), {
       key,
       token: newToken,

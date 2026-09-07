@@ -76,6 +76,7 @@
     },
     "test:e2e": {
       "dependsOn": ["@mini-workout/web#build"],
+      "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT"],
       "cache": false
     }
   }

@@ -10,3 +10,15 @@ test('web build includes every declared workspace dependency build', async () =>
 
   assert.ok(config.tasks?.build?.dependsOn?.includes('^build'));
 });
+
+test('root E2E task passes configurable server ports through strict env mode', async () => {
+  const configPath = new URL('../../turbo.json', import.meta.url);
+  const config = JSON.parse(await readFile(configPath, 'utf8')) as {
+    tasks?: { 'test:e2e'?: { env?: string[] } };
+  };
+
+  assert.deepEqual(config.tasks?.['test:e2e']?.env, [
+    'E2E_PUBLIC_PORT',
+    'E2E_DATABASE_PORT',
+  ]);
+});

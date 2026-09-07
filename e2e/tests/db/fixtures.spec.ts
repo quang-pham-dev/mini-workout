@@ -1,4 +1,4 @@
-import { expect, test } from '../fixtures/test';
+import { expect, test } from '../../fixtures/test';
 
 test('loads the populated home fixture', async ({ activePage }) => {
   await activePage.goto('/home');
@@ -8,6 +8,19 @@ test('loads the populated home fixture', async ({ activePage }) => {
       .getByRole('region', { name: 'For your week' })
       .getByRole('link', { name: 'The 20-minute reset' }),
   ).toBeVisible();
+});
+
+test('renders the active profile preferences from its stored fixture', async ({
+  activePage,
+}) => {
+  await activePage.goto('/profile');
+  const preferences = activePage.getByRole('region', {
+    name: 'Movement Focus',
+  });
+
+  await expect(preferences).toContainText('intermediate');
+  await expect(preferences).toContainText('Strength');
+  await expect(preferences).toContainText('HIIT');
 });
 
 test('loads the empty favourites fixture', async ({ emptyPage }) => {

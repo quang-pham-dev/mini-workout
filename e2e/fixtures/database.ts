@@ -28,6 +28,22 @@ export const fixtureUserWhere = {
   email: { in: Object.values(testUsers).map(({ email }) => email) },
 };
 
+export function cleanupUserWhere(claimedEmails: readonly string[]) {
+  return {
+    email: {
+      in: [...fixtureUserWhere.email.in, ...new Set(claimedEmails)],
+    },
+  };
+}
+
+export type ConfigureUserInput = {
+  onboardingCompleted: boolean;
+  experienceLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  interestSlugs?: string[];
+  favoriteWorkoutSlugs?: string[];
+  likeWorkoutSlugs?: string[];
+};
+
 function createPrisma(databaseUrl: string): DatabaseClient {
   const { PrismaClient } = requireFromWeb('@prisma/client') as {
     PrismaClient: new (options: { datasourceUrl: string }) => DatabaseClient;
@@ -49,13 +65,16 @@ export async function prepareDatabase(databaseUrl: string): Promise<void> {
   }
 }
 
-export async function cleanupDatabase(databaseUrl: string): Promise<void> {
+export async function cleanupDatabase(
+  databaseUrl: string,
+  claimedEmails: readonly string[] = [],
+): Promise<void> {
   assertTestDatabase(databaseUrl);
   const prisma = createPrisma(databaseUrl);
 
   try {
     await prisma.user.deleteMany({
-      where: fixtureUserWhere,
+      where: cleanupUserWhere(claimedEmails),
     });
   } finally {
     await prisma.$disconnect();
@@ -65,12 +84,7 @@ export async function cleanupDatabase(databaseUrl: string): Promise<void> {
 export async function configureUser(
   databaseUrl: string,
   email: string,
-  input: {
-    onboardingCompleted: boolean;
-    interestSlugs?: string[];
-    favoriteWorkoutSlugs?: string[];
-    likeWorkoutSlugs?: string[];
-  },
+  input: ConfigureUserInput,
 ): Promise<void> {
   assertTestDatabase(databaseUrl);
   const prisma = createPrisma(databaseUrl);
@@ -110,6 +124,7 @@ export async function configureUser(
       where: { id: user.id },
       data: {
         onboardingCompleted: input.onboardingCompleted,
+        experienceLevel: input.experienceLevel,
         interests: {
           deleteMany: {},
           create: interests.map(({ id }) => ({ interestId: id })),

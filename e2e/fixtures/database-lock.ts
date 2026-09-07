@@ -1,10 +1,10 @@
+import { assertTestDatabase } from './database-env.ts';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   lstatSync,
   mkdirSync,
   readFileSync,
   readdirSync,
-  renameSync,
   rmSync,
   rmdirSync,
   writeFileSync,
@@ -12,108 +12,53 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-type LockOwner = { pid: number; token: string };
-type PendingLock = LockOwner & { createdAt: number };
 export type DatabaseLock = { release: () => void; token: string };
-const pendingLockMaxAge = 5_000;
-const lockTokenPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const defaultDirectory = join(tmpdir(), 'mini-workout-e2e-locks');
 
-function assertSafeLockToken(token: string): void {
-  if (!lockTokenPattern.test(token)) {
+export function assertSafeLockToken(token: unknown): asserts token is string {
+  if (
+    typeof token !== 'string' ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      token,
+    )
+  ) {
     throw new Error('E2E database fixture lock token is malformed');
   }
 }
 
-function parseLockOwner(value: unknown): LockOwner {
+function readLockOwner(path: string): { pid: number; token: string } {
+  if (!lstatSync(path).isDirectory())
+    throw new Error('E2E lock owner directory is malformed');
+  const entries = readdirSync(path);
+  const token = entries[0];
+  assertSafeLockToken(token);
+  const ownerPath = join(path, token, 'owner');
   if (
-    typeof value !== 'object' ||
-    value === null ||
-    Array.isArray(value) ||
-    Object.keys(value).length !== 2
+    entries.length !== 1 ||
+    !lstatSync(join(path, token)).isDirectory() ||
+    !lstatSync(ownerPath).isFile()
   ) {
-    throw new Error('E2E database fixture lock owner is malformed');
+    throw new Error('E2E lock owner is malformed');
   }
-
-  const owner = value as Record<string, unknown>;
+  const owner = JSON.parse(readFileSync(ownerPath, 'utf8'));
   if (
-    !Object.hasOwn(owner, 'pid') ||
-    !Object.hasOwn(owner, 'token') ||
+    !owner ||
+    Object.keys(owner).length !== 2 ||
     !Number.isSafeInteger(owner.pid) ||
-    (owner.pid as number) <= 0 ||
-    typeof owner.token !== 'string'
+    owner.pid <= 0 ||
+    owner.token !== token
   ) {
-    throw new Error('E2E database fixture lock owner is malformed');
-  }
-
-  assertSafeLockToken(owner.token);
-  return { pid: owner.pid as number, token: owner.token };
-}
-
-function readLockOwner(path: string): LockOwner {
-  if (!lstatSync(path).isDirectory()) {
-    throw new Error('E2E database fixture lock owner is malformed');
-  }
-  const entries = readdirSync(path, { withFileTypes: true }).filter((entry) =>
-    entry.isDirectory(),
-  );
-  const ownerEntry = entries[0];
-  if (entries.length !== 1 || ownerEntry === undefined) {
-    throw new Error('E2E database fixture lock owner is malformed');
-  }
-  const ownerDirectory = join(path, ownerEntry.name);
-  if (!lstatSync(ownerDirectory).isDirectory()) {
-    throw new Error('E2E database fixture lock owner is malformed');
-  }
-  const ownerFile = join(ownerDirectory, 'owner');
-  if (!lstatSync(ownerFile).isFile()) {
-    throw new Error('E2E database fixture lock owner is malformed');
-  }
-  const owner = parseLockOwner(JSON.parse(readFileSync(ownerFile, 'utf8')));
-  if (owner.token !== ownerEntry.name) {
-    throw new Error('E2E database fixture lock owner is malformed');
+    throw new Error('E2E lock owner is malformed');
   }
   return owner;
 }
 
-function readPendingLock(path: string): PendingLock {
-  const pending = JSON.parse(
-    readFileSync(join(path, 'pending'), 'utf8'),
-  ) as unknown;
-  if (
-    typeof pending !== 'object' ||
-    pending === null ||
-    Array.isArray(pending) ||
-    Object.keys(pending).length !== 3
-  ) {
-    throw new Error('E2E database fixture pending lock is malformed');
-  }
-  const value = pending as Record<string, unknown>;
-  if (
-    !Object.hasOwn(value, 'pid') ||
-    !Object.hasOwn(value, 'token') ||
-    !Object.hasOwn(value, 'createdAt') ||
-    !Number.isSafeInteger(value.pid) ||
-    (value.pid as number) <= 0 ||
-    typeof value.token !== 'string' ||
-    !Number.isSafeInteger(value.createdAt) ||
-    (value.createdAt as number) > Date.now()
-  ) {
-    throw new Error('E2E database fixture pending lock is malformed');
-  }
-  assertSafeLockToken(value.token);
-  return {
-    pid: value.pid as number,
-    token: value.token,
-    createdAt: value.createdAt as number,
-  };
-}
-
 export function databaseRunKey(databaseUrl: string): string {
+  assertTestDatabase(databaseUrl);
   const url = new URL(databaseUrl);
-  url.searchParams.sort();
-  url.hash = '';
-  return createHash('sha256').update(url.toString()).digest('hex');
+  // All permitted loopback hosts may address the same server. Over-lock safely.
+  const resource = `postgresql://local:${url.port || '5432'}/${decodeURIComponent(url.pathname.slice(1))}`;
+  return createHash('sha256').update(resource).digest('hex');
 }
 
 export function lockPathForDatabase(
@@ -123,29 +68,16 @@ export function lockPathForDatabase(
   return join(directory, `${databaseRunKey(databaseUrl)}.lock`);
 }
 
-export function processStatus(
-  pid: number,
-  probe: (pid: number, signal: number) => void = process.kill,
-): 'alive' | 'dead' | 'unknown' {
-  try {
-    probe(pid, 0);
-    return 'alive';
-  } catch (error) {
-    return (error as NodeJS.ErrnoException).code === 'ESRCH'
-      ? 'dead'
-      : 'unknown';
-  }
-}
-
 export function isDatabaseLockOwner(
   databaseUrl: string,
   token: string,
-  directory = join(tmpdir(), 'mini-workout-e2e-locks'),
+  directory = defaultDirectory,
 ): boolean {
   assertSafeLockToken(token);
-  const path = lockPathForDatabase(databaseUrl, directory);
   try {
-    return readLockOwner(path).token === token;
+    return (
+      readLockOwner(lockPathForDatabase(databaseUrl, directory)).token === token
+    );
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false;
     throw error;
@@ -154,154 +86,39 @@ export function isDatabaseLockOwner(
 
 export function acquireDatabaseLock(
   databaseUrl: string,
-  directory = join(tmpdir(), 'mini-workout-e2e-locks'),
-  probe: (pid: number, signal: number) => void = process.kill,
+  directory = defaultDirectory,
 ): DatabaseLock {
-  mkdirSync(directory, { recursive: true });
   const path = lockPathForDatabase(databaseUrl, directory);
-  const owner: LockOwner = { pid: process.pid, token: randomUUID() };
-
-  while (true) {
-    try {
-      mkdirSync(path);
-      const pendingPath = join(path, 'pending');
-      const pendingTemporaryPath = `${pendingPath}.${randomUUID()}.tmp`;
-      writeFileSync(
-        pendingTemporaryPath,
-        JSON.stringify({ ...owner, createdAt: Date.now() }),
-      );
-      renameSync(pendingTemporaryPath, pendingPath);
-      const ownerTemporaryPath = join(
-        path,
-        `${owner.token}.${randomUUID()}.tmp`,
-      );
-      mkdirSync(ownerTemporaryPath);
-      writeFileSync(join(ownerTemporaryPath, 'owner'), JSON.stringify(owner));
-      renameSync(ownerTemporaryPath, join(path, owner.token));
-      rmSync(pendingPath, { force: true });
-      break;
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
-      try {
-        const existing = readLockOwner(path);
-        if (processStatus(existing.pid, probe) !== 'dead') {
-          throw new Error('E2E database fixture run is already in use');
-        }
-        const displacedPath = `${path}.${randomUUID()}.stale`;
-        try {
-          renameSync(path, displacedPath);
-        } catch (renameError) {
-          if ((renameError as NodeJS.ErrnoException).code === 'ENOENT')
-            continue;
-          throw renameError;
-        }
-        rmSync(displacedPath, { recursive: true });
-      } catch (readError) {
-        if ((readError as NodeJS.ErrnoException).code === 'ENOENT') continue;
-        if (
-          readError instanceof Error &&
-          /already in use/.test(readError.message)
-        ) {
-          throw readError;
-        }
-        try {
-          const pending = readPendingLock(path);
-          if (
-            Date.now() - pending.createdAt >= pendingLockMaxAge &&
-            processStatus(pending.pid, probe) === 'dead'
-          ) {
-            const displacedPath = `${path}.${randomUUID()}.stale`;
-            renameSync(path, displacedPath);
-            rmSync(displacedPath, { recursive: true });
-            continue;
-          }
-        } catch (pendingError) {
-          if ((pendingError as NodeJS.ErrnoException).code === 'ENOENT') {
-            try {
-              lstatSync(path);
-            } catch (pathError) {
-              if ((pathError as NodeJS.ErrnoException).code === 'ENOENT')
-                continue;
-              throw pathError;
-            }
-          }
-        }
-        throw new Error('E2E database fixture run is already in use', {
-          cause: readError,
-        });
-      }
-    }
+  mkdirSync(directory, { recursive: true });
+  try {
+    mkdirSync(path);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+    throw new Error(
+      `E2E database fixture run is already in use. Manual recovery required: stop all fixture coordinators and workers, verify no consumers remain, then remove ${path} and this resource's auth artifacts before retrying. Never recover while a run is active.`,
+    );
   }
-
+  const token = randomUUID();
+  // Incomplete publication is deliberately retained for manual recovery.
+  mkdirSync(join(path, token));
+  writeFileSync(
+    join(path, token, 'owner'),
+    JSON.stringify({ pid: process.pid, token }),
+  );
   return {
-    token: owner.token,
-    release: () => {
-      try {
-        const current = readLockOwner(path);
-        if (current.token === owner.token) {
-          const claimedPath = `${path}.${randomUUID()}.released`;
-          renameSync(join(path, owner.token), claimedPath);
-          rmSync(claimedPath, { recursive: true });
-          try {
-            rmdirSync(path);
-          } catch (error) {
-            if (
-              !['ENOENT', 'ENOTEMPTY'].includes(
-                (error as NodeJS.ErrnoException).code ?? '',
-              )
-            ) {
-              throw error;
-            }
-          }
-        }
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
-        throw error;
-      }
-    },
+    token,
+    release: () => releaseDatabaseLock(databaseUrl, token, directory),
   };
 }
 
 export function releaseDatabaseLock(
   databaseUrl: string,
   token: string | undefined,
-  directory = join(tmpdir(), 'mini-workout-e2e-locks'),
+  directory = defaultDirectory,
 ): void {
-  if (token !== undefined) assertSafeLockToken(token);
+  if (token === undefined) return;
+  if (!isDatabaseLockOwner(databaseUrl, token, directory)) return;
   const path = lockPathForDatabase(databaseUrl, directory);
-  try {
-    const owner = readLockOwner(path);
-    if (
-      (token !== undefined && owner.token === token) ||
-      (token === undefined && processStatus(owner.pid) === 'dead')
-    ) {
-      if (token === undefined) {
-        const displacedPath = `${path}.${randomUUID()}.released`;
-        renameSync(path, displacedPath);
-        rmSync(displacedPath, { recursive: true });
-      } else {
-        const ownerPath = join(path, token);
-        if (!lstatSync(ownerPath).isDirectory()) {
-          throw new Error('E2E database fixture lock owner is malformed');
-        }
-        const claimedPath = `${path}.${randomUUID()}.released`;
-        renameSync(ownerPath, claimedPath);
-        rmSync(claimedPath, { recursive: true });
-        try {
-          rmdirSync(path);
-        } catch (error) {
-          if (
-            !['ENOENT', 'ENOTEMPTY'].includes(
-              (error as NodeJS.ErrnoException).code ?? '',
-            )
-          ) {
-            throw error;
-          }
-        }
-      }
-    }
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
-    throw error;
-  }
+  rmSync(join(path, token), { recursive: true });
+  rmdirSync(path);
 }

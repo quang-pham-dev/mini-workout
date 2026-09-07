@@ -18,17 +18,21 @@ Implemented today:
 - Provider-agnostic observability primitives and a web health endpoint.
 - Better Auth email/password foundation with database-backed sessions, protected
   routes, and a Prisma auth schema.
+- Onboarding, workout discovery/detail, favourites, likes, profiles, and theme
+  preference slices backed by database integration.
+- Playwright public, authenticated, mobile, visual, and fixture-safety coverage.
 - Turborepo task orchestration, package boundaries, affected CI checks, and
   optional Vercel remote caching.
 
-The workout domain, onboarding, production database migrations, and full-stack
-product features described in the roadmap remain planned work. Authentication
-is currently a foundation slice and is not yet production-ready without a
-configured database migration, rate limiting, recovery flows, and E2E coverage.
+The full product roadmap remains incomplete. Authentication has implemented E2E
+coverage but is not production-ready without deployed database migrations, rate
+limiting, account recovery/verification flows, and an approved production
+operations policy. Profile preference editing, the product root entry
+experience, and real video playback/completion also remain follow-ups.
 
 ## Requirements
 
-- Node.js `>=20`.
+- Node.js `>=22.6.0`; use `nvm use` to select the `.nvmrc` runtime.
 - pnpm `10.30.0` or a compatible pnpm 10 release.
 
 The repository declares its package manager and engine requirements in the root
@@ -97,7 +101,7 @@ config/
   typescript-config/   Shared TypeScript configs
   vitest-config/       Shared Vitest configs
 docs/                  Architecture, testing, and product roadmap docs
-e2e/                   Reserved browser end-to-end test area
+e2e/                   Playwright journeys and fixture-safety contracts
 ```
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for dependency and task
