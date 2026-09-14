@@ -1,3 +1,4 @@
+import { SESSION_COOKIE_NAME } from '@/lib/auth/constants';
 import { prisma } from '@/lib/db/prisma';
 import { prismaAdapter } from '@better-auth/prisma-adapter';
 import { type Auth, type BetterAuthOptions, betterAuth } from 'better-auth';
@@ -15,13 +16,15 @@ const authOptions: BetterAuthOptions = {
     enabled: true,
     autoSignIn: true,
   },
-  user: {
-    additionalFields: {
-      onboardingCompleted: {
-        type: 'boolean',
-        defaultValue: false,
-        input: false,
-        required: false,
+  advanced: {
+    cookies: {
+      session_token: {
+        name: SESSION_COOKIE_NAME,
+        attributes: {
+          sameSite: 'lax',
+          httpOnly: true,
+          secure: true,
+        },
       },
     },
   },

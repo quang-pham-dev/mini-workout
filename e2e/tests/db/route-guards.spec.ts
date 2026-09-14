@@ -54,7 +54,7 @@ test('@critical stale sessions cannot view protected routes', async ({
 }) => {
   await mutationUser.context.addCookies([
     {
-      name: 'better-auth.session_token',
+      name: 'mini-workout-session',
       value: 'expired-e2e-session',
       url: origin,
       httpOnly: true,

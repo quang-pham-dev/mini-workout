@@ -1,5 +1,7 @@
+import type { NextConfig } from 'next';
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   distDir: '.next',
   reactCompiler: true,
   cacheComponents: true,
@@ -14,6 +16,7 @@ const nextConfig = {
     },
     exposeTestingApiInProductionBuild: true,
     useOffline: true,
+    inlineCss: true,
   },
 };
 

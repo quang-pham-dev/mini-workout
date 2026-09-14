@@ -20,15 +20,19 @@
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@mini-workout/observability": "workspace:*",
-    "@mini-workout/ui": "workspace:*",
     "@better-auth/prisma-adapter": "1.7.1",
     "@better-auth/utils": "0.4.2",
+    "@mini-workout/observability": "workspace:*",
+    "@mini-workout/ui": "workspace:*",
     "@prisma/client": "6.19.3",
     "better-auth": "1.7.1",
+    "eslint-plugin-boundaries": "^7.2.0",
+    "lucide-react": "^1.42.0",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "server-only": "^0.0.1",
+    "sonner": "^2.0.8",
     "zod": "4.4.3"
   },
   "devDependencies": {
@@ -37,10 +41,10 @@
     "@mini-workout/typescript-config": "workspace:*",
     "@mini-workout/vitest-config": "workspace:*",
     "@tailwindcss/postcss": "catalog:ui-styling",
-    "@vitest/coverage-v8": "catalog:test-unit",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "catalog:test-unit",
     "eslint": "catalog:",
     "postcss": "catalog:ui-styling",
     "prisma": "6.19.3",

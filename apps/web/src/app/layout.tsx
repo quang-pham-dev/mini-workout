@@ -1,5 +1,7 @@
 import './globals.css';
-import { ThemeProvider } from '@/components/theme/theme';
+import { OfflineIndicator } from '@/components/offline-indicator';
+import { ThemeProvider } from '@/components/theme';
+import { Toaster } from '@/components/toaster';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 
@@ -35,7 +37,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <OfflineIndicator />
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

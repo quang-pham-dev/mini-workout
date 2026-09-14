@@ -6,8 +6,11 @@ export const experienceLevelSchema = z.enum([
   'ADVANCED',
 ]);
 
-export const onboardingSchema = z.object({
+export const experienceStepSchema = z.object({
   experienceLevel: experienceLevelSchema,
+});
+
+export const interestsStepSchema = z.object({
   interests: z
     .array(z.string().trim().min(1))
     .min(1, 'Choose at least one focus')
@@ -17,4 +20,11 @@ export const onboardingSchema = z.object({
     }),
 });
 
+export const scheduleStepSchema = z.object({
+  weeklyGoalDays: z.coerce.number().int().min(1).max(7),
+});
+
+export const onboardingSchema = experienceStepSchema.merge(interestsStepSchema);
+
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
+export type ScheduleStepInput = z.infer<typeof scheduleStepSchema>;

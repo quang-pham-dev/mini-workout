@@ -1,6 +1,11 @@
-import { RegisterContent } from './register-content';
+import { AnimatedSuspense } from '@/components/animated-suspense';
 import { AuthCardSkeleton } from '@/components/skeletons/auth-card-skeleton';
-import { Suspense } from 'react';
+import { RegisterContent } from '@/features/auth/register';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Register',
+};
 
 type RegisterPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -8,8 +13,8 @@ type RegisterPageProps = {
 
 export default function RegisterPage({ searchParams }: RegisterPageProps) {
   return (
-    <Suspense fallback={<AuthCardSkeleton />}>
+    <AnimatedSuspense fallback={<AuthCardSkeleton fieldsCount={4} />}>
       <RegisterContent searchParams={searchParams} />
-    </Suspense>
+    </AnimatedSuspense>
   );
 }

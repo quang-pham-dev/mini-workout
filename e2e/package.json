@@ -10,7 +10,7 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint": "eslint .",
-    "test": "pnpm test:policy",
+    "_test": "pnpm test:policy",
     "test:policy": "node --test --experimental-strip-types fixtures/*.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots"

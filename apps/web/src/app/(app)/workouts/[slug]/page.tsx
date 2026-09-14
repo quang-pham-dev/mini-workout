@@ -1,9 +1,10 @@
-import { WorkoutDetail } from './workout-detail';
+import { AnimatedSuspense } from '@/components/animated-suspense';
+import { MainLayout } from '@/components/layout/main-layout';
 import { WorkoutDetailSkeleton } from '@/components/skeletons/workout-detail-skeleton';
+import { WorkoutContent } from '@/features/workouts';
 import { prisma } from '@/lib/db/prisma';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Suspense } from 'react';
 
 async function getPublishedWorkoutMeta(slug: string) {
   'use cache';
@@ -33,18 +34,18 @@ export async function generateMetadata({
 
 export default function WorkoutDetailPage({ params }: WorkoutDetailPageProps) {
   return (
-    <main className="min-h-[100svh] bg-background px-[clamp(1rem,5vw,5rem)] py-[clamp(1.25rem,5vw,5rem)] text-text-primary">
-      <article className="mx-auto max-w-6xl">
+    <MainLayout>
+      <article className="max-w-3xl">
         <Link
           className="text-[0.9rem] text-text-secondary no-underline hover:text-text-primary focus-visible:[outline:3px_solid_color-mix(in_oklch,var(--color-ring)_38%,transparent)] focus-visible:outline-offset-4"
           href="/home"
         >
           ← Back to your week
         </Link>
-        <Suspense fallback={<WorkoutDetailSkeleton />}>
-          <WorkoutDetail params={params} />
-        </Suspense>
+        <AnimatedSuspense fallback={<WorkoutDetailSkeleton />}>
+          <WorkoutContent params={params} />
+        </AnimatedSuspense>
       </article>
-    </main>
+    </MainLayout>
   );
 }

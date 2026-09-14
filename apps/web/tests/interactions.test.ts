@@ -71,7 +71,9 @@ describe('Workout Interactions Server Actions', () => {
       });
       expect(revalidatePathMock).toHaveBeenCalledWith('/home');
       expect(revalidatePathMock).toHaveBeenCalledWith('/favourites');
-      expect(revalidatePathMock).toHaveBeenCalledWith('/workouts/full-body-flow');
+      expect(revalidatePathMock).toHaveBeenCalledWith(
+        '/workouts/full-body-flow',
+      );
     });
 
     it('deletes an existing like when toggled again', async () => {
@@ -110,7 +112,9 @@ describe('Workout Interactions Server Actions', () => {
       });
       expect(revalidatePathMock).toHaveBeenCalledWith('/home');
       expect(revalidatePathMock).toHaveBeenCalledWith('/favourites');
-      expect(revalidatePathMock).toHaveBeenCalledWith('/workouts/full-body-flow');
+      expect(revalidatePathMock).toHaveBeenCalledWith(
+        '/workouts/full-body-flow',
+      );
     });
 
     it('deletes an existing favorite when toggled again', async () => {

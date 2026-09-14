@@ -112,8 +112,9 @@ PostgreSQL
   default for this product.
 
 The current schema includes Better Auth's `User`, `Account`, `Session`, and
-`Verification` models plus the product's `onboardingCompleted` field. Prisma
-migrations, password reset, email verification, rate limiting, and E2E auth
+`Verification` models plus the product's onboarding FSM fields
+(`onboardingStatus`, `currentStep`, completed/skipped steps, and optional
+profile fields). Password reset, email verification, rate limiting, and E2E auth
 coverage are separate follow-up work.
 
 ### Onboarding slice
@@ -124,9 +125,9 @@ implemented as a small vertical slice:
 ```text
 onboarding page (Server Component)
         ↓
-OnboardingForm (small Client Component for selection state)
+OnboardingForm / StepSchedule (small Client Components for selection state)
         ↓
-completeOnboarding Server Action
+step-based onboarding Server Actions
         ↓
 Zod boundary validation + Better Auth session check
         ↓
@@ -140,9 +141,9 @@ PostgreSQL
 - `UserInterest` is a composite-key join table so interests remain normalized
   and can later support recommendation queries without storing arrays in the
   user row.
-- `/home` checks `onboardingCompleted` server-side and redirects incomplete
-  users to `/onboarding`. Middleware remains an optimistic navigation aid, not
-  the authorization boundary.
+- `/home` checks `onboardingStatus` server-side and redirects `NOT_STARTED` or
+  `IN_PROGRESS` users to the current onboarding step. Middleware remains an
+  optimistic navigation aid, not the authorization boundary.
 - The form uses shared Button and semantic design-system tokens. Its layout and
   copy are feature-specific, so they stay in `apps/web` rather than expanding
   the reusable UI package prematurely.

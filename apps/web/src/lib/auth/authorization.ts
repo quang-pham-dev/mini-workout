@@ -1,4 +1,10 @@
-const protectedPrefixes = ['/home', '/favourites', '/profile', '/onboarding'];
+const protectedPrefixes = [
+  '/home',
+  '/favourites',
+  '/profile',
+  '/onboarding',
+  '/workouts',
+];
 const fallbackPath = '/home';
 
 export function isProtectedPath(pathname: string) {

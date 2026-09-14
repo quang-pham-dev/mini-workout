@@ -1,11 +1,10 @@
 'use client';
 
+import { useTheme } from '.';
 import { MoonIcon } from './moon-icon';
 import { SunIcon } from './sun-icon';
 import { SystemIcon } from './system-icon';
-import { useTheme } from './theme';
 import { cn } from '@mini-workout/ui';
-import * as React from 'react';
 
 export function ThemeSelector() {
   const { theme, setTheme, mounted } = useTheme();

@@ -14,11 +14,31 @@ enum ExperienceLevel {
   ADVANCED
 }
 
+enum OnboardingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  REQUIRED_COMPLETED
+  COMPLETED
+}
+
+enum OnboardingStep {
+  EXPERIENCE_LEVEL
+  INTERESTS
+  WEEKLY_SCHEDULE
+  FITNESS_GOALS
+  DONE
+}
+
 model User {
   id                  String   @id @default(cuid())
   name                String
   email               String   @unique
-  onboardingCompleted Boolean  @default(false)
+  onboardingStatus    OnboardingStatus @default(NOT_STARTED)
+  currentStep         OnboardingStep   @default(EXPERIENCE_LEVEL)
+  completedSteps      String[]         @default([])
+  skippedSteps        String[]         @default([])
+  weeklyGoalDays      Int?
+  targetFocusNotes    String?
   experienceLevel     ExperienceLevel?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

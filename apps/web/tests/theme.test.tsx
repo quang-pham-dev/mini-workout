@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
-import { ThemeProvider, ThemeToggle, useTheme } from '@/components/theme/theme';
+import { ThemeProvider, ThemeToggle, useTheme } from '@/components/theme';
 import * as React from 'react';
-import { act } from 'react';
-import { useEffect } from 'react';
+import { act, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
