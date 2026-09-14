@@ -12,7 +12,7 @@ export default function GlobalError({
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center space-y-4 max-w-md">
-        <AlertCircle className="w-16 h-16 text-red-400 mx-auto" />
+        <AlertCircle className="w-16 h-16 text-destructive mx-auto" />
         <h1 className="text-2xl font-bold text-white">Something went wrong</h1>
         <p className="text-gray-400 text-sm">
           {error.message || 'An unexpected error occurred. Please try again.'}
