@@ -1,0 +1,17 @@
+{
+  "extends": "@mini-workout/typescript-config/vitejs-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] },
+    "verbatimModuleSyntax": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": ["node_modules", ".output", "coverage"]
+}

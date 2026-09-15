@@ -1,0 +1,48 @@
+{
+  "name": "@mini-workout/database",
+  "private": true,
+  "type": "module",
+  "description": "Prisma database access for the mini workout monorepo",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "pnpm db:generate && tsup",
+    "check-types": "tsc --noEmit",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "db:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
+    "db:migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "prisma": "6.19.3",
+    "tsup": "catalog:",
+    "tsx": "^4.19.2",
+    "typescript": "catalog:",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

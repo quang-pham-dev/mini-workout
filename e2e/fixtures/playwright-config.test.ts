@@ -1,4 +1,7 @@
 import {
+  adminBaseURL,
+  adminServerCommand,
+  adminServerEnv,
   default as config,
   databaseBaseURL,
   databaseServerEnv,
@@ -24,12 +27,21 @@ const databaseUrl =
   'postgresql://user:password@127.0.0.1:5432/mini_workout_e2e';
 
 test('uses distinct default or environment-configured unprivileged E2E ports', () => {
-  assert.deepEqual(resolveE2EPorts({}), { database: 3001, public: 3000 });
+  assert.deepEqual(resolveE2EPorts({}), {
+    admin: 3002,
+    database: 3001,
+    public: 3000,
+  });
   const env = {
+    E2E_ADMIN_PORT: '3102',
     E2E_DATABASE_PORT: '3101',
     E2E_PUBLIC_PORT: '3100',
   };
-  assert.deepEqual(resolveE2EPorts(env), { database: 3101, public: 3100 });
+  assert.deepEqual(resolveE2EPorts(env), {
+    admin: 3102,
+    database: 3101,
+    public: 3100,
+  });
   assert.equal(publicServerEnv(env).PORT, '3100');
   assert.equal(publicServerEnv(env).BETTER_AUTH_URL, 'http://localhost:3100');
   assert.equal(databaseServerEnv(env, databaseUrl).PORT, '3101');
@@ -40,6 +52,33 @@ test('uses distinct default or environment-configured unprivileged E2E ports', (
   assert.equal(
     projectDefinitions(env).find(({ name }) => name === 'public')?.use?.baseURL,
     'http://localhost:3100',
+  );
+});
+
+test('defines an isolated admin server and projects only with disposable DB env', () => {
+  const env = {
+    DATABASE_URL: databaseUrl,
+    E2E_DATABASE_URL: databaseUrl,
+    E2E_ADMIN_PORT: '3102',
+    E2E_DATABASE_PORT: '3101',
+    E2E_PUBLIC_PORT: '3100',
+  };
+  assert.equal(adminBaseURL, 'http://localhost:3002');
+  assert.equal(adminServerEnv(env, databaseUrl).PORT, '3102');
+  assert.equal(
+    adminServerEnv(env, databaseUrl).BETTER_AUTH_URL,
+    'http://localhost:3102',
+  );
+  assert.match(
+    adminServerCommand(adminServerEnv(env, databaseUrl)),
+    /@mini-workout\/admin start/,
+  );
+  const projects = projectDefinitions(env);
+  assert.deepEqual(
+    projects
+      .filter(({ name }) => name.startsWith('admin'))
+      .map(({ name }) => name),
+    ['admin', 'admin-mobile'],
   );
 });
 
@@ -61,14 +100,14 @@ for (const invalidPort of [
   });
 }
 
-test('rejects equal public and database E2E ports', () => {
+test('rejects any duplicate E2E ports', () => {
   assert.throws(
     () =>
       resolveE2EPorts({
         E2E_DATABASE_PORT: '3100',
         E2E_PUBLIC_PORT: '3100',
       }),
-    /E2E_PUBLIC_PORT.*E2E_DATABASE_PORT.*distinct/i,
+    /public.*database.*admin.*distinct/i,
   );
 });
 
@@ -82,7 +121,7 @@ test('rejects Chromium-restricted ports while retaining ordinary unprivileged po
       E2E_DATABASE_PORT: '3101',
       E2E_PUBLIC_PORT: '3100',
     }),
-    { database: 3101, public: 3100 },
+    { admin: 3002, database: 3101, public: 3100 },
   );
 });
 
@@ -106,6 +145,11 @@ test('discovers arbitrary specs only in their directory project', () => {
   const spec =
     "import { test } from '@playwright/test';\ntest('arbitrary discovery contract', () => {});\n";
   const createdFiles: string[] = [];
+  const reportRoot = mkdtempSync(join(tmpdir(), 'mini-workout-pw-list-'));
+  const listEnvironment = {
+    ...process.env,
+    PLAYWRIGHT_HTML_OUTPUT_DIR: reportRoot,
+  };
 
   try {
     for (const path of [publicSpec, databaseSpec, fixtureTest]) {
@@ -115,7 +159,11 @@ test('discovers arbitrary specs only in their directory project', () => {
     const publicList = execFileSync(
       process.execPath,
       [cli, 'test', '--list', '--project=public', '--config', configPath],
-      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+      {
+        encoding: 'utf8',
+        env: listEnvironment,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
     );
     const databaseList = execFileSync(
       process.execPath,
@@ -123,7 +171,7 @@ test('discovers arbitrary specs only in their directory project', () => {
       {
         encoding: 'utf8',
         env: {
-          ...process.env,
+          ...listEnvironment,
           DATABASE_URL: databaseUrl,
           E2E_DATABASE_URL: databaseUrl,
         },
@@ -144,6 +192,7 @@ test('discovers arbitrary specs only in their directory project', () => {
     );
   } finally {
     for (const path of createdFiles) rmSync(path, { force: true });
+    rmSync(reportRoot, { force: true, recursive: true });
   }
 });
 
@@ -244,10 +293,20 @@ test('targets mobile behavior with Pixel projects instead of duplicating suites'
   const publicMobile = projects.find(({ name }) => name === 'public-mobile');
   const databaseProject = projects.find(({ name }) => name === 'db');
   const databaseMobile = projects.find(({ name }) => name === 'db-mobile');
+  const adminProject = projects.find(({ name }) => name === 'admin');
+  const adminMobile = projects.find(({ name }) => name === 'admin-mobile');
 
   assert.deepEqual(
     projects.map(({ name }) => name),
-    ['public', 'public-mobile', 'db-setup', 'db', 'db-mobile'],
+    [
+      'public',
+      'public-mobile',
+      'db-setup',
+      'db',
+      'db-mobile',
+      'admin',
+      'admin-mobile',
+    ],
   );
   assert.equal(
     publicProject?.testMatch?.test('tests/public/theme-mobile.spec.ts'),
@@ -271,6 +330,19 @@ test('targets mobile behavior with Pixel projects instead of duplicating suites'
   );
   assert.equal(databaseMobile?.testMatch?.test('tests/db/auth.spec.ts'), false);
   assert.deepEqual(databaseMobile?.dependencies, ['db-setup']);
+  assert.equal(
+    adminProject?.testMatch?.test(
+      'tests/admin/accessibility-responsive.spec.ts',
+    ),
+    false,
+  );
+  assert.equal(
+    adminMobile?.testMatch?.test(
+      'tests/admin/accessibility-responsive.spec.ts',
+    ),
+    true,
+  );
+  assert.deepEqual(adminMobile?.dependencies, ['db-setup']);
   assert.ok(publicMobile?.use && 'viewport' in publicMobile.use);
   assert.deepEqual(publicMobile.use.viewport, { width: 412, height: 839 });
   assert.equal(publicMobile.use.isMobile, true);
@@ -392,7 +464,15 @@ test('gates database projects on both matching database variables', () => {
       E2E_DATABASE_URL: databaseUrl,
       DATABASE_URL: databaseUrl,
     }).map(({ name }) => name),
-    ['public', 'public-mobile', 'db-setup', 'db', 'db-mobile'],
+    [
+      'public',
+      'public-mobile',
+      'db-setup',
+      'db',
+      'db-mobile',
+      'admin',
+      'admin-mobile',
+    ],
   );
 });
 

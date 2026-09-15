@@ -1,27 +1,19 @@
 import { getCurrentSession } from '@/lib/auth/session';
-import { prisma } from '@/lib/db/prisma';
+import { NotFoundError } from '@mini-workout/core/errors';
+import { getMemberProfile } from '@mini-workout/core/users';
+import { redirect } from 'next/navigation';
 
 export async function getUserProfile() {
   const session = await getCurrentSession();
 
   if (!session?.user?.id) {
-    throw new Error('Unauthorized');
+    redirect('/login');
   }
 
-  return await prisma.user.findUnique({
-    where: { id: session.user.id },
-    include: {
-      interests: {
-        include: {
-          interest: true,
-        },
-      },
-      _count: {
-        select: {
-          likes: true,
-          favorites: true,
-        },
-      },
-    },
-  });
+  try {
+    return await getMemberProfile({ userId: session.user.id });
+  } catch (error) {
+    if (error instanceof NotFoundError) redirect('/login');
+    throw error;
+  }
 }

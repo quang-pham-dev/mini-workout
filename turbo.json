@@ -6,7 +6,9 @@
     "BETTER_AUTH_SECRET",
     "DATABASE_URL",
     "E2E_DATABASE_URL",
-    "BETTER_AUTH_URL"
+    "BETTER_AUTH_URL",
+    "BETTER_AUTH_TRUSTED_ORIGINS",
+    "PLAYWRIGHT_HTML_OUTPUT_DIR"
   ],
   "globalPassThroughEnv": ["CI"],
   "ui": "tui",
@@ -20,6 +22,7 @@
       "outputs": [
         "dist/**",
         "build/**",
+        ".output/**",
         ".next/**",
         "!.next/cache/**",
         "!.next/dev/**"
@@ -75,8 +78,8 @@
       "inputs": ["$TURBO_DEFAULT$"]
     },
     "test:e2e": {
-      "dependsOn": ["@mini-workout/web#build"],
-      "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT"],
+      "dependsOn": ["@mini-workout/web#build", "@mini-workout/admin#build"],
+      "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT", "E2E_ADMIN_PORT"],
       "cache": false
     }
   }

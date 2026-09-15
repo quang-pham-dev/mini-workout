@@ -58,6 +58,7 @@ export async function RecommendedSection() {
             }}
             likes={likes}
             favorites={favorites}
+            from="home"
           />
         ),
       )}

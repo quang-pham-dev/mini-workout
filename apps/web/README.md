@@ -16,19 +16,19 @@ Open <http://localhost:3000>.
 The application uses local Geist fonts from `app/fonts` and consumes the shared
 UI package through its public exports.
 
-Authentication currently uses Better Auth email/password authentication with
-database-backed sessions through Prisma. Copy `.env.example` to `.env.local`,
+Authentication uses `@mini-workout/auth` (Better Auth email/password) with
+database-backed sessions through `@mini-workout/database`. Copy `.env.example` to `.env.local`,
 provide `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `DATABASE_URL`, then
 generate the Prisma client:
 
 ```bash
 cp apps/web/.env.example apps/web/.env.local
-cp apps/web/.env.example apps/web/.env
-pnpm --filter web db:generate
+pnpm --filter @mini-workout/database db:generate
 ```
 
 The Better Auth CLI can regenerate the auth portion of the Prisma schema when
-the auth configuration or plugins change:
+the auth configuration or plugins change. Review the resulting schema diff
+before using it: the `User.role` enum and existing migrations are intentional.
 
 ```bash
 pnpm --filter web auth:generate
@@ -37,21 +37,21 @@ pnpm --filter web auth:generate
 Apply the first local migration once a PostgreSQL database is available:
 
 ```bash
-pnpm --filter web db:migrate --name init
+pnpm --filter @mini-workout/database db:migrate
 ```
 
 Seed the reference interests used by onboarding:
 
 ```bash
-pnpm --filter web db:seed
+pnpm --filter @mini-workout/database db:seed
 ```
 
 The same seed command also creates the first coaches, categories, and published
 workout fixtures used by `/home` and `/workouts/[slug]`.
 
-Prisma CLI reads `apps/web/.env` by default. Next.js reads `.env.local` for
-development. Keep both files local, use the same `DATABASE_URL`, and never
-commit either file.
+Prisma CLI reads `packages/database/.env` or an exported `DATABASE_URL`.
+Next.js reads `apps/web/.env.local` for development. Keep both URLs pointed at
+the same local database and never commit either file.
 
 Its route, data, error, network, security, testing, and observability
 conventions are documented in

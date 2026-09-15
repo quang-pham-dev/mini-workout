@@ -126,18 +126,11 @@ export async function startFixtureCoordinator(
         const commands = options.commands ?? [
           {
             command: 'pnpm',
-            args: [
-              '--filter',
-              '@mini-workout/web',
-              'exec',
-              'prisma',
-              'migrate',
-              'deploy',
-            ],
+            args: ['--filter', '@mini-workout/database', 'db:migrate:deploy'],
           },
           {
             command: 'pnpm',
-            args: ['--filter', '@mini-workout/web', 'db:seed'],
+            args: ['--filter', '@mini-workout/database', 'db:seed'],
           },
         ];
         for (const command of commands) {

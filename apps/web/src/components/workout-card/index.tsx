@@ -1,22 +1,11 @@
 import { WorkoutActions } from './workout-actions';
 import { formatDuration } from '@/lib/utils/format';
-import { ExperienceLevel } from '@prisma/client';
+import type { WorkoutCard as WorkoutCardData } from '@mini-workout/core/workouts';
 import Image from 'next/image';
 import Link from 'next/link';
 
-type WorkoutCardProps = {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  durationMinutes: number;
-  thumbnailUrl: string;
-  coach: { name: string; bio: string };
-  level: ExperienceLevel;
-  category: { name: string };
-  _count: { likes: number };
-  likes: { userId: string }[];
-  favorites: { userId: string }[];
+type WorkoutCardProps = WorkoutCardData & {
+  from?: string;
 };
 
 export function WorkoutCard({
@@ -31,6 +20,7 @@ export function WorkoutCard({
   _count,
   likes,
   favorites,
+  from,
 }: WorkoutCardProps) {
   return (
     <article className="overflow-hidden rounded-2xl border border-border-subtle bg-surface transition-[border-color,box-shadow,transform] duration-[160ms] ease-[ease] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_1rem_2.5rem_oklch(0.2_0.02_250/0.08)] focus-within:[outline:3px_solid_color-mix(in_oklch,var(--color-ring)_38%,transparent)] focus-within:outline-offset-2 motion-reduce:transition-none">
@@ -51,7 +41,7 @@ export function WorkoutCard({
         <h3 className="mt-[0.55rem] mb-[0.35rem] text-[1.05rem] tracking-[-0.025em]">
           <Link
             className="text-inherit no-underline"
-            href={`/workouts/${slug}`}
+            href={from ? `/workouts/${slug}?from=${from}` : `/workouts/${slug}`}
           >
             {title}
           </Link>

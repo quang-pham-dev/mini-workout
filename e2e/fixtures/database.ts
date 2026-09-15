@@ -1,8 +1,8 @@
 import { assertTestDatabase } from './database-env.ts';
 import { createRequire } from 'node:module';
 
-const requireFromWeb = createRequire(
-  new URL('../../apps/web/package.json', import.meta.url),
+const requireFromDatabase = createRequire(
+  new URL('../../packages/database/package.json', import.meta.url),
 );
 type DatabaseClient = {
   user: {
@@ -22,6 +22,8 @@ export const testUsers = {
   active: { email: 'active-user@example.test', password: 'VisualTest123!' },
   empty: { email: 'empty-user@example.test', password: 'VisualTest123!' },
   newUser: { email: 'new-user@example.test', password: 'VisualTest123!' },
+  admin: { email: 'admin-user@example.test', password: 'VisualTest123!' },
+  member: { email: 'member-user@example.test', password: 'VisualTest123!' },
 } as const;
 
 export const fixtureUserWhere = {
@@ -38,6 +40,7 @@ export function cleanupUserWhere(claimedEmails: readonly string[]) {
 
 export type ConfigureUserInput = {
   onboardingCompleted: boolean;
+  role?: 'MEMBER' | 'ADMIN';
   experienceLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   interestSlugs?: string[];
   favoriteWorkoutSlugs?: string[];
@@ -45,7 +48,7 @@ export type ConfigureUserInput = {
 };
 
 function createPrisma(databaseUrl: string): DatabaseClient {
-  const { PrismaClient } = requireFromWeb('@prisma/client') as {
+  const { PrismaClient } = requireFromDatabase('@prisma/client') as {
     PrismaClient: new (options: { datasourceUrl: string }) => DatabaseClient;
   };
   return new PrismaClient({ datasourceUrl: databaseUrl });
@@ -123,6 +126,7 @@ export async function configureUser(
     await prisma.user.update({
       where: { id: user.id },
       data: {
+        role: input.role,
         onboardingCompleted: input.onboardingCompleted,
         experienceLevel: input.experienceLevel,
         interests: {

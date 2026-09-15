@@ -1,0 +1,15 @@
+{
+  "extends": "@mini-workout/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "include": [
+    "src",
+    "tests/authorization.test.ts",
+    "tests/tanstack-start.test.ts",
+    "tests/index.test.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

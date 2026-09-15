@@ -1,0 +1,7 @@
+@import '@mini-workout/design-system/globals';
+
+@source "../../../packages/ui/src";
+
+body {
+  min-width: 320px;
+}

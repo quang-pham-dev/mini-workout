@@ -33,12 +33,8 @@ vi.mock('@/auth', () => ({
   },
 }));
 
-vi.mock('@/lib/db/prisma', () => ({
-  prisma: {
-    user: {
-      findUnique: (...args: unknown[]) => findUniqueMock(...args),
-    },
-  },
+vi.mock('@mini-workout/core/users', () => ({
+  getOnboardingProfile: (...args: unknown[]) => findUniqueMock(...args),
 }));
 
 describe('getCurrentSession', () => {
@@ -78,22 +74,10 @@ describe('getUserProfile', () => {
     });
   });
 
-  it('queries onboarding state and recommendation fields for the user', async () => {
+  it('passes the user id to the core onboarding profile query', async () => {
     const profile = await getUserProfile('u1');
 
-    expect(findUniqueMock).toHaveBeenCalledWith({
-      where: { id: 'u1' },
-      select: {
-        onboardingStatus: true,
-        currentStep: true,
-        completedSteps: true,
-        skippedSteps: true,
-        experienceLevel: true,
-        weeklyGoalDays: true,
-        targetFocusNotes: true,
-        interests: { select: { interestId: true } },
-      },
-    });
+    expect(findUniqueMock).toHaveBeenCalledWith({ userId: 'u1' });
     expect(profile).toMatchObject({
       onboardingStatus: 'REQUIRED_COMPLETED',
       currentStep: 'WEEKLY_SCHEDULE',

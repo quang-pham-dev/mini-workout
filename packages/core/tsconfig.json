@@ -1,0 +1,21 @@
+{
+  "extends": "@mini-workout/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "include": [
+    "src",
+    "tests/coaches/repository.test.ts",
+    "tests/coaches/service.test.ts",
+    "tests/onboarding/repository.test.ts",
+    "tests/onboarding/service.test.ts",
+    "tests/users/repository.test.ts",
+    "tests/users/service.test.ts",
+    "tests/workouts/service.test.ts",
+    "tests/workouts/repository.test.ts",
+    "tests/workouts/admin-service.test.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

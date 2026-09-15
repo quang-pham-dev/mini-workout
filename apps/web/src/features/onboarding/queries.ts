@@ -1,9 +1,6 @@
-import { prisma } from '@/lib/db/prisma';
+import { getInterests as listInterests } from '@mini-workout/core/onboarding';
 import 'server-only';
 
 export async function getInterests() {
-  return prisma.interest.findMany({
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true, slug: true },
-  });
+  return listInterests();
 }

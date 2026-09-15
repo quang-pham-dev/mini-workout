@@ -1,12 +1,11 @@
 /**
  * Session cookie name used by better-auth.
- * Must stay in sync with the `advanced.cookies.session_token.name`
- * value in `src/auth.ts`.
+ * Re-exported from the shared auth package, which owns the cookie config.
  *
  * Kept in a separate file so it can be imported by edge-compatible
  * code (proxy.ts) without pulling in Prisma or other Node-only deps.
  */
-export const SESSION_COOKIE_NAME = 'mini-workout-session';
+export { SESSION_COOKIE_NAME } from '@mini-workout/auth/constants';
 export const ONBOARDING_COOKIE_NAME = 'mini-workout-onboarding-status';
 
 export const ONBOARDING_COOKIE_VALUES = {

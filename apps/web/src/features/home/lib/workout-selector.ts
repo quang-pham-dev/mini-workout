@@ -1,7 +1,4 @@
-import { withUserId } from '@/lib/utils';
-import { Prisma } from '@prisma/client';
+import type { WorkoutCard } from '@mini-workout/core/workouts';
 import 'server-only';
 
-export type WorkoutWithUserContext = Prisma.WorkoutGetPayload<{
-  select: ReturnType<typeof withUserId>;
-}>;
+export type WorkoutWithUserContext = WorkoutCard;

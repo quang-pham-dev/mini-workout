@@ -56,6 +56,24 @@ test('completed fixture users satisfy the onboarding contract', async () => {
       email: 'new-user@example.test',
       input: { onboardingCompleted: false },
     },
+    {
+      email: 'admin-user@example.test',
+      input: {
+        onboardingCompleted: true,
+        experienceLevel: 'INTERMEDIATE',
+        interestSlugs: ['strength'],
+        role: 'ADMIN',
+      },
+    },
+    {
+      email: 'member-user@example.test',
+      input: {
+        onboardingCompleted: true,
+        experienceLevel: 'BEGINNER',
+        interestSlugs: ['mobility'],
+        role: 'MEMBER',
+      },
+    },
   ]);
 
   for (const { input } of configurations.filter(

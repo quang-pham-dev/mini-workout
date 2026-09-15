@@ -1,0 +1,58 @@
+{
+  "name": "@mini-workout/core",
+  "private": true,
+  "type": "module",
+  "description": "Runtime-agnostic Mini Workout business services",
+  "exports": {
+    "./workouts": {
+      "types": "./dist/workouts/index.d.ts",
+      "import": "./dist/workouts/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
+    },
+    "./users": {
+      "types": "./dist/users/index.d.ts",
+      "import": "./dist/users/index.js"
+    },
+    "./onboarding": {
+      "types": "./dist/onboarding/index.d.ts",
+      "import": "./dist/onboarding/index.js"
+    },
+    "./coaches": {
+      "types": "./dist/coaches/index.d.ts",
+      "import": "./dist/coaches/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@mini-workout/database": "workspace:*",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

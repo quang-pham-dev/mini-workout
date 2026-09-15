@@ -533,7 +533,7 @@ test('rejects non-owned cleanup before creating a database client', async () => 
 
 test('user deletion cascades auth sessions and workout interactions', () => {
   const schema = readFileSync(
-    new URL('../../apps/web/prisma/schema.prisma', import.meta.url),
+    new URL('../../packages/database/prisma/schema.prisma', import.meta.url),
     'utf8',
   );
 

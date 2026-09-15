@@ -5,26 +5,21 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
-    "postinstall": "prisma generate",
     "analyze": "next build && next experimental-analyze",
     "check-types": "next typegen && tsc --noEmit",
     "clean": "rm -rf .next && rm -rf node_modules",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "auth:generate": "pnpm dlx auth@latest generate --output prisma/schema.prisma",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts"
+    "auth:generate": "pnpm dlx auth@latest generate --output ../../packages/database/prisma/schema.prisma"
   },
   "dependencies": {
-    "@better-auth/prisma-adapter": "1.7.1",
-    "@better-auth/utils": "0.4.2",
+    "@mini-workout/auth": "workspace:*",
     "@mini-workout/observability": "workspace:*",
+    "@mini-workout/core": "workspace:*",
     "@mini-workout/ui": "workspace:*",
-    "@prisma/client": "6.19.3",
     "better-auth": "1.7.1",
     "eslint-plugin-boundaries": "^7.2.0",
     "lucide-react": "^1.42.0",
@@ -47,13 +42,8 @@
     "@vitest/coverage-v8": "catalog:test-unit",
     "eslint": "catalog:",
     "postcss": "catalog:ui-styling",
-    "prisma": "6.19.3",
     "tailwindcss": "catalog:ui-styling",
-    "tsx": "^4.19.2",
     "typescript": "catalog:",
     "vitest": "catalog:test-unit"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }

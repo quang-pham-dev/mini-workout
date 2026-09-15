@@ -1,5 +1,5 @@
 import { requireOnboardedUser } from '@/lib/auth/session';
-import { prisma } from '@/lib/db/prisma';
+import { getPublishedWorkoutDetail } from '@mini-workout/core/workouts';
 
 type WorkoutDetailQueryProps = {
   slug: string;
@@ -8,22 +8,5 @@ type WorkoutDetailQueryProps = {
 export async function WorkoutDetailQuery({ slug }: WorkoutDetailQueryProps) {
   const { session } = await requireOnboardedUser();
 
-  const workout = await prisma.workout.findUnique({
-    where: { slug, isPublished: true },
-    include: {
-      coach: true,
-      category: true,
-      _count: { select: { likes: true } },
-      likes: {
-        where: { userId: session.user.id },
-        select: { userId: true },
-      },
-      favorites: {
-        where: { userId: session.user.id },
-        select: { userId: true },
-      },
-    },
-  });
-
-  return workout;
+  return getPublishedWorkoutDetail({ slug, userId: session.user.id });
 }

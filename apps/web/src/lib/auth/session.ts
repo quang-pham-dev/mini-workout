@@ -3,7 +3,7 @@ import {
   getRedirectStepParam,
   isReadyForApp,
 } from '@/features/onboarding/state-machine';
-import { prisma } from '@/lib/db/prisma';
+import { getOnboardingProfile } from '@mini-workout/core/users';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { connection } from 'next/server';
@@ -28,19 +28,7 @@ export const getCurrentSession = cache(async () => {
  *
  */
 export const getUserProfile = cache(async (userId: string) => {
-  return prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      onboardingStatus: true,
-      currentStep: true,
-      completedSteps: true,
-      skippedSteps: true,
-      experienceLevel: true,
-      weeklyGoalDays: true,
-      targetFocusNotes: true,
-      interests: { select: { interestId: true } },
-    },
-  });
+  return getOnboardingProfile({ userId });
 });
 
 /**

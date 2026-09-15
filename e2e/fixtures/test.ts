@@ -11,7 +11,9 @@ import { fileURLToPath } from 'node:url';
 
 type Fixtures = {
   activePage: Page;
+  adminPage: Page;
   emptyPage: Page;
+  memberPage: Page;
   newUserPage: Page;
 };
 
@@ -34,7 +36,7 @@ export function authStatePath(
   token?: string,
 ): string {
   assertSafeLockToken(token);
-  if (!['active', 'empty', 'new-user'].includes(name))
+  if (!['active', 'admin', 'empty', 'member', 'new-user'].includes(name))
     throw new Error('Invalid auth state name');
   return fileURLToPath(
     new URL(
@@ -55,8 +57,12 @@ async function authState(name: string): Promise<string> {
 export const test = base.extend<Fixtures>({
   activePage: async ({ browser }, use) =>
     pageWithStorageState(browser, await authState('active'), use),
+  adminPage: async ({ browser }, use) =>
+    pageWithStorageState(browser, await authState('admin'), use),
   emptyPage: async ({ browser }, use) =>
     pageWithStorageState(browser, await authState('empty'), use),
+  memberPage: async ({ browser }, use) =>
+    pageWithStorageState(browser, await authState('member'), use),
   newUserPage: async ({ browser }, use) =>
     pageWithStorageState(browser, await authState('new-user'), use),
 });

@@ -14,8 +14,9 @@ uses `--experimental-strip-types` and participates in the root `pnpm test` task.
 
 ## Commands and prerequisites
 
-Browser tests run against `apps/web` in production mode. The root `test:e2e`
-Turbo task builds the web app and its package dependencies first. Before a
+Browser tests run against production builds of `apps/web` and, when a disposable
+database is configured, `apps/admin`. The root `test:e2e` Turbo task builds both
+apps and their package dependencies first. Before a
 package-local Playwright command, build explicitly:
 
 ```bash
@@ -90,10 +91,11 @@ also rejected so a server cannot start on a URL the test browser refuses to
 load. Override both when a local development server occupies a default port:
 
 ```bash
-E2E_PUBLIC_PORT=3100 E2E_DATABASE_PORT=3101 pnpm test:e2e
+E2E_PUBLIC_PORT=3100 E2E_DATABASE_PORT=3101 E2E_ADMIN_PORT=3102 pnpm test:e2e
 ```
 
-The selected ports drive Playwright base URLs, health checks, Next `PORT` and
+The three ports default to `3000`, `3001`, and `3002` and must be distinct. The
+selected ports drive Playwright base URLs, health checks, app `PORT` and
 `BETTER_AUTH_URL`, auth setup origins, and mutation-user browser contexts. CI
 does not set these variables and therefore retains the `3000`/`3001` defaults.
 
@@ -229,6 +231,13 @@ persistence, two-user interaction isolation, stored profile preferences, and
 authenticated theme keyboard behavior. The focused database mobile project
 covers navigation focus/trapping/Escape/scroll lock, overflow, and profile theme
 persistence. Critical mutation journeys are tagged `@critical`.
+
+The `admin` and `admin-mobile` projects reuse the coordinator-owned disposable
+database. They cover own-origin ADMIN login/session/logout, current-role
+revalidation (including downgrade), MEMBER denial, direct/client/history
+navigation, cursor URL persistence, security headers, keyboard focus, and
+responsive overflow at 375, 768, 1024, and 1440 pixels. Admin parity stays
+read-only except for fixture user/session creation and controlled role changes.
 
 The Node policy suite covers disposable URL validation, run-scoped ownership,
 bounded process shutdown, partial setup cleanup, auth/metadata isolation,

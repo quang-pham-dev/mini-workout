@@ -80,6 +80,8 @@
     "@mini-workout/vitest-config": "workspace:*",
     "@storybook/react": "catalog:ui-storybook",
     "@storybook/react-vite": "catalog:ui-storybook",
+    "@testing-library/jest-dom": "catalog:test-unit",
+    "@testing-library/react": "catalog:test-unit",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

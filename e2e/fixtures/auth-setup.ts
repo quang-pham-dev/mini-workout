@@ -50,6 +50,18 @@ export async function prepareAuthState(
             interestSlugs: ['mobility'],
           },
           newUser: { onboardingCompleted: false },
+          admin: {
+            onboardingCompleted: true,
+            experienceLevel: 'INTERMEDIATE',
+            interestSlugs: ['strength'],
+            role: 'ADMIN',
+          },
+          member: {
+            onboardingCompleted: true,
+            experienceLevel: 'BEGINNER',
+            interestSlugs: ['mobility'],
+            role: 'MEMBER',
+          },
         };
       const configuration = configurations[name as keyof typeof testUsers];
       await configure(databaseUrl, user.email, configuration);

@@ -14,6 +14,11 @@ enum ExperienceLevel {
   ADVANCED
 }
 
+enum UserRole {
+  MEMBER
+  ADMIN
+}
+
 enum OnboardingStatus {
   NOT_STARTED
   IN_PROGRESS
@@ -33,6 +38,7 @@ model User {
   id                  String   @id @default(cuid())
   name                String
   email               String   @unique
+  role                UserRole @default(MEMBER)
   onboardingStatus    OnboardingStatus @default(NOT_STARTED)
   currentStep         OnboardingStep   @default(EXPERIENCE_LEVEL)
   completedSteps      String[]         @default([])

@@ -14,8 +14,8 @@ import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 
-const requireFromWeb = createRequire(
-  new URL('../../apps/web/package.json', import.meta.url),
+const requireFromDatabase = createRequire(
+  new URL('../../packages/database/package.json', import.meta.url),
 );
 
 type DatabaseClient = {
@@ -90,7 +90,7 @@ export async function cleanupMutationUser(
   email: string,
   runToken: string,
   createClient: (databaseUrl: string) => DatabaseClient = (datasourceUrl) => {
-    const { PrismaClient } = requireFromWeb('@prisma/client') as {
+    const { PrismaClient } = requireFromDatabase('@prisma/client') as {
       PrismaClient: new (options: { datasourceUrl: string }) => DatabaseClient;
     };
     return new PrismaClient({ datasourceUrl });

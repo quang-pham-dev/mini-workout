@@ -1,0 +1,57 @@
+{
+  "name": "@mini-workout/auth",
+  "private": true,
+  "type": "module",
+  "description": "Shared Better Auth configuration and server authorization",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./constants": {
+      "types": "./dist/constants.d.ts",
+      "import": "./dist/constants.js"
+    },
+    "./authorization": {
+      "types": "./dist/authorization.d.ts",
+      "import": "./dist/authorization.js"
+    },
+    "./tanstack-start": {
+      "types": "./dist/tanstack-start.d.ts",
+      "import": "./dist/tanstack-start.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@better-auth/prisma-adapter": "1.7.1",
+    "@better-auth/utils": "0.4.2",
+    "@mini-workout/database": "workspace:*",
+    "better-auth": "1.7.1"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "@tanstack/react-start": "catalog:tanstack-admin",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

@@ -2,7 +2,7 @@
   "extends": "@mini-workout/typescript-config/reactjs-library.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
+    "baseUrl": "",
     "module": "ESNext",
     "moduleResolution": "Bundler"
   },

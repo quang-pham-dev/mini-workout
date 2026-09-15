@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const defaultPublicPort = 3000;
 const defaultDatabasePort = 3001;
+const defaultAdminPort = 3002;
 // Keep in sync with Chromium's generic restricted ports in net/base/port_util.cc.
 const chromiumRestrictedPorts = new Set([
   0, 1, 7, 9, 11, 13, 15, 17, 19, 20, 21, 22, 23, 25, 37, 42, 43, 53, 69, 77,
@@ -15,7 +16,7 @@ const chromiumRestrictedPorts = new Set([
 
 function resolvePort(
   env: NodeJS.ProcessEnv,
-  key: 'E2E_PUBLIC_PORT' | 'E2E_DATABASE_PORT',
+  key: 'E2E_PUBLIC_PORT' | 'E2E_DATABASE_PORT' | 'E2E_ADMIN_PORT',
   fallback: number,
 ): number {
   const value = env[key];
@@ -35,11 +36,12 @@ function resolvePort(
 
 export function resolveE2EPorts(env: NodeJS.ProcessEnv) {
   const ports = {
+    admin: resolvePort(env, 'E2E_ADMIN_PORT', defaultAdminPort),
     database: resolvePort(env, 'E2E_DATABASE_PORT', defaultDatabasePort),
     public: resolvePort(env, 'E2E_PUBLIC_PORT', defaultPublicPort),
   };
-  if (ports.public === ports.database) {
-    throw new Error('E2E_PUBLIC_PORT and E2E_DATABASE_PORT must be distinct.');
+  if (new Set(Object.values(ports)).size !== Object.keys(ports).length) {
+    throw new Error('E2E public, database, and admin ports must be distinct.');
   }
   return ports;
 }
@@ -47,6 +49,7 @@ export function resolveE2EPorts(env: NodeJS.ProcessEnv) {
 const configuredPorts = resolveE2EPorts(process.env);
 export const publicBaseURL = `http://localhost:${configuredPorts.public}`;
 export const databaseBaseURL = `http://localhost:${configuredPorts.database}`;
+export const adminBaseURL = `http://localhost:${configuredPorts.admin}`;
 const mobileDevice = devices['Pixel 7'];
 const preservedEnvironmentKeys = [
   'CI',
@@ -102,6 +105,28 @@ export function databaseServerEnv(
   };
 }
 
+export function adminServerEnv(
+  env: NodeJS.ProcessEnv,
+  databaseUrl: string,
+): Record<string, string> {
+  const ports = resolveE2EPorts(env);
+  const validatedDatabaseUrl = resolveDatabaseUrl({
+    DATABASE_URL: databaseUrl,
+    E2E_DATABASE_URL: databaseUrl,
+  });
+  return {
+    ...publicServerEnv(env),
+    PORT: String(ports.admin),
+    BETTER_AUTH_URL: `http://localhost:${ports.admin}`,
+    BETTER_AUTH_TRUSTED_ORIGINS: [
+      `http://localhost:${ports.admin}`,
+      `http://localhost:${ports.database}`,
+    ].join(','),
+    DATABASE_URL: validatedDatabaseUrl,
+    E2E_DATABASE_URL: validatedDatabaseUrl,
+  };
+}
+
 function shellQuote(value: string): string {
   return `'${value.replaceAll("'", "'\\''")}'`;
 }
@@ -119,10 +144,18 @@ export function serverCommand(env: Record<string, string>): string {
   ].join(' ');
 }
 
+export function adminServerCommand(env: Record<string, string>): string {
+  return serverCommand(env).replace(
+    '@mini-workout/web start',
+    '@mini-workout/admin start',
+  );
+}
+
 export function projectDefinitions(env: NodeJS.ProcessEnv) {
   const ports = resolveE2EPorts(env);
   const selectedPublicBaseURL = `http://localhost:${ports.public}`;
   const selectedDatabaseBaseURL = `http://localhost:${ports.database}`;
+  const selectedAdminBaseURL = `http://localhost:${ports.admin}`;
   const hasDatabaseEnvironment =
     Boolean(env.E2E_DATABASE_URL) && Boolean(env.DATABASE_URL);
   return [
@@ -163,6 +196,23 @@ export function projectDefinitions(env: NodeJS.ProcessEnv) {
               trace: 'off' as const,
             },
           },
+          {
+            name: 'admin',
+            dependencies: ['db-setup'],
+            testMatch:
+              /tests\/admin\/(?!accessibility-responsive\.spec\.ts$).*\.spec\.ts$/,
+            use: { baseURL: selectedAdminBaseURL, trace: 'off' as const },
+          },
+          {
+            name: 'admin-mobile',
+            dependencies: ['db-setup'],
+            testMatch: /tests\/admin\/accessibility-responsive\.spec\.ts$/,
+            use: {
+              ...mobileDevice,
+              baseURL: selectedAdminBaseURL,
+              trace: 'off' as const,
+            },
+          },
         ]
       : []),
   ];
@@ -183,7 +233,14 @@ export default defineConfig({
   workers: 1,
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    [
+      'html',
+      {
+        outputFolder:
+          process.env.PLAYWRIGHT_HTML_OUTPUT_DIR ?? 'playwright-report',
+        open: 'never',
+      },
+    ],
   ],
   snapshotPathTemplate:
     '{testDir}/__screenshots__/{platform}/{projectName}/{testFilePath}/{arg}{ext}',
@@ -212,6 +269,13 @@ export default defineConfig({
           timeout: 120_000,
           url: `${databaseBaseURL}/api/health`,
           env: databaseServerEnv(process.env, databaseUrl),
+        },
+        {
+          command: adminServerCommand(adminServerEnv(process.env, databaseUrl)),
+          reuseExistingServer: false,
+          timeout: 120_000,
+          url: `${adminBaseURL}/login`,
+          env: adminServerEnv(process.env, databaseUrl),
         },
       ]
     : {
