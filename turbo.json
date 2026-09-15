@@ -81,6 +81,16 @@
       "dependsOn": ["@mini-workout/web#build", "@mini-workout/admin#build"],
       "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT", "E2E_ADMIN_PORT"],
       "cache": false
+    },
+    "test:e2e:admin": {
+      "dependsOn": ["@mini-workout/web#build", "@mini-workout/admin#build"],
+      "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT", "E2E_ADMIN_PORT"],
+      "cache": false
+    },
+    "test:e2e:db": {
+      "dependsOn": ["@mini-workout/web#build"],
+      "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT", "E2E_ADMIN_PORT"],
+      "cache": false
     }
   }
 }

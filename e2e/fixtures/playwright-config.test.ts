@@ -351,7 +351,7 @@ test('targets mobile behavior with Pixel projects instead of duplicating suites'
   assert.equal(databaseMobile?.use?.trace, 'off');
 });
 
-test('pins the canonical Linux CI runner and confirms E2E browser gates are removed', () => {
+test('pins the Linux CI runner and scopes the admin browser gate to a disposable database', () => {
   const workflow = readFileSync(
     fileURLToPath(new URL('../../.github/workflows/ci.yml', import.meta.url)),
     'utf8',
@@ -360,10 +360,22 @@ test('pins the canonical Linux CI runner and confirms E2E browser gates are remo
   // CI must run on the pinned Ubuntu version.
   assert.match(workflow, /runs-on: ubuntu-24\.04/);
 
-  // E2E browser gates were intentionally removed from CI.
-  assert.doesNotMatch(workflow, /playwright install/);
-  assert.doesNotMatch(workflow, /pnpm test:e2e/);
-  assert.doesNotMatch(workflow, /Upload Playwright artifacts/);
+  // Browser journeys run only in the explicitly disposable admin job.
+  assert.match(workflow, /admin-readiness:[\s\S]*image: postgres:16/);
+  assert.match(workflow, /POSTGRES_DB: mini_workout_e2e/);
+  assert.match(
+    workflow,
+    /E2E_DATABASE_URL: postgresql:\/\/postgres:postgres@127\.0\.0\.1:5432\/mini_workout_e2e/,
+  );
+  assert.match(
+    workflow,
+    /name: Install Chromium\s+run: pnpm --filter @mini-workout\/e2e exec playwright install --with-deps chromium/,
+  );
+  assert.match(
+    workflow,
+    /name: Run disposable admin E2E\s+run: pnpm test:e2e:admin/,
+  );
+  assert.doesNotMatch(workflow, /run: pnpm test:e2e -- --project=/);
 
   // E2E policy tests (Node.js-only fixture contracts) must still run.
   assert.match(workflow, /Run E2E policy tests/);

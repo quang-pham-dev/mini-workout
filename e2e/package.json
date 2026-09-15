@@ -13,7 +13,9 @@
     "_test": "pnpm test:policy",
     "test:policy": "node --test --experimental-strip-types fixtures/*.test.ts",
     "test:e2e": "playwright test",
-    "test:e2e:update": "playwright test --update-snapshots"
+    "test:e2e:admin": "playwright test --project=admin --project=admin-mobile",
+    "_test:e2e:db": "playwright test --project=db",
+    "_test:e2e:update": "playwright test --update-snapshots"
   },
   "devDependencies": {
     "@mini-workout/eslint-config": "workspace:*",

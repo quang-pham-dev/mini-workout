@@ -175,7 +175,7 @@ jobs:
         run: pnpm --filter @mini-workout/storybook lint
 
       - name: Build Storybook
-        run: pnpm --filter @mini-workout/storybook build
+        run: pnpm exec turbo run build --filter=@mini-workout/storybook...
 
   boundaries-docs:
     name: Boundaries, docs & policy tests
@@ -256,7 +256,7 @@ jobs:
         run: pnpm --filter @mini-workout/admin check-env
 
       - name: Build admin Nitro artifact
-        run: pnpm --filter @mini-workout/admin build
+        run: pnpm exec turbo run build --filter=@mini-workout/admin... --force
 
       - name: Verify Prisma client and Linux engine tracing
         run: pnpm --filter @mini-workout/admin check-artifact
@@ -268,7 +268,7 @@ jobs:
         run: pnpm --filter @mini-workout/e2e exec playwright install --with-deps chromium
 
       - name: Run disposable admin E2E
-        run: pnpm test:e2e -- --project=admin --project=admin-mobile
+        run: pnpm test:e2e:admin
 
       - name: Upload sanitized Playwright failures
         if: failure()

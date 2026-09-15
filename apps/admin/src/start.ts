@@ -1,4 +1,4 @@
-import { securityHeaders } from '@/lib/security';
+import { withSecurityHeaders } from '@/lib/security';
 import {
   createCsrfMiddleware,
   createMiddleware,
@@ -7,11 +7,7 @@ import {
 import { setResponseHeader } from '@tanstack/react-start/server';
 
 const securityMiddleware = createMiddleware().server(async ({ next }) => {
-  const result = await next();
-  for (const [name, value] of Object.entries(securityHeaders)) {
-    setResponseHeader(name, value);
-  }
-  return result;
+  return withSecurityHeaders(next, setResponseHeader);
 });
 
 const csrfMiddleware = createCsrfMiddleware({
