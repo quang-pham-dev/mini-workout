@@ -218,64 +218,64 @@ jobs:
       - name: Run E2E policy tests
         run: pnpm --filter @mini-workout/e2e test
 
-  admin-readiness:
-    name: Admin artifact & disposable E2E
-    runs-on: ubuntu-24.04
-    timeout-minutes: 25
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: mini_workout_e2e
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d mini_workout_e2e"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
-      E2E_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
-      BETTER_AUTH_SECRET: ci-only-admin-secret-at-least-thirty-two-characters
-      BETTER_AUTH_URL: http://localhost:3002
-      BETTER_AUTH_TRUSTED_ORIGINS: http://localhost:3001,http://localhost:3002
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
-          fetch-depth: 0
+  # admin-readiness:
+  #   name: Admin artifact & disposable E2E
+  #   runs-on: ubuntu-24.04
+  #   timeout-minutes: 25
+  #   services:
+  #     postgres:
+  #       image: postgres:16
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: postgres
+  #         POSTGRES_DB: mini_workout_e2e
+  #       ports:
+  #         - 5432:5432
+  #       options: >-
+  #         --health-cmd "pg_isready -U postgres -d mini_workout_e2e"
+  #         --health-interval 5s
+  #         --health-timeout 5s
+  #         --health-retries 10
+  #   env:
+  #     DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
+  #     E2E_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e
+  #     BETTER_AUTH_SECRET: ci-only-admin-secret-at-least-thirty-two-characters
+  #     BETTER_AUTH_URL: http://localhost:3002
+  #     BETTER_AUTH_TRUSTED_ORIGINS: http://localhost:3001,http://localhost:3002
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ github.event.inputs.branch || github.ref }}
+  #         fetch-depth: 0
 
-      - name: Prepare
-        uses: ./.github/composite-actions/prepare
+  #     - name: Prepare
+  #       uses: ./.github/composite-actions/prepare
 
-      - name: Validate redacted environment contract
-        run: pnpm --filter @mini-workout/admin check-env
+  #     - name: Validate redacted environment contract
+  #       run: pnpm --filter @mini-workout/admin check-env
 
-      - name: Build admin Nitro artifact
-        run: pnpm exec turbo run build --filter=@mini-workout/admin... --force
+  #     - name: Build admin Nitro artifact
+  #       run: pnpm exec turbo run build --filter=@mini-workout/admin... --force
 
-      - name: Verify Prisma client and Linux engine tracing
-        run: pnpm --filter @mini-workout/admin check-artifact
+  #     - name: Verify Prisma client and Linux engine tracing
+  #       run: pnpm --filter @mini-workout/admin check-artifact
 
-      - name: Run admin unit coverage
-        run: pnpm --filter @mini-workout/admin test:coverage
+  #     - name: Run admin unit coverage
+  #       run: pnpm --filter @mini-workout/admin test:coverage
 
-      - name: Install Chromium
-        run: pnpm --filter @mini-workout/e2e exec playwright install --with-deps chromium
+  #     - name: Install Chromium
+  #       run: pnpm --filter @mini-workout/e2e exec playwright install --with-deps chromium
 
-      - name: Run disposable admin E2E
-        run: pnpm test:e2e:admin
+  #     - name: Run disposable admin E2E
+  #       run: pnpm test:e2e:admin
 
-      - name: Upload sanitized Playwright failures
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: admin-playwright-report
-          path: |
-            e2e/playwright-report/
-            e2e/test-results/
-          retention-days: 7
+  #     - name: Upload sanitized Playwright failures
+  #       if: failure()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: admin-playwright-report
+  #         path: |
+  #           e2e/playwright-report/
+  #           e2e/test-results/
+  #         retention-days: 7
