@@ -42,7 +42,7 @@ async function walk(directory) {
 }
 await walk(root);
 const serverFiles = files.filter((file) => file.startsWith('server/'));
-const posthogKey = process.env.VITE_POSTHOG_KEY?.trim();
+const posthogKey = process.env.ADMIN_POSTHOG_KEY?.trim();
 if (posthogKey) {
   const leakedFiles = [];
   for (const file of serverFiles) {
@@ -99,9 +99,9 @@ if (databaseUrl) {
   } catch (error) {
     const code =
       error &&
-      typeof error === 'object' &&
-      'errorCode' in error &&
-      error.errorCode
+        typeof error === 'object' &&
+        'errorCode' in error &&
+        error.errorCode
         ? String(error.errorCode)
         : error && typeof error === 'object' && 'code' in error && error.code
           ? String(error.code)

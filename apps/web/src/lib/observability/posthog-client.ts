@@ -113,12 +113,12 @@ export function createPostHogAdapter(
 
 export const posthogClient = createPostHogAdapter(
   posthog as unknown as PostHogSdk,
-  process.env.NEXT_PUBLIC_POSTHOG_KEY,
-  process.env.NEXT_PUBLIC_POSTHOG_HOST,
+  process.env.POSTHOG_KEY,
+  process.env.POSTHOG_HOST,
   {
-    enabled: process.env.NEXT_PUBLIC_POSTHOG_ENABLED !== 'false',
+    enabled: process.env.POSTHOG_ENABLED !== 'false',
     hasConsent: () =>
-      process.env.NEXT_PUBLIC_POSTHOG_REQUIRE_CONSENT !== 'true' ||
+      process.env.POSTHOG_REQUIRE_CONSENT !== 'true' ||
       window.localStorage.getItem('mini-workout:analytics-consent') ===
         'granted',
   },
