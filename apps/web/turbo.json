@@ -8,7 +8,11 @@
         "BETTER_AUTH_SECRET",
         "BETTER_AUTH_URL",
         "DATABASE_URL",
-        "NEXT_PUBLIC_API_URL"
+        "NEXT_PUBLIC_API_URL",
+        "POSTHOG_SERVER_API_KEY",
+        "POSTHOG_HOST",
+        "POSTHOG_ENABLED",
+        "POSTHOG_REQUIRE_CONSENT"
       ],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
@@ -16,7 +20,14 @@
       "extends": false
     },
     "lint": {
-      "env": ["BETTER_AUTH_URL", "NODE_ENV"]
+      "env": [
+        "BETTER_AUTH_URL",
+        "NODE_ENV",
+        "POSTHOG_SERVER_API_KEY",
+        "POSTHOG_HOST",
+        "POSTHOG_ENABLED",
+        "POSTHOG_REQUIRE_CONSENT"
+      ]
     },
     "test": {
       "extends": false
