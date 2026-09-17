@@ -15,6 +15,7 @@ import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as AdminIndexRouteImport } from './routes/_admin.index'
 import { Route as AdminCoachesRouteImport } from './routes/_admin.coaches'
 import { Route as AdminWorkoutsRouteImport } from './routes/_admin.workouts'
+import { Route as ApiObservabilityConfigRouteImport } from './routes/api/observability-config'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const AdminRoute = AdminRouteImport.update({
@@ -46,6 +47,11 @@ const AdminWorkoutsRoute = AdminWorkoutsRouteImport.update({
   path: '/workouts',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiObservabilityConfigRoute = ApiObservabilityConfigRouteImport.update({
+  id: '/api/observability-config',
+  path: '/api/observability-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/unauthorized': typeof UnauthorizedRoute
   '/coaches': typeof AdminCoachesRoute
   '/workouts': typeof AdminWorkoutsRoute
+  '/api/observability-config': typeof ApiObservabilityConfigRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/unauthorized': typeof UnauthorizedRoute
   '/coaches': typeof AdminCoachesRoute
   '/workouts': typeof AdminWorkoutsRoute
+  '/api/observability-config': typeof ApiObservabilityConfigRoute
   '/': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -75,16 +83,29 @@ export interface FileRoutesById {
   '/unauthorized': typeof UnauthorizedRoute
   '/_admin/coaches': typeof AdminCoachesRoute
   '/_admin/workouts': typeof AdminWorkoutsRoute
+  '/api/observability-config': typeof ApiObservabilityConfigRoute
   '/_admin/': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/unauthorized' | '/coaches' | '/workouts' | '/api/auth/$'
+    | '/'
+    | '/login'
+    | '/unauthorized'
+    | '/coaches'
+    | '/workouts'
+    | '/api/observability-config'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/login' | '/unauthorized' | '/coaches' | '/workouts' | '/' | '/api/auth/$'
+    | '/login'
+    | '/unauthorized'
+    | '/coaches'
+    | '/workouts'
+    | '/api/observability-config'
+    | '/'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/_admin'
@@ -92,6 +113,7 @@ export interface FileRouteTypes {
     | '/unauthorized'
     | '/_admin/coaches'
     | '/_admin/workouts'
+    | '/api/observability-config'
     | '/_admin/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -100,6 +122,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
+  ApiObservabilityConfigRoute: typeof ApiObservabilityConfigRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -147,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWorkoutsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/observability-config': {
+      id: '/api/observability-config'
+      path: '/api/observability-config'
+      fullPath: '/api/observability-config'
+      preLoaderRoute: typeof ApiObservabilityConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -175,6 +205,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
   UnauthorizedRoute: UnauthorizedRoute,
+  ApiObservabilityConfigRoute: ApiObservabilityConfigRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

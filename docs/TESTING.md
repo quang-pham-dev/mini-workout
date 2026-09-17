@@ -101,7 +101,7 @@ E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DA
 To run only the database-backed project:
 
 ```bash
-E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' pnpm test:e2e -- --project=db
+E2E_DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' DATABASE_URL='postgresql://user:password@127.0.0.1:5432/mini_workout_e2e' pnpm test:e2e:db
 ```
 
 Approved local hosts include `localhost`, `127.0.0.1`, and `[::1]`. The E2E

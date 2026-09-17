@@ -1,6 +1,7 @@
 import { AnimatedSuspense } from '../animated-suspense';
 import { AppHeaderLogo } from './app-header-logo';
 import { NavLinks, NavLinksFallback } from './nav-links';
+import { PostHogIdentitySync } from '@/components/observability/posthog-bootstrap';
 import { ThemeToggle } from '@/components/theme';
 import { getInitials } from '@/lib/auth/initials';
 import { getCurrentSession } from '@/lib/auth/session';
@@ -12,11 +13,14 @@ async function HeaderSessionNav() {
   if (!initials) return null;
 
   return (
-    <NavLinks
-      userInitials={initials}
-      userName={session?.user?.name || undefined}
-      userEmail={session?.user?.email || undefined}
-    />
+    <>
+      <PostHogIdentitySync userId={session?.user?.id} />
+      <NavLinks
+        userInitials={initials}
+        userName={session?.user?.name || undefined}
+        userEmail={session?.user?.email || undefined}
+      />
+    </>
   );
 }
 

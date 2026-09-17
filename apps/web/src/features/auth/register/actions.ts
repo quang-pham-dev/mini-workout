@@ -6,6 +6,7 @@ import {
   ONBOARDING_COOKIE_VALUES,
 } from '@/lib/auth/constants';
 import { registerSchema } from '@/lib/auth/validation';
+import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -16,6 +17,15 @@ export type RegisterFormState = {
 };
 
 export async function registerAction(
+  prevState: RegisterFormState,
+  formData: FormData,
+): Promise<RegisterFormState> {
+  return withServerActionErrorBoundary('auth.register', () =>
+    registerActionImpl(prevState, formData),
+  );
+}
+
+async function registerActionImpl(
   prevState: RegisterFormState,
   formData: FormData,
 ): Promise<RegisterFormState> {

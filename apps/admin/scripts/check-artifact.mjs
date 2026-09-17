@@ -1,4 +1,4 @@
-import { readdir, stat } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { join, relative, resolve, sep } from 'node:path';
 import process from 'node:process';
@@ -41,6 +41,20 @@ async function walk(directory) {
   );
 }
 await walk(root);
+const serverFiles = files.filter((file) => file.startsWith('server/'));
+const posthogKey = process.env.VITE_POSTHOG_KEY?.trim();
+if (posthogKey) {
+  const leakedFiles = [];
+  for (const file of serverFiles) {
+    const contents = await readFile(join(root, file), 'utf8');
+    if (contents.includes(posthogKey)) leakedFiles.push(file);
+  }
+  if (leakedFiles.length) {
+    throw new Error(
+      `PostHog public key must not be bundled in the admin server artifact: ${leakedFiles.join(', ')}`,
+    );
+  }
+}
 const expectedFiles = [
   'server/index.mjs',
   'server/node_modules/@prisma/client/default.js',

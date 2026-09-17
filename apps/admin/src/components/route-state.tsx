@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect } from 'react';
+
 export function AdminRoutePending({ resource }: { resource: string }) {
   return (
     <section
@@ -17,10 +21,30 @@ export function AdminRoutePending({ resource }: { resource: string }) {
 export function AdminRouteError({
   resource,
   reset,
+  error,
 }: {
   resource: string;
   reset: () => void;
+  error?: unknown;
 }) {
+  useEffect(() => {
+    if (!error) return;
+    window.dispatchEvent(
+      new CustomEvent('mini-workout:admin-error', {
+        detail: {
+          error: new Error('Unhandled admin application error'),
+          properties: {
+            error_code: 'INTERNAL_ERROR',
+            error_category: 'internal',
+            service: 'admin',
+            route_template: `admin/${resource}`,
+            operation: 'route.render',
+          },
+        },
+      }),
+    );
+  }, [error, resource]);
+
   return (
     <section
       className="mx-auto max-w-2xl rounded-2xl border border-border-subtle bg-surface px-6 py-14 text-center shadow-sm"

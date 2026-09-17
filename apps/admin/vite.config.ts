@@ -5,6 +5,7 @@ import { nitro } from 'nitro/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   resolve: { tsconfigPaths: true },
   server: { port: 3001 },
   ssr: { external: ['@prisma/client'] },

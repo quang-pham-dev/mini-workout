@@ -4,10 +4,23 @@ export interface RequestContext {
   parentSpanId?: string;
 }
 
+const requestIdPattern = /^[A-Za-z0-9._:-]{1,128}$/;
+const traceIdPattern = /^[a-f0-9]{32}$/;
+const spanIdPattern = /^[a-f0-9]{16}$/;
+
 export function createRequestContext(headers?: Headers): RequestContext {
-  const requestId = headers?.get('x-request-id') ?? crypto.randomUUID();
-  const traceparent = headers?.get('traceparent');
-  const [, traceId, parentSpanId] = traceparent?.split('-') ?? [];
+  const incomingRequestId = headers?.get('x-request-id') ?? '';
+  const requestId = requestIdPattern.test(incomingRequestId)
+    ? incomingRequestId
+    : crypto.randomUUID();
+  const traceparent = headers?.get('traceparent')?.split('-') ?? [];
+  const [, candidateTraceId, candidateParentSpanId] = traceparent;
+  const traceId = traceIdPattern.test(candidateTraceId ?? '')
+    ? candidateTraceId
+    : undefined;
+  const parentSpanId = spanIdPattern.test(candidateParentSpanId ?? '')
+    ? candidateParentSpanId
+    : undefined;
 
   return { requestId, traceId, parentSpanId };
 }

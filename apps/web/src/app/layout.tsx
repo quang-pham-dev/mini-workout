@@ -1,4 +1,5 @@
 import './globals.css';
+import { PostHogBootstrap } from '@/components/observability/posthog-bootstrap';
 import { OfflineIndicator } from '@/components/offline-indicator';
 import { ThemeProvider } from '@/components/theme';
 import { Toaster } from '@/components/toaster';
@@ -38,6 +39,7 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProvider>
+          <PostHogBootstrap />
           <OfflineIndicator />
           {children}
           <Toaster />

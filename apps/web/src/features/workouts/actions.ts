@@ -1,6 +1,7 @@
 'use server';
 
 import { auth } from '@/auth';
+import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
 import {
   toggleWorkoutFavorite as toggleFavorite,
   toggleWorkoutLike as toggleLike,
@@ -16,19 +17,23 @@ async function requireUser() {
 }
 
 export async function toggleWorkoutLike(workoutId: string) {
-  const userId = await requireUser();
-  const { workoutSlug } = await toggleLike({ userId, workoutId });
+  return withServerActionErrorBoundary('workout.like.toggle', async () => {
+    const userId = await requireUser();
+    const { workoutSlug } = await toggleLike({ userId, workoutId });
 
-  revalidatePath('/home');
-  revalidatePath('/favourites');
-  revalidatePath(`/workouts/${workoutSlug}`);
+    revalidatePath('/home');
+    revalidatePath('/favourites');
+    revalidatePath(`/workouts/${workoutSlug}`);
+  });
 }
 
 export async function toggleWorkoutFavorite(workoutId: string) {
-  const userId = await requireUser();
-  const { workoutSlug } = await toggleFavorite({ userId, workoutId });
+  return withServerActionErrorBoundary('workout.favorite.toggle', async () => {
+    const userId = await requireUser();
+    const { workoutSlug } = await toggleFavorite({ userId, workoutId });
 
-  revalidatePath('/home');
-  revalidatePath('/favourites');
-  revalidatePath(`/workouts/${workoutSlug}`);
+    revalidatePath('/home');
+    revalidatePath('/favourites');
+    revalidatePath(`/workouts/${workoutSlug}`);
+  });
 }

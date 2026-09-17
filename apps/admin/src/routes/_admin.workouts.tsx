@@ -60,8 +60,8 @@ export const Route = createFileRoute('/_admin/workouts')({
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(adminWorkoutsQueryOptions(deps.cursor)),
   pendingComponent: () => <AdminRoutePending resource="workouts" />,
-  errorComponent: ({ reset }) => (
-    <AdminRouteError resource="workouts" reset={reset} />
+  errorComponent: ({ error, reset }) => (
+    <AdminRouteError error={error} resource="workouts" reset={reset} />
   ),
   component: WorkoutsPage,
 });

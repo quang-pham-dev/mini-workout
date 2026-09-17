@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
-import { NotFoundError, ValidationError } from '@mini-workout/core/errors';
+import { createApiErrorResponse } from '@/lib/observability/api-error';
 import { setWorkoutLike } from '@mini-workout/core/workouts';
+import { AppError } from '@mini-workout/observability';
 import { z } from 'zod';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -18,11 +19,35 @@ async function setLike(
   liked: boolean,
 ) {
   const session = await auth.api.getSession({ headers: request.headers });
-  if (!session?.user.id) return json({ error: 'Unauthorized' }, 401);
+  if (!session?.user.id) {
+    return createApiErrorResponse(
+      new AppError({
+        code: 'AUTH_REQUIRED',
+        category: 'authentication',
+        message: 'Authentication required',
+        status: 401,
+        retryable: false,
+        reportable: false,
+      }),
+      request,
+      'workout.like.update',
+    );
+  }
 
   const { id } = await context.params;
   if (!z.string().min(1).max(128).safeParse(id).success) {
-    return json({ error: 'Invalid workout id' }, 400);
+    return createApiErrorResponse(
+      new AppError({
+        code: 'INPUT_INVALID',
+        category: 'validation',
+        message: 'Invalid workout id',
+        status: 400,
+        retryable: false,
+        reportable: false,
+      }),
+      request,
+      'workout.like.update',
+    );
   }
 
   try {
@@ -33,11 +58,7 @@ async function setLike(
     });
     return json(result);
   } catch (error) {
-    if (error instanceof NotFoundError)
-      return json({ error: error.message }, 404);
-    if (error instanceof ValidationError)
-      return json({ error: 'Invalid input' }, 400);
-    throw error;
+    return createApiErrorResponse(error, request, 'workout.like.update');
   }
 }
 

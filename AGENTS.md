@@ -58,3 +58,12 @@ This repo has no commit history yet, but `commitlint` and Husky are configured. 
 ## Agent-Specific Notes
 
 Prefer workspace scripts over ad hoc commands. When changing shared config in `config/`, verify the affected app/package still type-checks and lints cleanly.
+
+## Mandatory Error Handling Convention
+
+When touching error handling, API routes, Server Actions, server functions,
+auth boundaries, data fetching, or observability, read and follow
+[`docs/ERROR_HANDLING_CONVENTION.md`](docs/ERROR_HANDLING_CONVENTION.md).
+Generated code must use the shared error contract, preserve framework
+control-flow, report unexpected errors once, sanitize telemetry, and include
+tests for error mapping and alert-noise behavior.

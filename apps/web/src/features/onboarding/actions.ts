@@ -12,6 +12,7 @@ import {
   getOnboardingCookieValue,
 } from '@/features/onboarding/state-machine';
 import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
+import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
 import { NotFoundError, ValidationError } from '@mini-workout/core/errors';
 import {
   completeRequiredOnboarding,
@@ -39,6 +40,12 @@ async function setOnboardingCookie(status: OnboardingStatus) {
 }
 
 export async function completeOnboarding(formData: FormData) {
+  return withServerActionErrorBoundary('onboarding.complete', () =>
+    completeOnboardingImpl(formData),
+  );
+}
+
+async function completeOnboardingImpl(formData: FormData) {
   const parsed = onboardingSchema.safeParse({
     experienceLevel: formData.get('experienceLevel'),
     interests: formData.getAll('interests'),
@@ -63,6 +70,12 @@ export async function completeOnboarding(formData: FormData) {
 }
 
 export async function saveExperienceStep(formData: FormData) {
+  return withServerActionErrorBoundary('onboarding.experience.save', () =>
+    saveExperienceStepImpl(formData),
+  );
+}
+
+async function saveExperienceStepImpl(formData: FormData) {
   const parsed = experienceStepSchema.safeParse({
     experienceLevel: formData.get('experienceLevel'),
   });
@@ -80,6 +93,12 @@ export async function saveExperienceStep(formData: FormData) {
 }
 
 export async function saveInterestsStep(formData: FormData) {
+  return withServerActionErrorBoundary('onboarding.interests.save', () =>
+    saveInterestsStepImpl(formData),
+  );
+}
+
+async function saveInterestsStepImpl(formData: FormData) {
   const parsed = interestsStepSchema.safeParse({
     interests: formData.getAll('interests'),
   });
@@ -104,6 +123,12 @@ export async function saveInterestsStep(formData: FormData) {
 }
 
 export async function saveWeeklyScheduleStep(formData: FormData) {
+  return withServerActionErrorBoundary('onboarding.schedule.save', () =>
+    saveWeeklyScheduleStepImpl(formData),
+  );
+}
+
+async function saveWeeklyScheduleStepImpl(formData: FormData) {
   const parsed = scheduleStepSchema.safeParse({
     weeklyGoalDays: formData.get('weeklyGoalDays'),
   });
@@ -117,6 +142,12 @@ export async function saveWeeklyScheduleStep(formData: FormData) {
 }
 
 export async function skipOptionalStep(formData: FormData) {
+  return withServerActionErrorBoundary('onboarding.schedule.skip', () =>
+    skipOptionalStepImpl(formData),
+  );
+}
+
+async function skipOptionalStepImpl(formData: FormData) {
   if (formData.get('step')?.toString() !== 'WEEKLY_SCHEDULE') {
     redirect('/onboarding?step=WEEKLY_SCHEDULE&error=invalid');
   }

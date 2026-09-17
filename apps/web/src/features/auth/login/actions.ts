@@ -9,6 +9,7 @@ import { getSafeRedirectPath } from '@/lib/auth/authorization';
 import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
 import { getUserProfile } from '@/lib/auth/session';
 import { loginSchema } from '@/lib/auth/validation';
+import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
 import type { Route } from 'next';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -19,6 +20,15 @@ export type LoginFormState = {
 };
 
 export async function loginAction(
+  prevState: LoginFormState,
+  formData: FormData,
+): Promise<LoginFormState> {
+  return withServerActionErrorBoundary('auth.login', () =>
+    loginActionImpl(prevState, formData),
+  );
+}
+
+async function loginActionImpl(
   prevState: LoginFormState,
   formData: FormData,
 ): Promise<LoginFormState> {

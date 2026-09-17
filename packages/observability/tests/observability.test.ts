@@ -1,13 +1,20 @@
 import {
+  AppError,
+  classifyError,
+  createErrorScope,
   createLogger,
   createLoggerErrorReporter,
+  createPostHogServerReporter,
+  createReportOnce,
   createRequestContext,
   createWebVitalReporter,
   normalizeError,
   redactContext,
   requestContextHeaders,
   runHealthChecks,
+  toPublicError,
 } from '../src/index';
+import { vi } from 'vitest';
 
 describe('observability primitives', () => {
   it('redacts sensitive context values', () => {
@@ -128,6 +135,157 @@ describe('logger', () => {
 });
 
 describe('errors', () => {
+  it('sends sanitized server error events without blocking the request', () => {
+    const fetcher = vi.fn(() => Promise.resolve(new Response('{}')));
+    const reporter = createPostHogServerReporter({
+      apiKey: 'server-key',
+      fetcher,
+      host: 'https://posthog.example.test',
+    });
+
+    reporter.report({
+      error: new Error('database password=secret'),
+      context: {
+        service: 'web',
+        operation: 'profile.load',
+        requestId: 'req-1',
+        errorCode: 'INTERNAL_ERROR',
+        email: 'must-not-send',
+      },
+    });
+
+    expect(fetcher).toHaveBeenCalledWith(
+      'https://posthog.example.test/capture/',
+      expect.objectContaining({ method: 'POST' }),
+    );
+    const body = JSON.parse(fetcher.mock.calls[0]?.[1]?.body as string);
+    expect(body.event).toBe('$exception');
+    expect(body.properties).toMatchObject({
+      service: 'web',
+      operation: 'profile.load',
+      request_id: 'req-1',
+    });
+    expect(body.properties.email).toBeUndefined();
+    expect(body.properties['$exception_message']).toBeUndefined();
+  });
+  it('deduplicates reports by key within an injected request scope', () => {
+    const report = vi.fn();
+    const scope = createErrorScope({ reporter: { report } }, 'request-1');
+
+    expect(
+      scope.reportOnce('fingerprint-1', { error: new Error('boom') }),
+    ).toBe(true);
+    expect(
+      scope.reportOnce('fingerprint-1', { error: new Error('boom') }),
+    ).toBe(false);
+    expect(report).toHaveBeenCalledOnce();
+  });
+
+  it('reports an error at most once per boundary instance', () => {
+    const report = vi.fn();
+    const reporter = createReportOnce({ report });
+    const error = new Error('boom');
+
+    reporter.report({ error });
+    reporter.report({ error });
+
+    expect(report).toHaveBeenCalledOnce();
+  });
+
+  it('creates a stable safe application error contract', () => {
+    const error = new AppError({
+      code: 'INPUT_INVALID',
+      category: 'validation',
+      message: 'Invalid input',
+      status: 400,
+      retryable: false,
+      reportable: false,
+    });
+
+    expect(error).toMatchObject({
+      name: 'AppError',
+      code: 'INPUT_INVALID',
+      category: 'validation',
+      status: 400,
+      retryable: false,
+      reportable: false,
+    });
+  });
+
+  it('classifies known errors without reporting expected outcomes', () => {
+    const classified = classifyError(
+      new AppError({
+        code: 'RESOURCE_NOT_FOUND',
+        category: 'not_found',
+        message: 'Workout not found',
+        status: 404,
+        retryable: false,
+        reportable: false,
+      }),
+      { service: 'web', operation: 'workout.detail' },
+    );
+
+    expect(classified).toMatchObject({
+      code: 'RESOURCE_NOT_FOUND',
+      publicMessage: 'Workout not found',
+      reportable: false,
+      fingerprint: expect.any(String),
+    });
+  });
+
+  it('converts unknown errors to a generic reportable internal error', () => {
+    const classified = classifyError(
+      new Error('database password=super-secret'),
+      { service: 'web', operation: 'profile.load', route: '/profile' },
+    );
+
+    expect(classified).toMatchObject({
+      code: 'INTERNAL_ERROR',
+      category: 'internal',
+      publicMessage: 'Something went wrong. Please try again.',
+      reportable: true,
+      retryable: false,
+    });
+    expect(classified.fingerprint).not.toContain('super-secret');
+    expect(toPublicError(classified)).toEqual({
+      code: 'INTERNAL_ERROR',
+      message: 'Something went wrong. Please try again.',
+      requestId: undefined,
+    });
+  });
+
+  it('maps dependency failures and groups only dynamic identifiers', () => {
+    const first = classifyError(
+      Object.assign(new Error('connection failed for workout 123'), {
+        code: 'P1001',
+      }),
+      { service: 'web', operation: 'workout.load' },
+    );
+    const second = classifyError(
+      Object.assign(new Error('connection failed for workout 456'), {
+        code: 'P1001',
+      }),
+      { service: 'web', operation: 'workout.load' },
+    );
+
+    expect(first).toMatchObject({
+      code: 'DEPENDENCY_UNAVAILABLE',
+      category: 'dependency',
+      retryable: true,
+    });
+    expect(first.fingerprint).toBe(second.fingerprint);
+  });
+
+  it('recognizes framework control-flow errors and does not classify them', () => {
+    const redirectError = Object.assign(new Error('redirect'), {
+      digest: 'NEXT_REDIRECT;replace;/login;307;',
+    });
+
+    expect(classifyError(redirectError, { service: 'web' }).controlFlow).toBe(
+      true,
+    );
+  });
+
   it('normalizeError wraps non-Error values', () => {
     expect(normalizeError('string error')).toBeInstanceOf(Error);
     expect(normalizeError('string error').message).toBe('string error');
@@ -171,11 +329,24 @@ describe('tracing', () => {
 
   it('parses traceparent header into traceId and parentSpanId', () => {
     const headers = new Headers({
-      traceparent: '00-traceid123-spanid456-01',
+      traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
     });
     const ctx = createRequestContext(headers);
-    expect(ctx.traceId).toBe('traceid123');
-    expect(ctx.parentSpanId).toBe('spanid456');
+    expect(ctx.traceId).toBe('4bf92f3577b34da6a3ce929d0e0e4736');
+    expect(ctx.parentSpanId).toBe('00f067aa0ba902b7');
+  });
+
+  it('rejects malformed correlation headers and generates safe IDs', () => {
+    const ctx = createRequestContext(
+      new Headers({
+        'x-request-id': 'contains spaces and secrets',
+        traceparent: '00-invalid-invalid-01',
+      }),
+    );
+
+    expect(ctx.requestId).toMatch(/^[a-f0-9-]{36}$/);
+    expect(ctx.traceId).toBeUndefined();
+    expect(ctx.parentSpanId).toBeUndefined();
   });
 
   it('requestContextHeaders sets x-request-id and optionally x-trace-id', () => {
@@ -234,5 +405,17 @@ describe('health checks', () => {
       { name: 'fast', run: async () => undefined },
     ]);
     expect(result.checks[0].durationMs).toBeGreaterThanOrEqual(0);
+  });
+
+  it('times out a hung dependency check', async () => {
+    const result = await runHealthChecks(
+      [{ name: 'database', run: () => new Promise<void>(() => undefined) }],
+      { timeoutMs: 5 },
+    );
+    expect(result.checks[0]).toMatchObject({
+      name: 'database',
+      status: 'unhealthy',
+      message: 'Health check timed out',
+    });
   });
 });

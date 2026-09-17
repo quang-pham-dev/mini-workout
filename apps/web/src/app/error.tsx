@@ -1,6 +1,8 @@
 'use client';
 
+import { posthogClient } from '@/lib/observability/posthog-client';
 import { AlertCircle, RotateCcw } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function GlobalError({
   error,
@@ -9,6 +11,19 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    posthogClient.captureException(
+      new Error('Unhandled client application error'),
+      {
+        error_code: 'INTERNAL_ERROR',
+        error_category: 'internal',
+        service: 'web',
+        route_template: 'app/error',
+        operation: 'render',
+      },
+    );
+  }, [error]);
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-background">
       <div className="text-center space-y-4 max-w-md">
@@ -17,7 +32,7 @@ export default function GlobalError({
           Something went wrong
         </h1>
         <p className="text-text-secondary text-sm">
-          {error.message || 'An unexpected error occurred. Please try again.'}
+          An unexpected error occurred. Please try again.
         </p>
         <button
           onClick={reset}

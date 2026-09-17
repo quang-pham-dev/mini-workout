@@ -1,5 +1,7 @@
 export * from './alerting';
 export * from './errors';
+export * from './scope';
+export * from './posthog-server';
 export * from './health';
 export * from './logger';
 export * from './tracing';

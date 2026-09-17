@@ -1,4 +1,5 @@
 import appCss from '../styles.css?url';
+import { PostHogBootstrap } from '@/components/observability/posthog-bootstrap';
 import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
@@ -49,6 +50,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <PostHogBootstrap />
         {children}
         {showDevtools && (
           <>

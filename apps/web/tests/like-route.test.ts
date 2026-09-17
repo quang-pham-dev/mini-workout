@@ -77,10 +77,17 @@ describe('workout like REST route', () => {
     expect((await PUT(request('PUT'), context('workout-1'))).status).toBe(400);
   });
 
-  it('lets unexpected storage failures surface for server logging', async () => {
+  it('returns a safe response for unexpected storage failures', async () => {
     setLike.mockRejectedValue(new Error('database unavailable'));
-    await expect(PUT(request('PUT'), context('workout-1'))).rejects.toThrow(
-      'database unavailable',
-    );
+    const response = await PUT(request('PUT'), context('workout-1'));
+    expect(response.status).toBe(500);
+    expect(response.headers.get('x-request-id')).toBeTruthy();
+    expect(await response.json()).toEqual({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Something went wrong. Please try again.',
+        requestId: expect.any(String),
+      },
+    });
   });
 });

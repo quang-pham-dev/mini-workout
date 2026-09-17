@@ -51,8 +51,8 @@ export const Route = createFileRoute('/_admin/coaches')({
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(adminCoachesQueryOptions(deps.cursor)),
   pendingComponent: () => <AdminRoutePending resource="coaches" />,
-  errorComponent: ({ reset }) => (
-    <AdminRouteError resource="coaches" reset={reset} />
+  errorComponent: ({ error, reset }) => (
+    <AdminRouteError error={error} resource="coaches" reset={reset} />
   ),
   component: CoachesPage,
 });

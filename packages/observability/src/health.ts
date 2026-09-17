@@ -12,14 +12,40 @@ export interface HealthCheck {
   run(): Promise<void>;
 }
 
+export interface HealthCheckOptions {
+  timeoutMs?: number;
+}
+
+async function withTimeout(
+  operation: Promise<void>,
+  timeoutMs: number,
+): Promise<void> {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      operation,
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(
+          () => reject(new Error('Health check timed out')),
+          timeoutMs,
+        );
+      }),
+    ]);
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
+}
+
 export async function runHealthChecks(
   checks: HealthCheck[],
+  options: HealthCheckOptions = {},
 ): Promise<{ status: HealthStatus; checks: HealthCheckResult[] }> {
+  const timeoutMs = options.timeoutMs ?? 1500;
   const results = await Promise.all(
     checks.map(async (check): Promise<HealthCheckResult> => {
       const startedAt = performance.now();
       try {
-        await check.run();
+        await withTimeout(check.run(), timeoutMs);
         return {
           name: check.name,
           status: 'healthy',

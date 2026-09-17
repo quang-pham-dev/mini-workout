@@ -1,3 +1,4 @@
+import { prisma } from '@mini-workout/database';
 import {
   createLogger,
   createRequestContext,
@@ -9,12 +10,18 @@ const logger = createLogger({ service: 'web' });
 
 export async function GET(request: Request) {
   const requestContext = createRequestContext(request.headers);
-  const result = await runHealthChecks([
-    {
-      name: 'application',
-      run: async () => undefined,
-    },
-  ]);
+  const result = await runHealthChecks(
+    [
+      { name: 'application', run: async () => undefined },
+      {
+        name: 'database',
+        run: async () => {
+          await prisma.$queryRaw`SELECT 1`;
+        },
+      },
+    ],
+    { timeoutMs: 1500 },
+  );
 
   logger.info('Health check completed', {
     requestId: requestContext.requestId,
@@ -29,7 +36,10 @@ export async function GET(request: Request) {
     },
     {
       status: result.status === 'healthy' ? 200 : 503,
-      headers: { 'cache-control': 'no-store' },
+      headers: {
+        'cache-control': 'no-store',
+        'x-request-id': requestContext.requestId,
+      },
     },
   );
 }

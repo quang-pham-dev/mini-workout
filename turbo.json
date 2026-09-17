@@ -8,7 +8,9 @@
     "E2E_DATABASE_URL",
     "BETTER_AUTH_URL",
     "BETTER_AUTH_TRUSTED_ORIGINS",
-    "PLAYWRIGHT_HTML_OUTPUT_DIR"
+    "PLAYWRIGHT_HTML_OUTPUT_DIR",
+    "POSTHOG_SERVER_API_KEY",
+    "POSTHOG_HOST"
   ],
   "globalPassThroughEnv": ["CI"],
   "ui": "tui",

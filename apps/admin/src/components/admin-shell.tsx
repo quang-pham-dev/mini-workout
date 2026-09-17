@@ -1,5 +1,6 @@
+import { PostHogIdentitySync } from './observability/posthog-bootstrap';
 import { SignOutButton } from './sign-out-button';
-import { Link, Outlet } from '@tanstack/react-router';
+import { Link, Outlet, useRouteContext } from '@tanstack/react-router';
 
 const navigation = [
   { to: '/workouts' as const, label: 'Workouts' },
@@ -7,8 +8,11 @@ const navigation = [
 ];
 
 export function AdminShell() {
+  const { admin } = useRouteContext({ from: '/_admin' });
+
   return (
     <div className="min-h-screen bg-surface-sunken lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <PostHogIdentitySync userId={admin.userId} />
       <aside className="border-b border-border-subtle bg-surface lg:min-h-screen lg:border-r lg:border-b-0">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:sticky lg:top-0 lg:block lg:px-6 lg:py-8">
           <div>
