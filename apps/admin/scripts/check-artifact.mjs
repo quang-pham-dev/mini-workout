@@ -99,9 +99,9 @@ if (databaseUrl) {
   } catch (error) {
     const code =
       error &&
-        typeof error === 'object' &&
-        'errorCode' in error &&
-        error.errorCode
+      typeof error === 'object' &&
+      'errorCode' in error &&
+      error.errorCode
         ? String(error.errorCode)
         : error && typeof error === 'object' && 'code' in error && error.code
           ? String(error.code)
