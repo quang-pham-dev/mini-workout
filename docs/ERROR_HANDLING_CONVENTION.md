@@ -163,6 +163,14 @@ PostHog SDK. Adapter failures are swallowed after a safe fallback log.
   not report as internal exceptions.
 - Never call an internal Route Handler from a Server Component just to reuse
   error handling; use the application/service boundary directly.
+- Health routes have separate contracts: `/api/health/live` performs no
+  dependency I/O and returns 200 when the handler executes; `/api/health/ready`
+  calls only `@mini-workout/database`'s `pingDatabase()` and returns 503 for an
+  unhealthy dependency. Readiness includes a request ID and
+  `cache-control: no-store`.
+- Health routes use `getObservability()` after app lifecycle initialization by
+  `instrumentation.ts`; they must not construct a route-local logger or another
+  infrastructure singleton at module scope.
 
 ### TanStack Admin
 
@@ -245,8 +253,8 @@ ID calls `identify`, and a missing session calls `reset`. Logout flows must
 invalidate the application session first; telemetry reset is a consequence of
 the resulting unauthenticated session state, not a substitute for logout.
 
-Consent is controlled by `NEXT_PUBLIC_POSTHOG_REQUIRE_CONSENT` for Web and
-`VITE_POSTHOG_REQUIRE_CONSENT` for Admin. When enabled, the product must write
+Consent is controlled by `POSTHOG_REQUIRE_CONSENT` for Web and
+`ADMIN_POSTHOG_REQUIRE_CONSENT` for Admin. When enabled, the product must write
 `mini-workout:analytics-consent=granted` only after the user has opted in.
 Until that UI/policy is supplied, keep the flag disabled in environments where
 analytics consent is not collected.

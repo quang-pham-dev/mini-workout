@@ -52,9 +52,17 @@ web app so product analytics and privacy requirements can be decided separately.
 
 ## Health and uptime
 
-`/api/health` is the public liveness endpoint. As dependencies are introduced,
-add bounded checks for the database, cache, and critical upstreams. Do not make
-health checks perform mutations or expensive queries.
+Health is split by operational meaning:
+
+- `/api/health/live` is liveness. It performs no dependency I/O and returns 200
+  when the route is reachable.
+- `/api/health/ready` is readiness. It calls the database package's bounded
+  `pingDatabase()` probe and returns 503 when the application is not ready.
+- `/api/health` is a compatibility alias to readiness for existing monitors.
+
+Do not make health checks perform mutations or expensive queries. Health route
+modules consume `getObservability()` from app instrumentation; they must not
+create a second module-scope logger.
 
 Uptime monitoring should call the endpoint from outside the deployment region.
 Alerting thresholds and escalation policy belong to deployment documentation,

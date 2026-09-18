@@ -1,5 +1,5 @@
 import { baseAuthOptions } from './base';
-import { type BetterAuthOptions, betterAuth } from 'better-auth';
+import { type Auth, type BetterAuthOptions, betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
 
 export const authOptions = {
@@ -7,4 +7,13 @@ export const authOptions = {
   plugins: [nextCookies()],
 } satisfies BetterAuthOptions;
 
-export const auth = betterAuth(authOptions);
+const globalForAuth = globalThis as typeof globalThis & {
+  miniWorkoutWebAuth?: Auth;
+};
+
+export const auth = (globalForAuth.miniWorkoutWebAuth ??
+  betterAuth(authOptions)) as Auth;
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForAuth.miniWorkoutWebAuth = auth;
+}

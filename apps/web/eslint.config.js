@@ -11,6 +11,10 @@ export default [
 
     settings: {
       'boundaries/include': ['src/**/*.{ts,tsx}'],
+      'import/resolver': {
+        typescript: { project: './tsconfig.json' },
+        node: true,
+      },
 
       'boundaries/elements': [
         {
@@ -22,7 +26,6 @@ export default [
           type: 'features',
           pattern: 'src/features/*',
           partialMatch: false,
-          capture: ['featureName'],
         },
         {
           type: 'components',
@@ -46,13 +49,25 @@ export default [
         },
         {
           type: 'libs',
-          pattern: 'src/libs',
+          pattern: 'src/lib',
           partialMatch: false,
         },
       ],
     },
 
     rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@mini-workout/database',
+              message:
+                'Web may import @mini-workout/database only from the readiness health route.',
+            },
+          ],
+        },
+      ],
       'boundaries/dependencies': [
         'error',
         {
@@ -102,7 +117,7 @@ export default [
                 to: {
                   element: {
                     type: 'features',
-                    fileInternalPath: 'index.ts',
+                    fileInternalPath: '**/index.tsx',
                   },
                 },
               },
@@ -120,6 +135,19 @@ export default [
              * the allowed targets. This prevents feature-to-feature
              * dependencies.
              */
+            {
+              from: {
+                element: {
+                  type: 'features',
+                },
+              },
+
+              allow: {
+                dependency: {
+                  relationship: { to: 'internal' },
+                },
+              },
+            },
             {
               from: {
                 element: {
@@ -245,6 +273,12 @@ export default [
           ],
         },
       ],
+    },
+  },
+  {
+    files: ['src/app/api/health/ready/route.ts'],
+    rules: {
+      'no-restricted-imports': 'off',
     },
   },
 ];

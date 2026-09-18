@@ -1,19 +1,16 @@
-export type OnboardingStatus =
-  'NOT_STARTED' | 'IN_PROGRESS' | 'REQUIRED_COMPLETED' | 'COMPLETED';
+import type {
+  OnboardingStatus,
+  OnboardingStep,
+} from '@mini-workout/core/onboarding';
 
-export type OnboardingStep =
-  | 'EXPERIENCE_LEVEL'
-  | 'INTERESTS'
-  | 'WEEKLY_SCHEDULE'
-  | 'FITNESS_GOALS'
-  | 'DONE';
+export { appendUniqueStep, isReadyForApp } from '@mini-workout/core/onboarding';
+export type {
+  OnboardingStatus,
+  OnboardingStep,
+} from '@mini-workout/core/onboarding';
 
 export type OnboardingCookieValue =
   'in_progress' | 'required_done' | 'completed';
-
-export function isReadyForApp(status: OnboardingStatus | null | undefined) {
-  return status === 'REQUIRED_COMPLETED' || status === 'COMPLETED';
-}
 
 export function getOnboardingCookieValue(
   status: OnboardingStatus | null | undefined,
@@ -21,14 +18,6 @@ export function getOnboardingCookieValue(
   if (status === 'COMPLETED') return 'completed';
   if (status === 'REQUIRED_COMPLETED') return 'required_done';
   return 'in_progress';
-}
-
-export function appendUniqueStep(
-  steps: string[] | null | undefined,
-  step: OnboardingStep,
-) {
-  const current = steps ?? [];
-  return current.includes(step) ? current : [...current, step];
 }
 
 export function getRedirectStepParam(step: OnboardingStep | null | undefined) {

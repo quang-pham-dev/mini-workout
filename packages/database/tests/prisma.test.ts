@@ -19,3 +19,15 @@ describe('Prisma client factory', () => {
     expect(second.prisma).toBe(first.prisma);
   });
 });
+
+describe('database health', () => {
+  it('pings the database through the shared Prisma singleton', async () => {
+    const queryRaw = vi.fn().mockResolvedValue([{ '?column?': 1 }]);
+    vi.doMock('../src/prisma', () => ({ prisma: { $queryRaw: queryRaw } }));
+
+    const { pingDatabase } = await import('../src/health');
+    await pingDatabase();
+
+    expect(queryRaw).toHaveBeenCalledOnce();
+  });
+});

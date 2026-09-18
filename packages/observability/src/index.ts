@@ -4,5 +4,6 @@ export * from './scope';
 export * from './posthog-server';
 export * from './health';
 export * from './logger';
+export * from './runtime';
 export * from './tracing';
 export * from './web-vitals';

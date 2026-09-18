@@ -1,7 +1,7 @@
 import {
   toggleWorkoutFavorite,
   toggleWorkoutLike,
-} from '@/features/workouts/actions';
+} from '@/lib/workouts/actions';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getSessionMock = vi.fn();

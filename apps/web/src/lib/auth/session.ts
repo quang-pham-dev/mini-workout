@@ -2,7 +2,7 @@ import { auth } from '@/auth';
 import {
   getRedirectStepParam,
   isReadyForApp,
-} from '@/features/onboarding/state-machine';
+} from '@/lib/onboarding/state-machine';
 import { getOnboardingProfile } from '@mini-workout/core/users';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';

@@ -3,12 +3,12 @@ import { StartingLine } from './components/starting-line';
 import { StepSchedule } from './components/step-schedule';
 import { getInterests } from './queries';
 import { MainLayout } from '@/components/layout/main-layout';
+import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
 import {
   type OnboardingStep,
   isReadyForApp,
   normalizeStepParam,
-} from '@/features/onboarding/state-machine';
-import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
+} from '@/lib/onboarding/state-machine';
 import { SearchParams } from '@/types/common';
 import { redirect } from 'next/navigation';
 

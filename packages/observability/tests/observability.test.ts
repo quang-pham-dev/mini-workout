@@ -8,6 +8,8 @@ import {
   createReportOnce,
   createRequestContext,
   createWebVitalReporter,
+  getObservability,
+  initObservability,
   normalizeError,
   redactContext,
   requestContextHeaders,
@@ -17,6 +19,14 @@ import {
 import { vi } from 'vitest';
 
 describe('observability primitives', () => {
+  it('reuses one observability instance per service across initialization', () => {
+    const first = initObservability({ service: 'lifecycle-test' });
+    const second = initObservability({ service: 'lifecycle-test' });
+
+    expect(second).toBe(first);
+    expect(getObservability('lifecycle-test')).toBe(first);
+  });
+
   it('redacts sensitive context values', () => {
     expect(
       redactContext({

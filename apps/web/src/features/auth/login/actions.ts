@@ -1,15 +1,15 @@
 'use server';
 
 import { auth } from '@/auth';
-import {
-  getOnboardingCookieValue,
-  isReadyForApp,
-} from '@/features/onboarding/state-machine';
 import { getSafeRedirectPath } from '@/lib/auth/authorization';
 import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
 import { getUserProfile } from '@/lib/auth/session';
 import { loginSchema } from '@/lib/auth/validation';
 import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
+import {
+  getOnboardingCookieValue,
+  isReadyForApp,
+} from '@/lib/onboarding/state-machine';
 import type { Route } from 'next';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';

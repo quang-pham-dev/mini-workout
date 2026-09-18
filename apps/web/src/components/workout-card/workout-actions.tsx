@@ -3,7 +3,7 @@
 import {
   toggleWorkoutFavorite,
   toggleWorkoutLike,
-} from '../../features/workouts/actions';
+} from '@/lib/workouts/actions';
 import { Button, cn } from '@mini-workout/ui';
 import { useState, useTransition } from 'react';
 

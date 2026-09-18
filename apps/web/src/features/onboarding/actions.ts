@@ -7,12 +7,12 @@ import {
   onboardingSchema,
   scheduleStepSchema,
 } from '@/features/onboarding/schema';
+import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
+import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
 import {
   type OnboardingStatus,
   getOnboardingCookieValue,
-} from '@/features/onboarding/state-machine';
-import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
-import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
+} from '@/lib/onboarding/state-machine';
 import { NotFoundError, ValidationError } from '@mini-workout/core/errors';
 import {
   completeRequiredOnboarding,

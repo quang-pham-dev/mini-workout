@@ -3,7 +3,7 @@ import {
   getOnboardingCookieValue,
   getRedirectStepParam,
   isReadyForApp,
-} from '@/features/onboarding/state-machine';
+} from '@/lib/onboarding/state-machine';
 import { describe, expect, it } from 'vitest';
 
 describe('onboarding state machine helpers', () => {

@@ -16,7 +16,8 @@
     "tests/workouts/service.test.ts",
     "tests/workouts/repository.test.ts",
     "tests/workouts/admin-service.test.ts",
-    "tests/errors.test.ts"
+    "tests/errors.test.ts",
+    "tests/onboarding/state-machine.test.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

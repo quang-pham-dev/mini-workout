@@ -1,8 +1,13 @@
-import { NextPageLink } from './_admin.workouts';
+import {
+  AdminDirectoryHeader,
+  NextPageLink,
+} from '@/components/admin-directory';
 import { AdminRouteError, AdminRoutePending } from '@/components/route-state';
-import type { AdminCoachView } from '@/features/admin/contracts';
-import { adminCursorSearchSchema } from '@/features/admin/contracts';
-import { adminCoachesQueryOptions } from '@/features/admin/query-options';
+import {
+  type AdminCoachView,
+  adminCoachesQueryOptions,
+  adminCursorSearchSchema,
+} from '@/features/admin';
 import {
   DataTable,
   type DataTableColumnDef,
@@ -61,27 +66,11 @@ function CoachesPage() {
   const { cursor } = Route.useSearch();
   const { data } = useSuspenseQuery(adminCoachesQueryOptions(cursor));
   return (
-    <section className="mx-auto max-w-7xl" aria-labelledby="coaches-title">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="mb-2 text-xs font-bold tracking-[0.16em] text-primary uppercase">
-            People
-          </p>
-          <h1
-            id="coaches-title"
-            className="text-3xl font-semibold tracking-tight"
-          >
-            Coaches
-          </h1>
-          <p className="mt-2 text-sm text-text-secondary">
-            See who is guiding the workout library. Editing controls are coming
-            in the next phase.
-          </p>
-        </div>
-        <span className="rounded-full border border-border-subtle bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary">
-          Read-only workspace
-        </span>
-      </div>
+    <AdminDirectoryHeader
+      eyebrow="People"
+      title="Coaches"
+      description="See who is guiding the workout library. Editing controls are coming in the next phase."
+    >
       <div className="overflow-x-auto rounded-2xl bg-surface shadow-sm">
         <DataTable
           caption="Coach directory"
@@ -96,6 +85,6 @@ function CoachesPage() {
       {data.nextCursor && (
         <NextPageLink to="/coaches" cursor={data.nextCursor} label="coaches" />
       )}
-    </section>
+    </AdminDirectoryHeader>
   );
 }

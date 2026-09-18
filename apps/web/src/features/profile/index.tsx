@@ -5,7 +5,7 @@ import { ProfileHeaderSection } from './components/profile-header-section';
 import { ProfileMovementFocusSection } from './components/profile-movement-focus-section';
 import { ProfileProgressSection } from './components/profile-progress.section';
 import { getUserProfile } from './queries';
-import { isReadyForApp } from '@/lib/onboarding';
+import { isReadyForApp } from '@/lib/onboarding/state-machine';
 import { redirect } from 'next/navigation';
 
 export async function ProfileContent() {

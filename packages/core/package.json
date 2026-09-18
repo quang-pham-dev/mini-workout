@@ -2,7 +2,7 @@
   "name": "@mini-workout/core",
   "private": true,
   "type": "module",
-  "description": "Runtime-agnostic Mini Workout business services",
+  "description": "Framework-agnostic, database-backed Mini Workout application core",
   "exports": {
     "./workouts": {
       "types": "./dist/workouts/index.d.ts",

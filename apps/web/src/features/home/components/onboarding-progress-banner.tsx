@@ -1,8 +1,9 @@
 'use client';
 
-import { STORAGE_KEY } from '../constants';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+
+const STORAGE_KEY = 'mini-workout-onboarding-banner-dismissed';
 
 export function OnboardingProgressBanner() {
   const [dismissed, setDismissed] = useState(true);

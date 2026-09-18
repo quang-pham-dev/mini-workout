@@ -1,9 +1,9 @@
 import { AnimatedSuspense } from '@/components/animated-suspense';
+import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
 import {
   getRedirectStepParam,
   isReadyForApp,
-} from '@/features/onboarding/state-machine';
-import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
+} from '@/lib/onboarding/state-machine';
 import { redirect } from 'next/navigation';
 
 async function RootRedirect(): Promise<null> {

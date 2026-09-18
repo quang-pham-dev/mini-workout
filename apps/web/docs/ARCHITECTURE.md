@@ -9,6 +9,19 @@ and product feature composition.
 It may consume shared packages through their public exports, but packages must
 not import from this app.
 
+### Health routes
+
+- `/api/health/live` is a dependency-free liveness probe and returns 200 when
+  the route handler can execute.
+- `/api/health/ready` is the readiness probe. It is the only Web source file
+  allowed to import `@mini-workout/database`, and it calls the package-owned
+  `pingDatabase()` function. It returns 503 when the database is unavailable.
+- `/api/health` is a compatibility alias to readiness. New monitors should
+  choose the endpoint whose semantics they need.
+- Readiness uses `getObservability()` from the lifecycle initialized in
+  `instrumentation.ts`; route modules must not create logger or Prisma
+  instances at module scope.
+
 ## Route and rendering conventions
 
 - Use Server Components by default.
@@ -44,8 +57,62 @@ The `@/*` TypeScript alias maps to `src/*`. Use it for imports across feature,
 infrastructure, and route boundaries; relative imports are appropriate only
 for files that are direct siblings in the same feature or route folder.
 
+### Feature dependency rules
+
+Features are independent vertical slices. A feature may import shared lower
+layers and workspace packages, but it must not import another feature. Route
+modules are the composition layer and may import a feature only through its
+public `index.tsx` entrypoint.
+
+```text
+app/routes
+    ↓
+feature public entrypoints
+    ↓
+lib / components / hooks / types
+    ↓
+workspace packages
+```
+
+Shared code needed by multiple features moves downward into `src/lib`,
+`src/components`, `src/hooks`, `src/types`, or a package with a real external
+consumer. Shared components must not import feature actions or queries. Avoid
+re-exporting another feature's internals to hide a forbidden dependency.
+
+The boundary policy is enforced by `eslint-plugin-boundaries` in
+`apps/web/eslint.config.js`. The configured element patterns must match the
+actual `src/app/**`, `src/features/*/**`, `src/components/**`, `src/lib/**`,
+and `src/types/**` paths. A boundary change is incomplete until a deliberate
+invalid-import fixture or equivalent lint check proves that ESLint fails for
+feature-to-feature, shared-component-to-feature, and route-to-feature-internal
+imports.
+
 Extract a feature into `packages/` only when it has a real consumer outside the
 web app. Do not create speculative domain packages.
+
+The Web ESLint config also forbids direct `@mini-workout/database` imports in
+all `src/**` files except `src/app/api/health/ready/route.ts`. Feature reads
+and writes must go through `@mini-workout/core`.
+
+### Singleton and dependency-injection entrypoints
+
+Runtime infrastructure is created at one explicit package entrypoint per
+runtime adapter:
+
+- `@mini-workout/database` owns one `PrismaClient` instance and reuses it across
+  development/HMR module reloads through its `globalThis` guard.
+- `@mini-workout/auth` owns one Web Better Auth instance and one TanStack Start
+  Better Auth instance. They intentionally remain separate because they use
+  different framework cookie plugins; they must not be instantiated in feature
+  modules or route files.
+- `apps/admin/src/router.tsx` creates a request/application router through its
+  factory. Do not create additional QueryClient/router instances in route
+  modules; preserve the factory boundary when changing SSR integration.
+
+When adding a singleton dependency, export it from its owning entrypoint, add a
+module-reload test, and keep the global key namespaced to this application. Do
+not replace a singleton import with `new ...` inside a feature or create a
+second provider-specific instance without documenting the runtime boundary.
 
 ### Styling and shared UI
 

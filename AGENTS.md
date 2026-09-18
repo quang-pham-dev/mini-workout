@@ -6,7 +6,11 @@ This repository is a Turborepo monorepo.
 
 - `apps/web/` is the main Next.js app. App Router code lives in `apps/web/app/`, static files in `apps/web/public/`, and fonts in `apps/web/app/fonts/`.
 - `packages/ui/` contains shared React UI components such as `src/button.tsx`, `src/card.tsx`, and `src/code.tsx`.
-- `packages/types/` is reserved for shared TypeScript types.
+- Shared TypeScript types must live with their owner: domain contracts in
+  `packages/core`, generated persistence types in `packages/database`, and
+  app/transport types in the owning app. Do not create a generic `types`
+  package; create `@mini-workout/contracts` only when an independent API,
+  mobile, worker, or other runtime boundary genuinely needs public Zod DTOs.
 - `config/` holds shared tooling presets for ESLint, Prettier, TypeScript, and Vitest.
 - `e2e/` contains Playwright public/authenticated browser journeys and fixture-safety contracts.
 - `docs/` contains design and implementation notes.

@@ -25,6 +25,8 @@ guidance, testing strategy, and product roadmap.
 
 - [`../apps/web/docs/ARCHITECTURE.md`](../apps/web/docs/ARCHITECTURE.md) — web
   routes, data, errors, security, network, and testing conventions.
+- [`../apps/admin/docs/ARCHITECTURE.md`](../apps/admin/docs/ARCHITECTURE.md) —
+  admin route, feature, server-function, query-cache, and lifecycle rules.
 - [`../apps/storybook/docs/ARCHITECTURE.md`](../apps/storybook/docs/ARCHITECTURE.md)
   — Storybook ownership and visual/a11y testing rules.
 - [`../packages/ui/docs/ARCHITECTURE.md`](../packages/ui/docs/ARCHITECTURE.md)

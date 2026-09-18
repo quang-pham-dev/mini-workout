@@ -1,5 +1,3 @@
-export const STORAGE_KEY = 'mini-workout-onboarding-banner-dismissed';
-
 export const experienceLevels = [
   { value: 'BEGINNER', label: 'New to regular movement', title: 'Beginner' },
   {

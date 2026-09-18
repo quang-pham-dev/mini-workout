@@ -1,8 +1,8 @@
 import type {
-  ExperienceLevel,
   OnboardingStatus,
   OnboardingStep,
-} from '@mini-workout/database';
+} from '../onboarding/state-machine';
+import type { ExperienceLevel } from '@mini-workout/database';
 import { z } from 'zod';
 
 export const userIdInput = z.object({ userId: z.string().min(1).max(128) });

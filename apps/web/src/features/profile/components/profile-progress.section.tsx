@@ -1,4 +1,4 @@
-import { OnboardingStatus } from '@/lib/onboarding';
+import type { OnboardingStatus } from '@/lib/onboarding/state-machine';
 
 type ProfileProgressSectionProps = {
   onboardingStatus: OnboardingStatus;

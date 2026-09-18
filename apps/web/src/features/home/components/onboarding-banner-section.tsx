@@ -1,4 +1,4 @@
-import { OnboardingProgressBanner } from '@/features/onboarding/components/onboarding-banner';
+import { OnboardingProgressBanner } from './onboarding-progress-banner';
 import { requireOnboardedUser } from '@/lib/auth/session';
 
 export async function OnboardingBannerSection() {

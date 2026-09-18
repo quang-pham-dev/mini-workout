@@ -32,6 +32,9 @@ is declared in `vercel.json`.
 
 ## Architecture notes
 
+- App-specific ownership and dependency rules are documented in
+  [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); repository-wide rules are in
+  [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md).
 - Router loaders prefill a request-scoped TanStack Query cache.
 - Every admin server function independently validates the Better Auth session
   and delegates current-role authorization to `packages/core`.
