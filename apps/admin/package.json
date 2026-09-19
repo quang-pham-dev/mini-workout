@@ -41,6 +41,7 @@
     "@mini-workout/prettier-config": "workspace:*",
     "@mini-workout/typescript-config": "workspace:*",
     "@mini-workout/vitest-config": "workspace:*",
+    "@prisma/client": "6.19.3",
     "@tailwindcss/postcss": "catalog:ui-styling",
     "@tailwindcss/vite": "catalog:ui-styling",
     "@tanstack/router-cli": "catalog:tanstack-admin",
