@@ -4,8 +4,15 @@ import { MoonIcon } from './moon-icon';
 import { SunIcon } from './sun-icon';
 import { SystemIcon } from './system-icon';
 import { cn } from '@mini-workout/ui';
-import * as React from 'react';
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import {
+  KeyboardEvent,
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 export const THEME_STORAGE_KEY = 'mini-workout-theme';
 const DARK_THEME_COLOR = 'oklch(0.14 0.008 250)';
@@ -58,7 +65,7 @@ function persistTheme(theme: Theme) {
   }
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>('light');
   const [mounted, setMounted] = useState(false);
@@ -129,7 +136,7 @@ export function useTheme() {
   return context;
 }
 
-const options: { value: Theme; label: string; icon: React.ReactNode }[] = [
+const options: { value: Theme; label: string; icon: ReactNode }[] = [
   { value: 'light', label: 'Light', icon: <SunIcon className="size-4" /> },
   { value: 'dark', label: 'Dark', icon: <MoonIcon className="size-4" /> },
   { value: 'system', label: 'System', icon: <SystemIcon className="size-4" /> },
@@ -177,7 +184,7 @@ export function ThemeToggle({ className }: { className?: string } = {}) {
     triggerRef.current?.focus();
   }
 
-  function moveFocusAfterTab(event: React.KeyboardEvent<HTMLDivElement>) {
+  function moveFocusAfterTab(event: KeyboardEvent<HTMLDivElement>) {
     event.preventDefault();
     const focusable = Array.from(
       document.querySelectorAll<HTMLElement>(
@@ -208,7 +215,7 @@ export function ThemeToggle({ className }: { className?: string } = {}) {
     closeMenu();
   }
 
-  function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+  function handleTriggerKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
     if (
       event.key === 'Enter' ||
       event.key === ' ' ||
@@ -219,7 +226,7 @@ export function ThemeToggle({ className }: { className?: string } = {}) {
     }
   }
 
-  function handleMenuKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function handleMenuKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'Tab') {
       moveFocusAfterTab(event);
       return;

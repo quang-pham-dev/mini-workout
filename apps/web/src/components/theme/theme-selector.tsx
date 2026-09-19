@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from '.';
+import { useTheme } from './index';
 import { MoonIcon } from './moon-icon';
 import { SunIcon } from './sun-icon';
 import { SystemIcon } from './system-icon';

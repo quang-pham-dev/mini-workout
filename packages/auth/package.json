@@ -37,7 +37,7 @@
     "@better-auth/prisma-adapter": "1.7.1",
     "@better-auth/utils": "0.4.2",
     "@mini-workout/database": "workspace:*",
-    "better-auth": "1.7.1"
+    "better-auth": "catalog:better-auth"
   },
   "devDependencies": {
     "@mini-workout/eslint-config": "workspace:*",

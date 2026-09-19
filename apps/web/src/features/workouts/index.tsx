@@ -3,6 +3,8 @@ import { WorkoutHeroSection } from './components/workout-hero-section';
 import { WorkoutDetailQuery } from './queries';
 import { notFound } from 'next/navigation';
 
+export { BackButton } from './components/back-button';
+
 type WorkoutContentProps = {
   params: Promise<{ slug: string }>;
 };

@@ -1,8 +1,7 @@
-import { BackButton } from './back-button';
 import { AnimatedSuspense } from '@/components/animated-suspense';
 import { MainLayout } from '@/components/layout/main-layout';
 import { WorkoutDetailSkeleton } from '@/components/skeletons/workout-detail-skeleton';
-import { WorkoutContent } from '@/features/workouts';
+import { BackButton, WorkoutContent } from '@/features/workouts';
 import { getPublishedWorkoutMeta as findWorkoutMeta } from '@mini-workout/core/workouts';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
