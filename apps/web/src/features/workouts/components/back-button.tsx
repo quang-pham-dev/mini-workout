@@ -22,6 +22,7 @@ export function BackButton() {
     <Link
       className="text-[0.9rem] text-text-secondary no-underline hover:text-text-primary focus-visible:[outline:3px_solid_color-mix(in_oklch,var(--color-ring)_38%,transparent)] focus-visible:outline-offset-4"
       href={back.href}
+      transitionTypes={['nav-back']}
     >
       ← {back.label}
     </Link>

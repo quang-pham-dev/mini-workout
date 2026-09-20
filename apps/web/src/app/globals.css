@@ -13,3 +13,108 @@ body {
   background: var(--color-background);
   font-family: var(--font-sans);
 }
+
+:root {
+  --view-transition-exit: 150ms;
+  --view-transition-enter: 210ms;
+  --view-transition-move: 400ms;
+}
+
+@keyframes view-transition-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes view-transition-slide {
+  from {
+    translate: var(--view-transition-offset);
+  }
+  to {
+    translate: 0;
+  }
+}
+
+::view-transition-old(.nav-forward) {
+  --view-transition-offset: -60px;
+  animation:
+    var(--view-transition-exit) ease-in both view-transition-fade reverse,
+    var(--view-transition-move) ease-in-out both view-transition-slide reverse;
+}
+
+::view-transition-new(.nav-forward) {
+  --view-transition-offset: 60px;
+  animation:
+    var(--view-transition-enter) ease-out var(--view-transition-exit) both
+      view-transition-fade,
+    var(--view-transition-move) ease-in-out both view-transition-slide;
+}
+
+::view-transition-old(.nav-back) {
+  --view-transition-offset: 60px;
+  animation:
+    var(--view-transition-exit) ease-in both view-transition-fade reverse,
+    var(--view-transition-move) ease-in-out both view-transition-slide reverse;
+}
+
+::view-transition-new(.nav-back) {
+  --view-transition-offset: -60px;
+  animation:
+    var(--view-transition-enter) ease-out var(--view-transition-exit) both
+      view-transition-fade,
+    var(--view-transition-move) ease-in-out both view-transition-slide;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: var(--view-transition-move);
+}
+
+::view-transition-image-pair(.morph) {
+  animation-name: view-transition-morph;
+}
+
+@keyframes view-transition-morph {
+  30% {
+    filter: blur(3px);
+  }
+}
+
+::view-transition-old(.slide-down) {
+  animation:
+    var(--view-transition-exit) ease-out both view-transition-fade reverse,
+    var(--view-transition-exit) ease-out both view-transition-slide reverse;
+  --view-transition-offset: 10px;
+}
+
+::view-transition-new(.slide-up) {
+  animation:
+    var(--view-transition-enter) ease-in var(--view-transition-exit) both
+      view-transition-fade,
+    var(--view-transition-move) ease-in both view-transition-slide;
+  --view-transition-offset: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.nav-forward),
+  ::view-transition-group(.nav-back),
+  ::view-transition-group(.morph),
+  ::view-transition-group(.slide-down),
+  ::view-transition-group(.slide-up) {
+    animation-duration: 1ms !important;
+  }
+
+  ::view-transition-old(.nav-forward),
+  ::view-transition-new(.nav-forward),
+  ::view-transition-old(.nav-back),
+  ::view-transition-new(.nav-back),
+  ::view-transition-old(.morph),
+  ::view-transition-new(.morph),
+  ::view-transition-old(.slide-down),
+  ::view-transition-new(.slide-up) {
+    animation-duration: 1ms !important;
+    filter: none !important;
+  }
+}

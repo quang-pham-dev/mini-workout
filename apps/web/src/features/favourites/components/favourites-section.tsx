@@ -45,6 +45,7 @@ export function FavouritesSection({ savedWorkouts }: FavouritesSectionProps) {
             likes={likes}
             favorites={favorites}
             from="favourites"
+            transitionSource="favourites"
           />
         ),
       )}

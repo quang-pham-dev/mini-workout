@@ -43,6 +43,7 @@ export async function LatestSection() {
             likes={likes}
             favorites={favorites}
             from="home"
+            transitionSource="home-latest"
           />
         ),
       )}

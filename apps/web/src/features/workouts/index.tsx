@@ -1,16 +1,20 @@
 import { WorkoutDetailSection } from './components/workout-detail-section';
 import { WorkoutHeroSection } from './components/workout-hero-section';
 import { WorkoutDetailQuery } from './queries';
+import type { WorkoutTransitionSource } from '@/components/view-transitions/workout-thumbnail';
 import { notFound } from 'next/navigation';
 
 export { BackButton } from './components/back-button';
 
 type WorkoutContentProps = {
-  params: Promise<{ slug: string }>;
+  slug: string;
+  transitionSource?: WorkoutTransitionSource;
 };
 
-export async function WorkoutContent({ params }: WorkoutContentProps) {
-  const { slug } = await params;
+export async function WorkoutContent({
+  slug,
+  transitionSource,
+}: WorkoutContentProps) {
   const workout = await WorkoutDetailQuery({ slug });
 
   if (!workout) notFound();
@@ -31,7 +35,11 @@ export async function WorkoutContent({ params }: WorkoutContentProps) {
 
   return (
     <>
-      <WorkoutHeroSection thumbnailUrl={thumbnailUrl} />
+      <WorkoutHeroSection
+        id={id}
+        thumbnailUrl={thumbnailUrl}
+        transitionSource={transitionSource}
+      />
       <WorkoutDetailSection
         id={id}
         title={title}

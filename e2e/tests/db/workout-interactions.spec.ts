@@ -101,6 +101,28 @@ test('@critical save and unsave persist through favourites and reloads', async (
   ).toBeVisible();
 });
 
+test('@critical workout thumbnails open the detail route', async ({
+  mutationUser,
+}) => {
+  await createCompletedPrerequisite(mutationUser);
+  await mutationUser.page.goto('/home');
+
+  const card = workoutCard(mutationUser.page);
+  await card.getByRole('link', { name: `Open ${workoutName}` }).click();
+
+  await expect(mutationUser.page).toHaveURL(
+    /\/workouts\/the-20-minute-reset\?from=home&transition=home-(recommended|latest)$/,
+  );
+  await expect(
+    mutationUser.page.getByRole('heading', { name: workoutName }),
+  ).toBeVisible();
+
+  await mutationUser.page
+    .getByRole('link', { name: 'Back to your week' })
+    .click();
+  await expect(mutationUser.page).toHaveURL('/home');
+});
+
 test('@critical like and unlike state and count agree between home and detail', async ({
   mutationUser,
 }) => {

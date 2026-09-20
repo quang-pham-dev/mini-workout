@@ -3,23 +3,33 @@ import { Suspense, ViewTransition } from 'react';
 type AnimatedSuspenseProps = {
   children: React.ReactNode;
   fallback?: React.ReactNode;
+  variant?: 'none' | 'reveal';
 };
 
 export function AnimatedSuspense({
   children,
   fallback,
+  variant = 'none',
 }: AnimatedSuspenseProps) {
   return (
     <Suspense
       fallback={
-        <ViewTransition default="none" exit="auto">
-          {fallback}
-        </ViewTransition>
+        variant === 'reveal' ? (
+          <ViewTransition default="none" exit="slide-down">
+            {fallback}
+          </ViewTransition>
+        ) : (
+          fallback
+        )
       }
     >
-      <ViewTransition enter="auto" default="none">
-        {children}
-      </ViewTransition>
+      {variant === 'reveal' ? (
+        <ViewTransition enter="slide-up" default="none">
+          {children}
+        </ViewTransition>
+      ) : (
+        children
+      )}
     </Suspense>
   );
 }
