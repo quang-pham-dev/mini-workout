@@ -67,7 +67,7 @@
     "lucide-react": "catalog:ui-styling",
     "tailwind-merge": "catalog:ui-styling",
     "tw-animate-css": "catalog:ui-styling",
-    "@tanstack/react-table": "catalog:ui-data"
+    "@tanstack/react-table": "catalog:tanstack"
   },
   "peerDependencies": {
     "react": ">=18.2.0",

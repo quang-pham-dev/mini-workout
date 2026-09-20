@@ -69,11 +69,11 @@ Thumbs.db
 *.mobileprovision
 
 # Agentic / AI Tools
-.agent
-.agents
-.claude
-.codex
-.cursor
-.opencode
+# .agent
+# .agents
+# .claude
+# .codex
+# .cursor
+# .opencode
 e2e-web
-skills-lock.json
+# skills-lock.json
