@@ -1,6 +1,7 @@
 import './globals.css';
 import { PostHogBootstrap } from '@/components/observability/posthog-bootstrap';
 import { OfflineIndicator } from '@/components/offline-indicator';
+import { QueryProvider } from '@/components/query-provider';
 import { ThemeProvider } from '@/components/theme';
 import { Toaster } from '@/components/toaster';
 import type { Metadata } from 'next';
@@ -39,10 +40,12 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProvider>
-          <PostHogBootstrap />
-          <OfflineIndicator />
-          {children}
-          <Toaster />
+          <QueryProvider>
+            <PostHogBootstrap />
+            <OfflineIndicator />
+            {children}
+            <Toaster />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

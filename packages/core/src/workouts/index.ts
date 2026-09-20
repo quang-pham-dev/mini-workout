@@ -1,4 +1,5 @@
 export {
+  getWorkoutEngagement,
   listAdminWorkouts,
   getPublishedWorkoutDetail,
   getPublishedWorkoutMeta,
@@ -6,12 +7,12 @@ export {
   getRecommendedWorkouts,
   getSavedWorkouts,
   setWorkoutLike,
-  toggleWorkoutFavorite,
-  toggleWorkoutLike,
+  setWorkoutFavorite,
 } from './service';
 export type { AdminPageInput, AdminPage } from '../admin-pagination';
-export type { AdminWorkoutRow } from './repository';
+export type { AdminWorkoutRow, WorkoutEngagement } from './repository';
 export type {
+  SetWorkoutFavoriteInput,
   SetWorkoutLikeInput,
   WorkoutDetailInput,
   WorkoutInteractionInput,

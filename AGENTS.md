@@ -63,6 +63,15 @@ This repo has no commit history yet, but `commitlint` and Husky are configured. 
 
 Prefer workspace scripts over ad hoc commands. When changing shared config in `config/`, verify the affected app/package still type-checks and lints cleanly.
 
+### Project Agent Harness
+
+For non-trivial work, follow the project-local delivery phases in
+`.agents/phases/`, starting with `.agents/phases/00-discovery.md` and ending
+with `.agents/phases/06-handoff.md`. The phase index and skill routing rules
+are documented in [`.agents/README.md`](.agents/README.md). Keep project rules
+in this file or `docs/`; do not modify vendored skill instructions to encode
+repository-specific behavior.
+
 ## Mandatory Error Handling Convention
 
 When touching error handling, API routes, Server Actions, server functions,

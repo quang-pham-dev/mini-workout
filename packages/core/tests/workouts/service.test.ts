@@ -1,24 +1,29 @@
-import { NotFoundError, ValidationError } from '../../src/errors';
+import { NotFoundError } from '../../src/errors';
 import * as repository from '../../src/workouts/repository';
 import {
   getPublishedWorkoutDetail,
   getRecommendedWorkouts,
   getSavedWorkouts,
+  getWorkoutEngagement,
+  setWorkoutFavorite,
   setWorkoutLike,
-  toggleWorkoutFavorite,
-  toggleWorkoutLike,
 } from '../../src/workouts/service';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../src/workouts/repository');
 
 const workout = vi.mocked(repository.findPublishedWorkoutById);
-const like = vi.mocked(repository.findLike);
-const favorite = vi.mocked(repository.findFavorite);
+const engagement = vi.mocked(repository.findWorkoutEngagement);
 
 beforeEach(() => {
   vi.resetAllMocks();
   workout.mockResolvedValue({ slug: 'full-body-flow' });
+  engagement.mockResolvedValue({
+    workoutId: 'workout-1',
+    likeCount: 4,
+    liked: true,
+    favorited: false,
+  });
 });
 
 describe('workout interactions', () => {
@@ -65,23 +70,81 @@ describe('workout interactions', () => {
         workoutId: 'workout-1',
         liked: true,
       }),
-    ).resolves.toEqual({ workoutSlug: 'full-body-flow', liked: true });
+    ).resolves.toEqual({
+      workoutId: 'workout-1',
+      likeCount: 4,
+      liked: true,
+      favorited: false,
+    });
     expect(repository.insertLikeIfAbsent).toHaveBeenCalledWith(
       'user-123',
       'workout-1',
     );
-    expect(repository.findLike).not.toHaveBeenCalled();
+    expect(repository.findWorkoutEngagement).toHaveBeenCalled();
   });
 
   it('clears a like even when it is already absent', async () => {
+    engagement.mockResolvedValue({
+      workoutId: 'workout-1',
+      likeCount: 3,
+      liked: false,
+      favorited: false,
+    });
     await expect(
       setWorkoutLike({
         userId: 'user-123',
         workoutId: 'workout-1',
         liked: false,
       }),
-    ).resolves.toEqual({ workoutSlug: 'full-body-flow', liked: false });
+    ).resolves.toEqual({
+      workoutId: 'workout-1',
+      likeCount: 3,
+      liked: false,
+      favorited: false,
+    });
     expect(repository.deleteLikeIfPresent).toHaveBeenCalledWith(
+      'user-123',
+      'workout-1',
+    );
+  });
+
+  it('sets favourite state idempotently and returns authoritative engagement', async () => {
+    engagement.mockResolvedValue({
+      workoutId: 'workout-1',
+      likeCount: 4,
+      liked: true,
+      favorited: true,
+    });
+
+    await expect(
+      setWorkoutFavorite({
+        userId: 'user-123',
+        workoutId: 'workout-1',
+        favorited: true,
+      }),
+    ).resolves.toEqual({
+      workoutId: 'workout-1',
+      likeCount: 4,
+      liked: true,
+      favorited: true,
+    });
+    expect(repository.insertFavoriteIfAbsent).toHaveBeenCalledWith(
+      'user-123',
+      'workout-1',
+    );
+    expect(repository.findWorkoutEngagement).toHaveBeenCalled();
+  });
+
+  it('reads authoritative engagement for a published workout', async () => {
+    await expect(
+      getWorkoutEngagement({ userId: 'user-123', workoutId: 'workout-1' }),
+    ).resolves.toEqual({
+      workoutId: 'workout-1',
+      likeCount: 4,
+      liked: true,
+      favorited: false,
+    });
+    expect(repository.findWorkoutEngagement).toHaveBeenCalledWith(
       'user-123',
       'workout-1',
     );
@@ -101,56 +164,6 @@ describe('workout interactions', () => {
     ).rejects.toThrow();
     expect(repository.insertLikeIfAbsent).not.toHaveBeenCalled();
     expect(repository.deleteLikeIfPresent).not.toHaveBeenCalled();
-  });
-
-  it('creates a like for a published workout', async () => {
-    like.mockResolvedValue(null);
-
-    await expect(
-      toggleWorkoutLike({ userId: 'user-123', workoutId: 'workout-1' }),
-    ).resolves.toEqual({ workoutSlug: 'full-body-flow', active: true });
-    expect(repository.createLike).toHaveBeenCalledWith('user-123', 'workout-1');
-  });
-
-  it('removes an existing like', async () => {
-    like.mockResolvedValue({ userId: 'user-123', workoutId: 'workout-1' });
-
-    await expect(
-      toggleWorkoutLike({ userId: 'user-123', workoutId: 'workout-1' }),
-    ).resolves.toEqual({ workoutSlug: 'full-body-flow', active: false });
-    expect(repository.deleteLike).toHaveBeenCalledWith('user-123', 'workout-1');
-  });
-
-  it('rejects an unpublished or missing workout before mutating', async () => {
-    workout.mockResolvedValue(null);
-
-    await expect(
-      toggleWorkoutLike({ userId: 'user-123', workoutId: 'workout-1' }),
-    ).rejects.toBeInstanceOf(NotFoundError);
-    expect(repository.findLike).not.toHaveBeenCalled();
-  });
-
-  it('validates identifiers before accessing storage', async () => {
-    await expect(
-      toggleWorkoutLike({ userId: '', workoutId: 'workout-1' }),
-    ).rejects.toBeInstanceOf(ValidationError);
-    expect(repository.findPublishedWorkoutById).not.toHaveBeenCalled();
-  });
-
-  it('creates and removes favourites through the same domain contract', async () => {
-    favorite.mockResolvedValueOnce(null).mockResolvedValueOnce({
-      userId: 'user-123',
-      workoutId: 'workout-1',
-    });
-
-    await expect(
-      toggleWorkoutFavorite({ userId: 'user-123', workoutId: 'workout-1' }),
-    ).resolves.toEqual({ workoutSlug: 'full-body-flow', active: true });
-    await expect(
-      toggleWorkoutFavorite({ userId: 'user-123', workoutId: 'workout-1' }),
-    ).resolves.toEqual({ workoutSlug: 'full-body-flow', active: false });
-    expect(repository.createFavorite).toHaveBeenCalledOnce();
-    expect(repository.deleteFavorite).toHaveBeenCalledOnce();
   });
 
   it('queries a published detail for the requesting user', async () => {

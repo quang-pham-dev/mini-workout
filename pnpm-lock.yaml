@@ -107,7 +107,7 @@ catalogs:
     typescript-eslint:
       specifier: ^8.65.0
       version: 8.67.0
-  tanstack-admin:
+  tanstack:
     '@tanstack/react-query':
       specifier: 5.102.8
       version: 5.102.8
@@ -282,28 +282,28 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@tanstack/react-query':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 5.102.8(react@19.2.0)
       '@tanstack/react-query-devtools':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 5.102.8(@tanstack/react-query@5.102.8(react@19.2.0))(react@19.2.0)
       '@tanstack/react-router':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 1.170.36(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tanstack/react-router-devtools':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 1.167.2(@tanstack/react-router@1.170.36(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@tanstack/router-core@1.171.30)(csstype@3.1.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tanstack/react-router-ssr-query':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 1.167.2(@tanstack/query-core@5.102.8)(@tanstack/react-query@5.102.8(react@19.2.0))(@tanstack/react-router@1.170.36(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@tanstack/router-core@1.171.30)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tanstack/react-start':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       better-auth:
         specifier: catalog:better-auth
         version: 1.7.1(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)))(next@16.3.0(@babel/core@7.29.7)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7)
       nitro:
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 3.0.260903-beta
       posthog-js:
         specifier: catalog:analysis
@@ -340,7 +340,7 @@ importers:
         specifier: catalog:ui-styling
         version: 4.3.3(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       '@tanstack/router-cli':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 1.167.36
       '@testing-library/jest-dom':
         specifier: catalog:test-unit
@@ -358,7 +358,7 @@ importers:
         specifier: 'catalog:'
         version: 19.2.2(@types/react@19.2.2)
       '@vitejs/plugin-react':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 6.1.1(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       '@vitest/coverage-v8':
         specifier: catalog:test-unit
@@ -385,7 +385,7 @@ importers:
         specifier: 'catalog:'
         version: 5.9.2
       vite:
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       vitest:
         specifier: catalog:test-unit
@@ -505,6 +505,9 @@ importers:
       '@mini-workout/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@tanstack/react-query':
+        specifier: catalog:tanstack
+        version: 5.102.8(react@19.2.0)
       better-auth:
         specifier: catalog:better-auth
         version: 1.7.1(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)))(next@16.3.0(@babel/core@7.29.7)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7)
@@ -703,7 +706,7 @@ importers:
         specifier: workspace:*
         version: link:../../config/vitest-config
       '@tanstack/react-start':
-        specifier: catalog:tanstack-admin
+        specifier: catalog:tanstack
         version: 1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.27.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       '@types/node':
         specifier: 'catalog:'

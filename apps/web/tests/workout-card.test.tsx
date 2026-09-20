@@ -34,9 +34,8 @@ vi.mock('next/image', () => ({
   default: () => <span data-testid="workout-thumbnail" />,
 }));
 
-vi.mock('@/lib/workouts/actions', () => ({
-  toggleWorkoutFavorite: vi.fn(),
-  toggleWorkoutLike: vi.fn(),
+vi.mock('@/components/workout-card/workout-actions', () => ({
+  WorkoutActions: () => <span data-testid="workout-actions" />,
 }));
 
 const { WorkoutCard } = await import('@/components/workout-card');
@@ -48,6 +47,9 @@ describe('WorkoutCard navigation', () => {
   let root: ReturnType<typeof createRoot>;
 
   beforeEach(() => {
+    (
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true;
     container = document.createElement('div');
     document.body.append(container);
     root = createRoot(container);
@@ -62,6 +64,7 @@ describe('WorkoutCard navigation', () => {
     await act(async () => {
       root.render(
         <WorkoutCard
+          viewerId="viewer-1"
           id="workout-1"
           title="Move better, feel lighter"
           slug="move-better"
@@ -106,6 +109,7 @@ describe('WorkoutCard navigation', () => {
       root.render(
         <>
           <WorkoutCard
+            viewerId="viewer-1"
             id="duplicate-workout"
             title="Recommended workout"
             slug="recommended-workout"
@@ -122,6 +126,7 @@ describe('WorkoutCard navigation', () => {
             transitionSource="home-recommended"
           />
           <WorkoutCard
+            viewerId="viewer-1"
             id="duplicate-workout"
             title="Latest workout"
             slug="latest-workout"

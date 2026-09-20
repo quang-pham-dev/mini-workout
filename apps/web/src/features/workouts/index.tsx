@@ -2,6 +2,7 @@ import { WorkoutDetailSection } from './components/workout-detail-section';
 import { WorkoutHeroSection } from './components/workout-hero-section';
 import { WorkoutDetailQuery } from './queries';
 import type { WorkoutTransitionSource } from '@/components/view-transitions/workout-thumbnail';
+import { WorkoutEngagementHydration } from '@/components/workout-engagement-hydration';
 import { notFound } from 'next/navigation';
 
 export { BackButton } from './components/back-button';
@@ -15,7 +16,7 @@ export async function WorkoutContent({
   slug,
   transitionSource,
 }: WorkoutContentProps) {
-  const workout = await WorkoutDetailQuery({ slug });
+  const { viewerId, workout } = await WorkoutDetailQuery({ slug });
 
   if (!workout) notFound();
 
@@ -28,30 +29,25 @@ export async function WorkoutContent({
     level,
     coach,
     category,
-    _count,
-    likes,
-    favorites,
   } = workout;
 
   return (
-    <>
+    <WorkoutEngagementHydration viewerId={viewerId} workouts={[workout]}>
       <WorkoutHeroSection
         id={id}
         thumbnailUrl={thumbnailUrl}
         transitionSource={transitionSource}
       />
       <WorkoutDetailSection
+        viewerId={viewerId}
         id={id}
         title={title}
         description={description}
         durationMinutes={durationMinutes}
         level={level}
-        likeCount={_count?.likes}
         coach={coach}
         category={category}
-        likes={likes}
-        favorites={favorites}
       />
-    </>
+    </WorkoutEngagementHydration>
   );
 }

@@ -2,10 +2,14 @@ import { WorkoutCard } from '@/components/workout-card';
 import { WorkoutType } from '@/types/workout';
 
 type FavouritesSectionProps = {
+  viewerId: string;
   savedWorkouts: WorkoutType[];
 };
 
-export function FavouritesSection({ savedWorkouts }: FavouritesSectionProps) {
+export function FavouritesSection({
+  viewerId,
+  savedWorkouts,
+}: FavouritesSectionProps) {
   return (
     <section className="grid grid-cols-3 gap-5 max-[900px]:grid-cols-2 max-[640px]:grid-cols-1">
       {savedWorkouts.map(
@@ -25,6 +29,7 @@ export function FavouritesSection({ savedWorkouts }: FavouritesSectionProps) {
         }: WorkoutType) => (
           <WorkoutCard
             key={id}
+            viewerId={viewerId}
             id={id}
             title={title}
             slug={slug}

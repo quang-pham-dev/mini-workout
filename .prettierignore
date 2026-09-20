@@ -19,3 +19,11 @@ out
 **/*.gen.ts
 **/routeTree.gen.ts
 pnpm-lock.yaml
+.agent
+.agents
+.claude
+.codex
+.cursor
+.opencode
+e2e-web
+skills-lock.json

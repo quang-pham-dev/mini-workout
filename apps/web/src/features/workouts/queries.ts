@@ -8,5 +8,11 @@ type WorkoutDetailQueryProps = {
 export async function WorkoutDetailQuery({ slug }: WorkoutDetailQueryProps) {
   const { session } = await requireOnboardedUser();
 
-  return getPublishedWorkoutDetail({ slug, userId: session.user.id });
+  return {
+    viewerId: session.user.id,
+    workout: await getPublishedWorkoutDetail({
+      slug,
+      userId: session.user.id,
+    }),
+  };
 }

@@ -45,7 +45,7 @@
     "@mini-workout/typescript-config": "workspace:*",
     "@mini-workout/vitest-config": "workspace:*",
     "@types/node": "catalog:",
-    "@tanstack/react-start": "catalog:tanstack-admin",
+    "@tanstack/react-start": "catalog:tanstack",
     "@vitest/coverage-v8": "catalog:test-unit",
     "eslint": "catalog:",
     "prettier": "catalog:",

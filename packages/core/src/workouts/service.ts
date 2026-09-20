@@ -10,12 +10,14 @@ import { requireAdminActor } from '../users/service';
 import * as repository from './repository';
 import {
   type RecommendationInput,
+  type SetWorkoutFavoriteInput,
   type SetWorkoutLikeInput,
   type WorkoutDetailInput,
   type WorkoutInteractionInput,
   type WorkoutListInput,
   type WorkoutMetaInput,
   recommendationInput,
+  setWorkoutFavoriteInput,
   setWorkoutLikeInput,
   workoutDetailInput,
   workoutInteractionInput,
@@ -29,6 +31,12 @@ async function requirePublishedWorkout(workoutId: string) {
   return workout;
 }
 
+async function requireWorkoutEngagement(userId: string, workoutId: string) {
+  const engagement = await repository.findWorkoutEngagement(userId, workoutId);
+  if (!engagement) throw new NotFoundError('Workout not found');
+  return engagement;
+}
+
 export async function listAdminWorkouts(
   input: AdminPageInput,
 ): Promise<AdminPage<repository.AdminWorkoutRow>> {
@@ -38,36 +46,32 @@ export async function listAdminWorkouts(
   return makeAdminPage(rows, limit);
 }
 
-export async function toggleWorkoutLike(input: WorkoutInteractionInput) {
-  const { userId, workoutId } = parseInput(workoutInteractionInput, input);
-  const workout = await requirePublishedWorkout(workoutId);
-  const existing = await repository.findLike(userId, workoutId);
-
-  if (existing) await repository.deleteLike(userId, workoutId);
-  else await repository.createLike(userId, workoutId);
-
-  return { workoutSlug: workout.slug, active: !existing };
-}
-
 export async function setWorkoutLike(input: SetWorkoutLikeInput) {
   const { userId, workoutId, liked } = parseInput(setWorkoutLikeInput, input);
-  const workout = await requirePublishedWorkout(workoutId);
+  await requirePublishedWorkout(workoutId);
 
   if (liked) await repository.insertLikeIfAbsent(userId, workoutId);
   else await repository.deleteLikeIfPresent(userId, workoutId);
 
-  return { workoutSlug: workout.slug, liked };
+  return requireWorkoutEngagement(userId, workoutId);
 }
 
-export async function toggleWorkoutFavorite(input: WorkoutInteractionInput) {
+export async function setWorkoutFavorite(input: SetWorkoutFavoriteInput) {
+  const { userId, workoutId, favorited } = parseInput(
+    setWorkoutFavoriteInput,
+    input,
+  );
+  await requirePublishedWorkout(workoutId);
+
+  if (favorited) await repository.insertFavoriteIfAbsent(userId, workoutId);
+  else await repository.deleteFavoriteIfPresent(userId, workoutId);
+
+  return requireWorkoutEngagement(userId, workoutId);
+}
+
+export async function getWorkoutEngagement(input: WorkoutInteractionInput) {
   const { userId, workoutId } = parseInput(workoutInteractionInput, input);
-  const workout = await requirePublishedWorkout(workoutId);
-  const existing = await repository.findFavorite(userId, workoutId);
-
-  if (existing) await repository.deleteFavorite(userId, workoutId);
-  else await repository.createFavorite(userId, workoutId);
-
-  return { workoutSlug: workout.slug, active: !existing };
+  return requireWorkoutEngagement(userId, workoutId);
 }
 
 export async function getPublishedWorkoutDetail(

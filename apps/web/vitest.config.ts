@@ -1,16 +1,20 @@
-import { nodeConfig } from '@mini-workout/vitest-config/node';
+import { reactConfig } from '@mini-workout/vitest-config/react';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 export default mergeConfig(
-  nodeConfig,
+  reactConfig,
   defineConfig({
+    esbuild: {
+      jsx: 'automatic',
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
     test: {
+      environment: 'node',
       include: ['tests/**/*.{test,spec}.{ts,tsx}'],
       coverage: {
         // Only measure coverage for pure logic files that can be unit-tested

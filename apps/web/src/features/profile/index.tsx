@@ -52,7 +52,7 @@ export async function ProfileContent() {
           weeklyGoalDays={weeklyGoalDays || 0}
         />
         <ProfileAppearanceSection />
-        <ProfileFooterSection email={''} />
+        <ProfileFooterSection email={email || ''} />
       </div>
     </>
   );

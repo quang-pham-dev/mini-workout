@@ -9,11 +9,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 type WorkoutCardProps = WorkoutCardData & {
+  viewerId: string;
   from?: string;
   transitionSource?: WorkoutTransitionSource;
 };
 
 export function WorkoutCard({
+  viewerId,
   id,
   title,
   slug,
@@ -22,9 +24,6 @@ export function WorkoutCard({
   thumbnailUrl,
   coach,
   category,
-  _count,
-  likes,
-  favorites,
   from,
   transitionSource,
 }: WorkoutCardProps) {
@@ -72,12 +71,7 @@ export function WorkoutCard({
         <p className="mt-4 mb-0 text-[0.78rem] text-text-tertiary">
           with {coach.name}
         </p>
-        <WorkoutActions
-          workoutId={id}
-          likeCount={_count.likes}
-          liked={likes.length > 0}
-          favorited={favorites.length > 0}
-        />
+        <WorkoutActions viewerId={viewerId} workoutId={id} />
       </div>
     </article>
   );

@@ -9,6 +9,7 @@ const ignoredDirectories = new Set([
   'dist',
   'node_modules',
 ]);
+const ignoredPathPrefixes = ['.agents/skills/'];
 const staleText = [
   'Clinic Platform',
   'Turborepo starter',
@@ -39,6 +40,9 @@ const errors = [];
 for (const file of collectMarkdownFiles(root)) {
   const content = fs.readFileSync(file, 'utf8');
   const relativeFile = path.relative(root, file);
+  if (ignoredPathPrefixes.some((prefix) => relativeFile.startsWith(prefix))) {
+    continue;
+  }
 
   for (const staleValue of staleText) {
     if (content.includes(staleValue)) {

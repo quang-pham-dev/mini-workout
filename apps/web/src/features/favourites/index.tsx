@@ -2,6 +2,7 @@ import { EmptyState } from './components/empty-state';
 import { FavouritesHeaderSection } from './components/favourites-header-section';
 import { FavouritesSection } from './components/favourites-section';
 import { findSavedWorkouts } from './queries';
+import { WorkoutEngagementHydration } from '@/components/workout-engagement-hydration';
 import { requireOnboardedUser } from '@/lib/auth/session';
 
 export async function FavouritesContent() {
@@ -18,7 +19,15 @@ export async function FavouritesContent() {
       <FavouritesHeaderSection
         savedWorkoutsCount={savedWorkouts?.length || 0}
       />
-      <FavouritesSection savedWorkouts={savedWorkouts} />
+      <WorkoutEngagementHydration
+        viewerId={session.user.id}
+        workouts={savedWorkouts}
+      >
+        <FavouritesSection
+          viewerId={session.user.id}
+          savedWorkouts={savedWorkouts}
+        />
+      </WorkoutEngagementHydration>
     </>
   );
 }

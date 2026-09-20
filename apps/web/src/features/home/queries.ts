@@ -4,5 +4,8 @@ import 'server-only';
 
 export async function getWorkLatest() {
   const { session } = await requireOnboardedUser();
-  return getLatestWorkouts({ userId: session.user.id });
+  return {
+    viewerId: session.user.id,
+    workouts: await getLatestWorkouts({ userId: session.user.id }),
+  };
 }

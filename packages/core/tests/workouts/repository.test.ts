@@ -12,7 +12,13 @@ vi.mock('@mini-workout/database', () => ({
       delete: vi.fn(),
       deleteMany: vi.fn(),
     },
-    workoutFavorite: { findUnique: vi.fn(), create: vi.fn(), delete: vi.fn() },
+    workoutFavorite: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      createMany: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
+    },
   },
 }));
 
@@ -100,23 +106,18 @@ describe('workout repository', () => {
     });
   });
 
-  it('uses the composite key for like reads and writes', async () => {
-    await repository.findLike('user-123', 'workout-1');
-    await repository.createLike('user-123', 'workout-1');
-    await repository.deleteLike('user-123', 'workout-1');
-
-    expect(prisma.workoutLike.findUnique).toHaveBeenCalledWith({
-      where: {
-        userId_workoutId: { userId: 'user-123', workoutId: 'workout-1' },
-      },
-      select: { userId: true, workoutId: true },
-    });
-    expect(prisma.workoutLike.create).toHaveBeenCalledWith({
-      data: { userId: 'user-123', workoutId: 'workout-1' },
-    });
-    expect(prisma.workoutLike.delete).toHaveBeenCalledWith({
-      where: {
-        userId_workoutId: { userId: 'user-123', workoutId: 'workout-1' },
+  it('reads a published workout engagement projection for one viewer', async () => {
+    await repository.findWorkoutEngagement('user-123', 'workout-1');
+    expect(prisma.workout.findFirst).toHaveBeenCalledWith({
+      where: { id: 'workout-1', isPublished: true },
+      select: {
+        id: true,
+        _count: { select: { likes: true } },
+        likes: { where: { userId: 'user-123' }, select: { userId: true } },
+        favorites: {
+          where: { userId: 'user-123' },
+          select: { userId: true },
+        },
       },
     });
   });
@@ -134,24 +135,16 @@ describe('workout repository', () => {
     });
   });
 
-  it('uses the composite key for favourite reads and writes', async () => {
-    await repository.findFavorite('user-123', 'workout-1');
-    await repository.createFavorite('user-123', 'workout-1');
-    await repository.deleteFavorite('user-123', 'workout-1');
+  it('uses conflict-safe writes when setting favourite state', async () => {
+    await repository.insertFavoriteIfAbsent('user-123', 'workout-1');
+    await repository.deleteFavoriteIfPresent('user-123', 'workout-1');
 
-    expect(prisma.workoutFavorite.findUnique).toHaveBeenCalledWith({
-      where: {
-        userId_workoutId: { userId: 'user-123', workoutId: 'workout-1' },
-      },
-      select: { userId: true, workoutId: true },
+    expect(prisma.workoutFavorite.createMany).toHaveBeenCalledWith({
+      data: [{ userId: 'user-123', workoutId: 'workout-1' }],
+      skipDuplicates: true,
     });
-    expect(prisma.workoutFavorite.create).toHaveBeenCalledWith({
-      data: { userId: 'user-123', workoutId: 'workout-1' },
-    });
-    expect(prisma.workoutFavorite.delete).toHaveBeenCalledWith({
-      where: {
-        userId_workoutId: { userId: 'user-123', workoutId: 'workout-1' },
-      },
+    expect(prisma.workoutFavorite.deleteMany).toHaveBeenCalledWith({
+      where: { userId: 'user-123', workoutId: 'workout-1' },
     });
   });
 });

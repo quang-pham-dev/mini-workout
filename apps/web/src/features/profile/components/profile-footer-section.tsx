@@ -1,3 +1,4 @@
+import { SignOutButton } from './sign-out-button';
 import { auth } from '@/auth';
 import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
 import { cookies, headers } from 'next/headers';
@@ -22,12 +23,7 @@ export async function ProfileFooterSection({
         Signed in as {email}
       </span>
       <form action={handleSignOut}>
-        <button
-          className="rounded-full border border-border-default bg-surface px-5 py-[0.6rem] text-sm font-medium text-text-secondary transition-[background-color,color,border-color] hover:border-border-strong hover:bg-surface-sunken hover:text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
-          type="submit"
-        >
-          Sign out
-        </button>
+        <SignOutButton />
       </form>
     </footer>
   );

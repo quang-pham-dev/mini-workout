@@ -32,6 +32,13 @@ export type WorkoutCard = {
   favorites: { userId: string }[];
 };
 
+export type WorkoutEngagement = {
+  workoutId: string;
+  likeCount: number;
+  liked: boolean;
+  favorited: boolean;
+};
+
 export type AdminWorkoutRow = {
   id: string;
   title: string;
@@ -141,6 +148,30 @@ export function findPublishedWorkoutById(workoutId: string) {
   });
 }
 
+export async function findWorkoutEngagement(
+  userId: string,
+  workoutId: string,
+): Promise<WorkoutEngagement | null> {
+  const workout = await prisma.workout.findFirst({
+    where: { id: workoutId, isPublished: true },
+    select: {
+      id: true,
+      _count: { select: { likes: true } },
+      likes: { where: { userId }, select: { userId: true } },
+      favorites: { where: { userId }, select: { userId: true } },
+    },
+  });
+
+  if (!workout) return null;
+
+  return {
+    workoutId: workout.id,
+    likeCount: workout._count.likes,
+    liked: workout.likes.length > 0,
+    favorited: workout.favorites.length > 0,
+  };
+}
+
 export function findPublishedWorkoutDetail(slug: string, userId: string) {
   return prisma.workout.findUnique({
     where: { slug, isPublished: true },
@@ -154,17 +185,6 @@ export function findPublishedWorkoutDetail(slug: string, userId: string) {
   });
 }
 
-export function findLike(userId: string, workoutId: string) {
-  return prisma.workoutLike.findUnique({
-    where: { userId_workoutId: { userId, workoutId } },
-    select: { userId: true, workoutId: true },
-  });
-}
-
-export function createLike(userId: string, workoutId: string) {
-  return prisma.workoutLike.create({ data: { userId, workoutId } });
-}
-
 export function insertLikeIfAbsent(userId: string, workoutId: string) {
   return prisma.workoutLike.createMany({
     data: [{ userId, workoutId }],
@@ -172,29 +192,17 @@ export function insertLikeIfAbsent(userId: string, workoutId: string) {
   });
 }
 
-export function deleteLike(userId: string, workoutId: string) {
-  return prisma.workoutLike.delete({
-    where: { userId_workoutId: { userId, workoutId } },
-  });
-}
-
 export function deleteLikeIfPresent(userId: string, workoutId: string) {
   return prisma.workoutLike.deleteMany({ where: { userId, workoutId } });
 }
 
-export function findFavorite(userId: string, workoutId: string) {
-  return prisma.workoutFavorite.findUnique({
-    where: { userId_workoutId: { userId, workoutId } },
-    select: { userId: true, workoutId: true },
+export function insertFavoriteIfAbsent(userId: string, workoutId: string) {
+  return prisma.workoutFavorite.createMany({
+    data: [{ userId, workoutId }],
+    skipDuplicates: true,
   });
 }
 
-export function createFavorite(userId: string, workoutId: string) {
-  return prisma.workoutFavorite.create({ data: { userId, workoutId } });
-}
-
-export function deleteFavorite(userId: string, workoutId: string) {
-  return prisma.workoutFavorite.delete({
-    where: { userId_workoutId: { userId, workoutId } },
-  });
+export function deleteFavoriteIfPresent(userId: string, workoutId: string) {
+  return prisma.workoutFavorite.deleteMany({ where: { userId, workoutId } });
 }

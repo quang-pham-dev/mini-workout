@@ -2,29 +2,25 @@ import { WorkoutActions } from '@/components/workout-card/workout-actions';
 import { formatDuration } from '@/lib/utils/format';
 
 type WorkoutDetailSectionProps = {
+  viewerId: string;
   id: string;
   title: string;
   description: string;
   durationMinutes: number;
   level: string;
-  likeCount: number;
   coach: { name: string; bio: string };
   category: { name: string };
-  likes: { userId: string }[];
-  favorites: { userId: string }[];
 };
 
 export function WorkoutDetailSection({
+  viewerId,
   id,
   title,
   description,
   durationMinutes,
   level,
   coach,
-  likeCount,
   category,
-  likes,
-  favorites,
 }: WorkoutDetailSectionProps) {
   return (
     <section className="max-w-3xl py-[clamp(2rem,6vw,5rem)]">
@@ -42,12 +38,7 @@ export function WorkoutDetailSection({
         <span>{level.toLowerCase()}</span>
         <span>with {coach.name}</span>
       </div>
-      <WorkoutActions
-        workoutId={id}
-        likeCount={likeCount}
-        liked={likes.length > 0}
-        favorited={favorites.length > 0}
-      />
+      <WorkoutActions viewerId={viewerId} workoutId={id} />
       <div className="mt-12 border-t border-border-subtle pt-6">
         <strong>Meet {coach.name}</strong>
         <p className="mt-2 text-text-secondary">{coach.bio}</p>

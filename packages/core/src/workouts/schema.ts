@@ -9,6 +9,10 @@ export const setWorkoutLikeInput = workoutInteractionInput.extend({
   liked: z.boolean(),
 });
 
+export const setWorkoutFavoriteInput = workoutInteractionInput.extend({
+  favorited: z.boolean(),
+});
+
 export const workoutDetailInput = z.object({
   userId: z.string().min(1),
   slug: z.string().min(1),
@@ -25,6 +29,7 @@ export const recommendationInput = workoutListInput.extend({
 
 export type WorkoutInteractionInput = z.infer<typeof workoutInteractionInput>;
 export type SetWorkoutLikeInput = z.infer<typeof setWorkoutLikeInput>;
+export type SetWorkoutFavoriteInput = z.infer<typeof setWorkoutFavoriteInput>;
 export type WorkoutDetailInput = z.infer<typeof workoutDetailInput>;
 export type WorkoutListInput = z.infer<typeof workoutListInput>;
 export type WorkoutMetaInput = z.infer<typeof workoutMetaInput>;

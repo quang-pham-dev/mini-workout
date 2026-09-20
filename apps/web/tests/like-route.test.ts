@@ -21,7 +21,12 @@ const request = (method: 'PUT' | 'DELETE') =>
 beforeEach(() => {
   vi.resetAllMocks();
   getSession.mockResolvedValue({ user: { id: 'user-123' } } as never);
-  setLike.mockResolvedValue({ workoutSlug: 'flow', liked: true });
+  setLike.mockResolvedValue({
+    workoutId: 'workout-1',
+    likeCount: 2,
+    liked: true,
+    favorited: false,
+  });
 });
 
 describe('workout like REST route', () => {
@@ -36,7 +41,12 @@ describe('workout like REST route', () => {
     const response = await PUT(request('PUT'), context('workout-1'));
     expect(response.status).toBe(200);
     expect(response.headers.get('cache-control')).toBe('no-store');
-    expect(await response.json()).toEqual({ workoutSlug: 'flow', liked: true });
+    expect(await response.json()).toEqual({
+      workoutId: 'workout-1',
+      likeCount: 2,
+      liked: true,
+      favorited: false,
+    });
     expect(setLike).toHaveBeenCalledWith({
       userId: 'user-123',
       workoutId: 'workout-1',
@@ -45,12 +55,19 @@ describe('workout like REST route', () => {
   });
 
   it('DELETE clears liked state', async () => {
-    setLike.mockResolvedValue({ workoutSlug: 'flow', liked: false });
+    setLike.mockResolvedValue({
+      workoutId: 'workout-1',
+      likeCount: 1,
+      liked: false,
+      favorited: false,
+    });
     const response = await DELETE(request('DELETE'), context('workout-1'));
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
-      workoutSlug: 'flow',
+      workoutId: 'workout-1',
+      likeCount: 1,
       liked: false,
+      favorited: false,
     });
     expect(setLike).toHaveBeenCalledWith({
       userId: 'user-123',

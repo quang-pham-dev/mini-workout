@@ -5,6 +5,10 @@ guidance, testing strategy, and product roadmap.
 
 ## Engineering documentation
 
+- [`AGENT_WORKFLOW.md`](AGENT_WORKFLOW.md) — team workflow for starting,
+  implementing, verifying, reviewing, and handing off features with agents.
+- [`AGENT_HARNESS_REVIEW.md`](AGENT_HARNESS_REVIEW.md) — harness assessment,
+  skill governance, and improvement roadmap.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — workspace structure, package
   boundaries, Turborepo tasks, and caching.
 - [`TESTING.md`](TESTING.md) — unit, component, Storybook, and E2E testing.

@@ -44,14 +44,13 @@ async function expectLikeCount(button: Locator, count: number) {
   await expect(button.getByText(String(count), { exact: true })).toHaveCount(1);
 }
 
-async function clickAndWaitForServerAction(page: Page, button: Locator) {
+async function clickAndWaitForEngagementMutation(page: Page, button: Locator) {
   const [response] = await Promise.all([
     page.waitForResponse((candidate) => {
       const request = candidate.request();
       return (
-        request.method() === 'POST' &&
-        candidate.url() === page.url() &&
-        request.headers()['next-action'] !== undefined
+        ['PUT', 'DELETE'].includes(request.method()) &&
+        /\/api\/v1\/workouts\/[^/]+\/(favorite|like)$/.test(candidate.url())
       );
     }),
     button.click(),
@@ -66,7 +65,7 @@ test('@critical save and unsave persist through favourites and reloads', async (
   await createCompletedPrerequisite(mutationUser);
   await mutationUser.page.goto('/home');
   const card = workoutCard(mutationUser.page);
-  await clickAndWaitForServerAction(
+  await clickAndWaitForEngagementMutation(
     mutationUser.page,
     card.getByRole('button', { name: 'Save to favourites' }),
   );
@@ -84,7 +83,7 @@ test('@critical save and unsave persist through favourites and reloads', async (
     savedCard.getByRole('button', { name: 'Remove from favourites' }),
   ).toHaveAttribute('aria-pressed', 'true');
 
-  await clickAndWaitForServerAction(
+  await clickAndWaitForEngagementMutation(
     mutationUser.page,
     savedCard.getByRole('button', { name: 'Remove from favourites' }),
   );
@@ -129,7 +128,7 @@ test('@critical like and unlike state and count agree between home and detail', 
   await createCompletedPrerequisite(mutationUser);
   await mutationUser.page.goto('/home');
   const initialCount = await likeCount(mutationUser.page);
-  await clickAndWaitForServerAction(
+  await clickAndWaitForEngagementMutation(
     mutationUser.page,
     workoutCard(mutationUser.page).getByRole('button', {
       name: 'Like workout',
@@ -141,6 +140,18 @@ test('@critical like and unlike state and count agree between home and detail', 
     }),
     initialCount + 1,
   );
+  const matchingCards = mutationUser.page.getByRole('article').filter({
+    has: mutationUser.page.getByRole('link', { name: workoutName }),
+  });
+  for (const duplicateCard of await matchingCards.all()) {
+    await expect(
+      duplicateCard.getByRole('button', { name: 'Unlike workout' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expectLikeCount(
+      duplicateCard.getByRole('button', { name: 'Unlike workout' }),
+      initialCount + 1,
+    );
+  }
 
   await mutationUser.page.reload();
   await expect(
@@ -157,7 +168,7 @@ test('@critical like and unlike state and count agree between home and detail', 
   });
   await expectLikeCount(detailLike, initialCount + 1);
 
-  await clickAndWaitForServerAction(mutationUser.page, detailLike);
+  await clickAndWaitForEngagementMutation(mutationUser.page, detailLike);
   await expectLikeCount(
     mutationUser.page.getByRole('button', { name: 'Like workout' }),
     initialCount,
@@ -181,13 +192,13 @@ test('@critical saves and likes are isolated per user while like counts stay glo
 
   await mutationUser.page.goto('/home');
   const initialCount = await likeCount(mutationUser.page);
-  await clickAndWaitForServerAction(
+  await clickAndWaitForEngagementMutation(
     mutationUser.page,
     workoutCard(mutationUser.page).getByRole('button', {
       name: 'Like workout',
     }),
   );
-  await clickAndWaitForServerAction(
+  await clickAndWaitForEngagementMutation(
     mutationUser.page,
     workoutCard(mutationUser.page).getByRole('button', {
       name: 'Save to favourites',
@@ -207,7 +218,7 @@ test('@critical saves and likes are isolated per user while like counts stay glo
     initialCount + 1,
   );
 
-  await clickAndWaitForServerAction(
+  await clickAndWaitForEngagementMutation(
     secondUser.page,
     secondCard.getByRole('button', { name: 'Like workout' }),
   );
