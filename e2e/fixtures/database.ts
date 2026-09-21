@@ -123,12 +123,24 @@ export async function configureUser(
       workouts.map((workout) => [workout.slug, workout.id]),
     );
 
+    const onboardingCompleted = input.onboardingCompleted;
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        role: input.role,
-        onboardingCompleted: input.onboardingCompleted,
-        experienceLevel: input.experienceLevel,
+        ...(input.role === undefined ? {} : { role: input.role }),
+        onboardingStatus: onboardingCompleted ? 'COMPLETED' : 'NOT_STARTED',
+        currentStep: onboardingCompleted ? 'DONE' : 'EXPERIENCE_LEVEL',
+        completedSteps: onboardingCompleted
+          ? [
+              'EXPERIENCE_LEVEL',
+              'INTERESTS',
+              'WEEKLY_SCHEDULE',
+              'FITNESS_GOALS',
+            ]
+          : [],
+        ...(input.experienceLevel === undefined
+          ? {}
+          : { experienceLevel: input.experienceLevel }),
         interests: {
           deleteMany: {},
           create: interests.map(({ id }) => ({ interestId: id })),
