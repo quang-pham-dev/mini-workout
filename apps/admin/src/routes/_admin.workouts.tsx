@@ -81,7 +81,7 @@ function WorkoutsPage() {
       title="Workouts"
       description="Review published sessions and drafts. Editing controls are coming in the next phase."
     >
-      <div className="overflow-x-auto rounded-2xl bg-surface shadow-sm">
+      <div className="min-w-0 max-w-full overflow-x-auto rounded-2xl bg-surface shadow-sm">
         <DataTable
           caption="Workout publishing overview"
           columns={columns}

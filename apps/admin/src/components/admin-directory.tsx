@@ -12,7 +12,10 @@ export function AdminDirectoryHeader({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mx-auto max-w-7xl" aria-labelledby={`${title}-title`}>
+    <section
+      className="mx-auto max-w-7xl min-w-0"
+      aria-labelledby={`${title}-title`}
+    >
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mb-2 text-xs font-bold tracking-[0.16em] text-primary uppercase">

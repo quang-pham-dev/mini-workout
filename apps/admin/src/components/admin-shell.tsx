@@ -14,7 +14,7 @@ export function AdminShell() {
     <div className="min-h-screen bg-surface-sunken lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
       <PostHogIdentitySync userId={admin.userId} />
       <aside className="border-b border-border-subtle bg-surface lg:min-h-screen lg:border-r lg:border-b-0">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:sticky lg:top-0 lg:block lg:px-6 lg:py-8">
+        <div className="mx-auto flex flex-wrap max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:sticky lg:top-0 lg:block lg:px-6 lg:py-8">
           <div>
             <p className="text-xs font-bold tracking-[0.18em] text-primary uppercase">
               Mini Workout
@@ -25,7 +25,7 @@ export function AdminShell() {
           </div>
           <nav
             aria-label="Admin navigation"
-            className="flex gap-2 text-sm lg:mt-9 lg:flex-col"
+            className="flex flex-wrap gap-2 text-sm lg:mt-9 lg:flex-col"
           >
             {navigation.map((item) => (
               <Link
