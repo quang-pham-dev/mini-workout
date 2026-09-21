@@ -398,6 +398,14 @@ test('always exposes a public project and sanitizes its server environment', () 
   assert.notEqual(env.BETTER_AUTH_SECRET, 'production-secret');
 });
 
+test('starts the database-free public server against its liveness probe', () => {
+  assert.equal(Array.isArray(config.webServer), false);
+  assert.equal(
+    Array.isArray(config.webServer) ? undefined : config.webServer?.url,
+    `${publicBaseURL}/api/health/live`,
+  );
+});
+
 test('explicit public database environment wins over a conflicting Next env file', () => {
   const root = mkdtempSync(join(tmpdir(), 'mini-workout-next-env-'));
   const explicitPublicEnv = publicServerEnv({});

@@ -260,7 +260,7 @@ export default defineConfig({
           command: serverCommand(publicServerEnv(process.env)),
           reuseExistingServer: false,
           timeout: 120_000,
-          url: `${publicBaseURL}/api/health`,
+          url: `${publicBaseURL}/api/health/live`,
           env: publicServerEnv(process.env),
         },
         {
@@ -282,7 +282,7 @@ export default defineConfig({
         command: serverCommand(publicServerEnv(process.env)),
         reuseExistingServer: false,
         timeout: 120_000,
-        url: `${publicBaseURL}/api/health`,
+        url: `${publicBaseURL}/api/health/live`,
         env: publicServerEnv(process.env),
       },
   projects: projectDefinitions(process.env),
