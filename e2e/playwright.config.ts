@@ -102,6 +102,7 @@ export function databaseServerEnv(
     BETTER_AUTH_URL: baseURL,
     DATABASE_URL: validatedDatabaseUrl,
     E2E_DATABASE_URL: validatedDatabaseUrl,
+    E2E_AUTH_RATE_LIMIT_DISABLED: '1',
   };
 }
 
@@ -124,6 +125,7 @@ export function adminServerEnv(
     ].join(','),
     DATABASE_URL: validatedDatabaseUrl,
     E2E_DATABASE_URL: validatedDatabaseUrl,
+    E2E_AUTH_RATE_LIMIT_DISABLED: '1',
   };
 }
 

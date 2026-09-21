@@ -1,3 +1,4 @@
+import { getE2ERateLimitOverride } from '../src/base';
 import { SESSION_COOKIE_NAME } from '../src/constants';
 import { authOptions } from '../src/index';
 import { describe, expect, it, vi } from 'vitest';
@@ -30,5 +31,15 @@ describe('shared auth configuration', () => {
       input: false,
       defaultValue: 'MEMBER',
     });
+  });
+
+  it('disables rate limiting only for an explicit E2E server override', () => {
+    expect(getE2ERateLimitOverride({})).toEqual({});
+    expect(
+      getE2ERateLimitOverride({ E2E_AUTH_RATE_LIMIT_DISABLED: 'true' }),
+    ).toEqual({});
+    expect(
+      getE2ERateLimitOverride({ E2E_AUTH_RATE_LIMIT_DISABLED: '1' }),
+    ).toEqual({ rateLimit: { enabled: false } });
   });
 });

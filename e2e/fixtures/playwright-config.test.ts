@@ -50,6 +50,10 @@ test('uses distinct default or environment-configured unprivileged E2E ports', (
     'http://localhost:3101',
   );
   assert.equal(
+    databaseServerEnv(env, databaseUrl).E2E_AUTH_RATE_LIMIT_DISABLED,
+    '1',
+  );
+  assert.equal(
     projectDefinitions(env).find(({ name }) => name === 'public')?.use?.baseURL,
     'http://localhost:3100',
   );
@@ -68,6 +72,10 @@ test('defines an isolated admin server and projects only with disposable DB env'
   assert.equal(
     adminServerEnv(env, databaseUrl).BETTER_AUTH_URL,
     'http://localhost:3102',
+  );
+  assert.equal(
+    adminServerEnv(env, databaseUrl).E2E_AUTH_RATE_LIMIT_DISABLED,
+    '1',
   );
   assert.match(
     adminServerCommand(adminServerEnv(env, databaseUrl)),

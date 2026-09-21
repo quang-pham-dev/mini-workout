@@ -29,10 +29,19 @@ function getTrustedOrigins(): string[] | undefined {
   return origins.size > 0 ? Array.from(origins) : undefined;
 }
 
+export function getE2ERateLimitOverride(
+  env: NodeJS.ProcessEnv,
+): Pick<BetterAuthOptions, 'rateLimit'> {
+  return env.E2E_AUTH_RATE_LIMIT_DISABLED === '1'
+    ? { rateLimit: { enabled: false } }
+    : {};
+}
+
 export const baseAuthOptions = {
   baseURL: process.env.BETTER_AUTH_URL,
   trustedOrigins: getTrustedOrigins(),
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
+  ...getE2ERateLimitOverride(process.env),
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
