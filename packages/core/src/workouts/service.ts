@@ -76,7 +76,7 @@ export async function getWorkoutEngagement(input: WorkoutInteractionInput) {
 
 export async function getPublishedWorkoutDetail(
   input: WorkoutDetailInput,
-): Promise<repository.WorkoutCard | null> {
+): Promise<repository.WorkoutDetail | null> {
   const { userId, slug } = parseInput(workoutDetailInput, input);
   return repository.findPublishedWorkoutDetail(slug, userId);
 }

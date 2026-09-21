@@ -1,0 +1,15 @@
+.player {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-surface-sunken);
+  border-radius: 1.5rem;
+
+  --media-accent-color: var(--color-highlight);
+  --media-accent-text-color: var(--color-highlight-foreground);
+  --media-border-color: var(--color-border-subtle);
+  --media-border-radius: 0.75rem;
+  --media-font-family: var(--font-sans);
+  --media-object-fit: cover;
+  --media-scale-unit: 1rem;
+}

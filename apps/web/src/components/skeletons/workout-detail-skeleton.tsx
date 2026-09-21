@@ -3,8 +3,7 @@ export function WorkoutDetailSkeleton() {
     <div aria-busy="true" aria-label="Loading workout details">
       {/* Hero Media Skeleton */}
       <div className="relative mt-8 overflow-hidden rounded-3xl bg-surface-sunken">
-        <div className="animate-shimmer aspect-[3/2] max-h-[32rem] w-full rounded-3xl bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none" />
-        <div className="animate-shimmer absolute right-4 bottom-4 h-8 w-28 rounded-full bg-[linear-gradient(90deg,rgb(0_0_0/12%)_25%,rgb(0_0_0/22%)_37%,rgb(0_0_0/12%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none" />
+        <div className="animate-shimmer aspect-video w-full rounded-3xl bg-[linear-gradient(90deg,rgb(0_0_0/6%)_25%,rgb(0_0_0/12%)_37%,rgb(0_0_0/6%)_63%)] bg-[length:400%_100%] motion-reduce:animate-none" />
       </div>
 
       {/* Content Skeleton */}

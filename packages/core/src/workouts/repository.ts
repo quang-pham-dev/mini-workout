@@ -32,6 +32,11 @@ export type WorkoutCard = {
   favorites: { userId: string }[];
 };
 
+export type WorkoutDetail = WorkoutCard & {
+  videoUrl: string;
+  videoSourceType: 'MP4' | 'HLS';
+};
+
 export type WorkoutEngagement = {
   workoutId: string;
   likeCount: number;
@@ -172,12 +177,24 @@ export async function findWorkoutEngagement(
   };
 }
 
-export function findPublishedWorkoutDetail(slug: string, userId: string) {
+export function findPublishedWorkoutDetail(
+  slug: string,
+  userId: string,
+): Promise<WorkoutDetail | null> {
   return prisma.workout.findUnique({
     where: { slug, isPublished: true },
-    include: {
-      coach: true,
-      category: true,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      durationMinutes: true,
+      level: true,
+      videoUrl: true,
+      videoSourceType: true,
+      thumbnailUrl: true,
+      coach: { select: { name: true, bio: true } },
+      category: { select: { name: true } },
       _count: { select: { likes: true } },
       likes: { where: { userId }, select: { userId: true } },
       favorites: { where: { userId }, select: { userId: true } },

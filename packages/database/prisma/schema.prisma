@@ -14,6 +14,11 @@ enum ExperienceLevel {
   ADVANCED
 }
 
+enum WorkoutVideoSourceType {
+  MP4
+  HLS
+}
+
 enum UserRole {
   MEMBER
   ADMIN
@@ -99,6 +104,7 @@ model Workout {
   durationMinutes Int
   level           ExperienceLevel
   videoUrl        String
+  videoSourceType WorkoutVideoSourceType @default(MP4)
   thumbnailUrl    String
   isPublished     Boolean           @default(false)
   publishedAt     DateTime?

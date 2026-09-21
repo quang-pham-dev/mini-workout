@@ -74,6 +74,10 @@ describe('workout repository', () => {
     expect(calls[4]?.where).toMatchObject({
       favorites: { some: { userId: 'user-1' } },
     });
+    for (const query of calls) {
+      expect(query?.select).not.toHaveProperty('videoUrl');
+      expect(query?.select).not.toHaveProperty('videoSourceType');
+    }
   });
 
   it('reads metadata only for published workouts', async () => {
@@ -96,9 +100,18 @@ describe('workout repository', () => {
     await repository.findPublishedWorkoutDetail('flow', 'user-123');
     expect(prisma.workout.findUnique).toHaveBeenCalledWith({
       where: { slug: 'flow', isPublished: true },
-      include: {
-        coach: true,
-        category: true,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        description: true,
+        durationMinutes: true,
+        level: true,
+        videoUrl: true,
+        videoSourceType: true,
+        thumbnailUrl: true,
+        coach: { select: { name: true, bio: true } },
+        category: { select: { name: true } },
         _count: { select: { likes: true } },
         likes: { where: { userId: 'user-123' }, select: { userId: true } },
         favorites: { where: { userId: 'user-123' }, select: { userId: true } },

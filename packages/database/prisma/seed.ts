@@ -40,7 +40,9 @@ const workouts = [
       'A focused full-body session to bring your energy back online.',
     durationMinutes: 20,
     level: 'BEGINNER' as const,
-    videoUrl: 'https://example.com/workouts/reset',
+    videoUrl:
+      'https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4',
+    videoSourceType: 'MP4' as const,
     thumbnailUrl:
       'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80',
     coachSlug: 'maya-chen',
@@ -53,7 +55,9 @@ const workouts = [
     description: 'Gentle mobility work for the places that hold onto the day.',
     durationMinutes: 15,
     level: 'BEGINNER' as const,
-    videoUrl: 'https://example.com/workouts/mobility',
+    videoUrl:
+      'https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8',
+    videoSourceType: 'HLS' as const,
     thumbnailUrl:
       'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80',
     coachSlug: 'jon-bell',
@@ -67,7 +71,9 @@ const workouts = [
       'A steady strength session for building confidence from the ground up.',
     durationMinutes: 30,
     level: 'INTERMEDIATE' as const,
-    videoUrl: 'https://example.com/workouts/base',
+    videoUrl:
+      'https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4',
+    videoSourceType: 'MP4' as const,
     thumbnailUrl:
       'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=80',
     coachSlug: 'maya-chen',
@@ -81,7 +87,9 @@ const workouts = [
       'A quiet morning flow to start with attention instead of urgency.',
     durationMinutes: 12,
     level: 'BEGINNER' as const,
-    videoUrl: 'https://example.com/workouts/softer-start',
+    videoUrl:
+      'https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8',
+    videoSourceType: 'HLS' as const,
     thumbnailUrl:
       'https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80',
     coachSlug: 'jon-bell',

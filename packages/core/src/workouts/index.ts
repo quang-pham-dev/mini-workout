@@ -17,4 +17,4 @@ export type {
   WorkoutDetailInput,
   WorkoutInteractionInput,
 } from './schema';
-export type { WorkoutCard } from './repository';
+export type { WorkoutCard, WorkoutDetail } from './repository';

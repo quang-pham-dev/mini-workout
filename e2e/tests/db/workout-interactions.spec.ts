@@ -59,6 +59,134 @@ async function clickAndWaitForEngagementMutation(page: Page, button: Locator) {
   expect(await response.finished()).toBeNull();
 }
 
+async function createSyntheticWorkoutVideo(page: Page): Promise<Buffer> {
+  const encodedVideo = await page.evaluate(async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 180;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Canvas 2D context is unavailable');
+
+    const mimeType = 'video/mp4;codecs=avc1.42E01E';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      throw new Error('Chromium cannot generate the deterministic MP4 fixture');
+    }
+    const stream = canvas.captureStream(15);
+    const recorder = new MediaRecorder(stream, { mimeType });
+    const chunks: Blob[] = [];
+    recorder.addEventListener('dataavailable', (event) => {
+      if (event.data.size > 0) chunks.push(event.data);
+    });
+    const stopped = new Promise<void>((resolve) => {
+      recorder.addEventListener('stop', () => resolve(), { once: true });
+    });
+
+    recorder.start();
+    for (let frame = 0; frame < 24; frame += 1) {
+      context.fillStyle = frame % 2 === 0 ? '#cc5b2c' : '#132238';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    recorder.stop();
+    await stopped;
+    stream.getTracks().forEach((track) => track.stop());
+
+    const blob = new Blob(chunks, { type: mimeType });
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => resolve(String(reader.result)), {
+        once: true,
+      });
+      reader.addEventListener('error', () => reject(reader.error), {
+        once: true,
+      });
+      reader.readAsDataURL(blob);
+    });
+    return dataUrl.slice(dataUrl.indexOf(',') + 1);
+  });
+
+  return Buffer.from(encodedVideo, 'base64');
+}
+
+test('@critical workout player plays, pauses, seeks, and handles source errors safely', async ({
+  mutationUser,
+}) => {
+  await createCompletedPrerequisite(mutationUser);
+  const media = await createSyntheticWorkoutVideo(mutationUser.page);
+  const mediaPattern = '**/highest.mp4';
+  await mutationUser.page.route(mediaPattern, (route) =>
+    route.fulfill({
+      body: media,
+      contentType: 'video/mp4',
+      headers: { 'Accept-Ranges': 'bytes' },
+      status: 200,
+    }),
+  );
+
+  await mutationUser.page.goto('/workouts/the-20-minute-reset');
+
+  const playerRegion = mutationUser.page.getByRole('region', {
+    name: 'The 20-minute reset video',
+  });
+  const mediaPlayer = playerRegion.getByRole('group', {
+    name: 'Media player',
+  });
+  const video = playerRegion.locator('video');
+  const playButton = playerRegion.getByRole('button', { name: 'Play' });
+
+  await expect(mediaPlayer).toBeVisible();
+  await expect(video).toHaveAttribute('playsinline', '');
+  await expect(video).toHaveAttribute('preload', 'metadata');
+  await expect(video).not.toHaveAttribute('autoplay', /.*/);
+  await expect
+    .poll(() => video.evaluate((node) => (node as HTMLVideoElement).readyState))
+    .toBeGreaterThan(0);
+  await expect(
+    video.evaluate((node) => (node as HTMLVideoElement).paused),
+  ).resolves.toBe(true);
+
+  await playButton.focus();
+  await expect(playButton).toBeFocused();
+  await mutationUser.page.keyboard.press('Enter');
+  await expect
+    .poll(() => video.evaluate((node) => (node as HTMLVideoElement).paused))
+    .toBe(false);
+  await expect
+    .poll(() =>
+      video.evaluate((node) => (node as HTMLVideoElement).currentTime),
+    )
+    .toBeGreaterThan(0);
+
+  const seek = playerRegion.getByRole('slider', { name: 'Seek' });
+  const beforeSeek = await video.evaluate(
+    (node) => (node as HTMLVideoElement).currentTime,
+  );
+  await seek.focus();
+  await mutationUser.page.keyboard.press('ArrowRight');
+  await expect
+    .poll(() =>
+      video.evaluate((node) => (node as HTMLVideoElement).currentTime),
+    )
+    .toBeGreaterThan(beforeSeek);
+
+  await playerRegion.getByRole('button', { name: 'Pause' }).click();
+  await expect
+    .poll(() => video.evaluate((node) => (node as HTMLVideoElement).paused))
+    .toBe(true);
+
+  await mutationUser.page.unroute(mediaPattern);
+  await mutationUser.page.route(mediaPattern, (route) =>
+    route.fulfill({ status: 404, body: 'missing' }),
+  );
+  await mutationUser.page.reload();
+
+  const errorDialog = mutationUser.page.getByRole('alertdialog');
+  await expect(errorDialog).toBeVisible();
+  await expect(errorDialog).toContainText('Something went wrong.');
+  await expect(errorDialog).not.toContainText('stream.mux.com');
+  await expect(errorDialog).not.toContainText('highest.mp4');
+});
+
 test('@critical save and unsave persist through favourites and reloads', async ({
   mutationUser,
 }) => {

@@ -49,6 +49,13 @@ pnpm --filter @mini-workout/database db:seed
 The same seed command also creates the first coaches, categories, and published
 workout fixtures used by `/home` and `/workouts/[slug]`.
 
+Workout detail pages include a Video.js 10 player for on-demand `MP4` and `HLS`
+sources. Each workout stores an explicit `videoSourceType`; the UI does not
+infer the adapter from the URL. The player uses the workout thumbnail as its
+poster, starts paused, preloads metadata, and uses inline playback on mobile.
+Video.js packages are pinned to `10.0.0-rc.2`; reassess the integration when a
+stable 10.0.0 release is available.
+
 Prisma CLI reads `packages/database/.env` or an exported `DATABASE_URL`.
 Next.js reads `apps/web/.env.local` for development. Keep both URLs pointed at
 the same local database and never commit either file.
@@ -90,7 +97,8 @@ to `/login`; users who have not completed onboarding are redirected to
 database persistence and per-user state.
 
 Playwright currently covers public themes, authentication, onboarding, route
-guards, saved/liked workout interactions, responsive mobile navigation, and
-profile theme preferences. Real video playback and workout completion remain
-planned product work. Profile preference editing and replacement of the current
-root starter entry also require separate product decisions.
+guards, saved/liked workout interactions, deterministic workout playback and
+safe media errors, responsive mobile navigation, and profile theme preferences.
+Workout completion remains planned product work. Profile preference editing and
+replacement of the current root starter entry also require separate product
+decisions.

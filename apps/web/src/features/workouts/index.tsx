@@ -24,6 +24,8 @@ export async function WorkoutContent({
     id,
     thumbnailUrl,
     title,
+    videoSourceType,
+    videoUrl,
     description,
     durationMinutes,
     level,
@@ -36,7 +38,10 @@ export async function WorkoutContent({
       <WorkoutHeroSection
         id={id}
         thumbnailUrl={thumbnailUrl}
+        title={title}
         transitionSource={transitionSource}
+        videoSourceType={videoSourceType}
+        videoUrl={videoUrl}
       />
       <WorkoutDetailSection
         viewerId={viewerId}
