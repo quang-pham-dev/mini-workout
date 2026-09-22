@@ -11,7 +11,7 @@
     "format:fix": "prettier --write .",
     "lint": "eslint .",
     "test": "pnpm test:policy",
-    "test:policy": "node --test --experimental-strip-types fixtures/*.test.ts",
+    "test:policy": "node --test --test-concurrency=1 --experimental-strip-types fixtures/*.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:admin": "playwright test --project=admin --project=admin-mobile",
     "test:e2e:db": "playwright test --project=db",
