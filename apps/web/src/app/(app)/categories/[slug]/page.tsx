@@ -1,7 +1,10 @@
 import { AnimatedSuspense } from '@/components/animated-suspense';
 import { MainLayout } from '@/components/layout/main-layout';
 import { DirectionalPageTransition } from '@/components/view-transitions';
-import { CategoryWorkoutsSection } from '@/features/categories';
+import {
+  CategoryWorkoutsSection,
+  CategoryWorkoutsSkeleton,
+} from '@/features/categories';
 import type { Metadata } from 'next';
 
 type CategoryPageProps = { params: Promise<{ slug: string }> };
@@ -17,7 +20,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   return (
     <DirectionalPageTransition>
       <MainLayout>
-        <AnimatedSuspense fallback={null}>
+        <AnimatedSuspense fallback={<CategoryWorkoutsSkeleton />}>
           <CategoryWorkoutsRoute params={params} />
         </AnimatedSuspense>
       </MainLayout>

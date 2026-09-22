@@ -1,1 +1,4 @@
-export { CategoryWorkoutsSection } from './components/category-workouts-section';
+export {
+  CategoryWorkoutsSection,
+  CategoryWorkoutsSkeleton,
+} from './components/category-workouts-section';
