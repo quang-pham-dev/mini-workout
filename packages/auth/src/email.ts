@@ -1,3 +1,6 @@
+import { appendFile, mkdir, writeFile } from 'node:fs/promises';
+import { dirname, isAbsolute } from 'node:path';
+
 export type AuthEmailKind = 'verification' | 'password-reset';
 
 export type AuthEmail = Readonly<{
@@ -23,6 +26,33 @@ export class AuthEmailDeliveryError extends Error {
 }
 
 export type AuthEmailSender = (email: AuthEmail) => Promise<void>;
+
+function isDisposableE2EDatabase(env: AuthEmailEnvironment) {
+  if (!env.DATABASE_URL || env.DATABASE_URL !== env.E2E_DATABASE_URL)
+    return false;
+  try {
+    const url = new URL(env.DATABASE_URL);
+    return (
+      ['postgres:', 'postgresql:'].includes(url.protocol) &&
+      ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname) &&
+      url.pathname === '/mini_workout_e2e' &&
+      url.search === '' &&
+      url.hash === ''
+    );
+  } catch {
+    return false;
+  }
+}
+
+function assertFakeAuthEmailConfiguration(env: AuthEmailEnvironment) {
+  const captureFile = env.AUTH_EMAIL_CAPTURE_FILE?.trim();
+  if (!captureFile || !isAbsolute(captureFile)) {
+    throw new AuthEmailConfigurationError();
+  }
+  if (env.NODE_ENV === 'production' && !isDisposableE2EDatabase(env)) {
+    throw new AuthEmailConfigurationError();
+  }
+}
 
 export function assertAuthEmailConfiguration(
   env: AuthEmailEnvironment = process.env,
@@ -62,9 +92,39 @@ function getEmailContent(email: AuthEmail) {
   };
 }
 
+function createFakeAuthEmailSender(env: AuthEmailEnvironment): AuthEmailSender {
+  assertFakeAuthEmailConfiguration(env);
+  const captureFile = env.AUTH_EMAIL_CAPTURE_FILE!.trim();
+  const resetCapture =
+    env.AUTH_EMAIL_CAPTURE_RESET === '1'
+      ? mkdir(dirname(captureFile), { recursive: true }).then(() =>
+          writeFile(captureFile, '', 'utf8'),
+        )
+      : Promise.resolve();
+
+  return async (email) => {
+    await resetCapture;
+    const content = getEmailContent(email);
+    await mkdir(dirname(captureFile), { recursive: true });
+    await appendFile(
+      captureFile,
+      `${JSON.stringify({
+        ...email,
+        ...content,
+        createdAt: new Date().toISOString(),
+      })}\n`,
+      'utf8',
+    );
+  };
+}
+
 export function createAuthEmailSender(
   env: AuthEmailEnvironment = process.env,
 ): AuthEmailSender {
+  const provider = env.AUTH_EMAIL_PROVIDER?.trim() || 'resend';
+  if (provider === 'fake') return createFakeAuthEmailSender(env);
+  if (provider !== 'resend') throw new AuthEmailConfigurationError();
+
   return async (email) => {
     const apiKey = env.RESEND_API_KEY?.trim();
     const from = env.AUTH_EMAIL_FROM?.trim();

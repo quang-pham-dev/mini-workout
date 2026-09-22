@@ -1,4 +1,5 @@
 import { resolveDatabaseUrl } from './fixtures/database-env.ts';
+import { emailCapturePath } from './fixtures/email-capture.ts';
 import { defineConfig, devices } from '@playwright/test';
 
 const defaultPublicPort = 3000;
@@ -105,6 +106,9 @@ export function databaseServerEnv(
     DATABASE_URL: validatedDatabaseUrl,
     E2E_DATABASE_URL: validatedDatabaseUrl,
     E2E_AUTH_RATE_LIMIT_DISABLED: '1',
+    AUTH_EMAIL_PROVIDER: 'fake',
+    AUTH_EMAIL_CAPTURE_FILE: emailCapturePath(validatedDatabaseUrl),
+    AUTH_EMAIL_CAPTURE_RESET: '1',
   };
 }
 

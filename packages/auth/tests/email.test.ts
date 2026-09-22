@@ -4,6 +4,9 @@ import {
   assertAuthEmailConfiguration,
   createAuthEmailSender,
 } from '../src/email';
+import { mkdtemp, readFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 describe('auth email sender', () => {
@@ -74,5 +77,57 @@ describe('auth email sender', () => {
         url: 'https://example.test/reset',
       }),
     ).rejects.toBeInstanceOf(AuthEmailDeliveryError);
+  });
+
+  it('captures fake E2E messages as structured JSONL without calling Resend', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'mini-workout-email-'));
+    const captureFile = join(root, 'messages.jsonl');
+    const send = createAuthEmailSender({
+      NODE_ENV: 'production',
+      AUTH_EMAIL_PROVIDER: 'fake',
+      AUTH_EMAIL_CAPTURE_FILE: captureFile,
+      DATABASE_URL:
+        'postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e',
+      E2E_DATABASE_URL:
+        'postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e',
+    });
+
+    await send({
+      kind: 'verification',
+      to: 'user@example.test',
+      url: 'http://localhost:3001/api/auth/verify-email?token=test-token',
+    });
+
+    const [message] = (await readFile(captureFile, 'utf8'))
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line));
+    expect(message).toMatchObject({
+      kind: 'verification',
+      to: 'user@example.test',
+      url: 'http://localhost:3001/api/auth/verify-email?token=test-token',
+      subject: 'Verify your Mini Workout email',
+    });
+  });
+
+  it('rejects the fake provider outside a disposable E2E database', () => {
+    expect(() =>
+      createAuthEmailSender({
+        NODE_ENV: 'production',
+        AUTH_EMAIL_PROVIDER: 'fake',
+        AUTH_EMAIL_CAPTURE_FILE: '/tmp/messages.jsonl',
+      }),
+    ).toThrow(AuthEmailConfigurationError);
+    expect(() =>
+      createAuthEmailSender({
+        NODE_ENV: 'production',
+        AUTH_EMAIL_PROVIDER: 'fake',
+        AUTH_EMAIL_CAPTURE_FILE: '/tmp/messages.jsonl',
+        DATABASE_URL:
+          'postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e?host=remote.example',
+        E2E_DATABASE_URL:
+          'postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e?host=remote.example',
+      }),
+    ).toThrow(AuthEmailConfigurationError);
   });
 });

@@ -31,3 +31,10 @@ Deploy database migrations before deploying auth code. Missing the
 `rateLimit` table intentionally fails sensitive production operations closed.
 Password reset tokens are one-time and a successful reset revokes all existing
 sessions.
+
+Email delivery is provider-neutral. Resend is the default production adapter;
+the fake adapter is available only with an absolute capture file and, in
+production mode, matching disposable E2E database URLs. It writes structured
+JSONL to the run-scoped file so browser tests can consume verification/reset
+links without calling an external provider. Never enable the fake provider for
+preview or production traffic.

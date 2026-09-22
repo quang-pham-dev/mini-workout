@@ -73,6 +73,16 @@ it. Never point either variable at a developer, shared, staging, or production
 database. The canonical URL is propagated to Prisma migrate, seed, fixture
 setup, and the Next web server.
 
+Database-backed E2E servers use the auth package's fake email transport. Messages
+are written as JSONL to a run-scoped file in the system temporary directory,
+derived from the validated database resource key; no Resend request or provider
+secret is used. The transport is accepted in `NODE_ENV=production` only when
+both database variables match an approved loopback `mini_workout_e2e` database.
+The file is reset when the E2E server starts and is never committed or uploaded
+as a test artifact. Flag-on verification tests can read the captured callback
+URL from this file while the default suite keeps
+`MW_FEATURE_AUTH_EMAIL_VERIFICATION=0`.
+
 Public-only startup receives an explicit whitelist-only environment. Its
 `DATABASE_URL` is the unreachable
 `postgresql://invalid:invalid@127.0.0.1:1/mini_workout_public_test` sentinel and

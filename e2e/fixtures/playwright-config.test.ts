@@ -53,6 +53,15 @@ test('uses distinct default or environment-configured unprivileged E2E ports', (
     databaseServerEnv(env, databaseUrl).E2E_AUTH_RATE_LIMIT_DISABLED,
     '1',
   );
+  assert.equal(databaseServerEnv(env, databaseUrl).AUTH_EMAIL_PROVIDER, 'fake');
+  assert.equal(
+    databaseServerEnv(env, databaseUrl).AUTH_EMAIL_CAPTURE_RESET,
+    '1',
+  );
+  assert.match(
+    databaseServerEnv(env, databaseUrl).AUTH_EMAIL_CAPTURE_FILE!,
+    /mini-workout-e2e-email-[a-f0-9]{64}\.jsonl$/,
+  );
   assert.equal(
     projectDefinitions(env).find(({ name }) => name === 'public')?.use?.baseURL,
     'http://localhost:3100',
