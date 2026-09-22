@@ -188,15 +188,11 @@ toolchain on `ubuntu-24.04`; CI installs Chromium only and sets snapshot updates
 to `none`. Local runs use `missing`, so a missing baseline can be created for
 review without replacing an existing one.
 
-Visual baselines are strict by default: there is no suite-wide differing-pixel
-allowance. Any future per-snapshot tolerance must document a concrete reviewed
-rendering difference at that assertion. Snapshot paths include both platform
-and project. The approved Linux Chromium baselines live under
-`__screenshots__/linux/public/`; macOS local output is separate and cannot make
-CI accept a Linux rendering change. Review baseline changes on the pinned CI
-renderer and run the visual project without `--update-snapshots` before approval.
-The System-theme snapshot explicitly uses `1280x900`; landing snapshots use the
-Desktop Chrome project's default `1280x720` viewport.
+The Playwright configuration retains platform/project snapshot paths for future
+reviewed visual suites. Current public theme checks are behavioral rather than
+visual snapshots and run against the `/login` auth entry route. The old
+`/theme-preview` route and landing screenshot claims are not part of the
+implemented suite.
 
 The `public-mobile` and `db-mobile` projects use Playwright's Pixel 7 Chromium
 device profile. They discover only `theme-mobile.spec.ts` and
@@ -217,11 +213,10 @@ or session data.
 
 ## Implemented coverage
 
-Current public desktop coverage includes landing health, theme defaults,
-UI-selected persistence across reload, pre-hydration theme bootstrap, keyboard
-theme-menu behavior, system preference changes, and the strict landing/theme
-visual baselines. The focused public mobile project covers theme control
-usability and horizontal overflow.
+Current public desktop coverage includes the auth entry health check, theme
+defaults, UI-selected persistence across reload, pre-hydration theme bootstrap,
+keyboard/system theme behavior, and route contracts. The focused public mobile
+project covers the `/login` entry route and horizontal overflow.
 
 Current database-backed desktop coverage includes deterministic populated and
 empty fixtures, registration validation and duplicate handling, login and

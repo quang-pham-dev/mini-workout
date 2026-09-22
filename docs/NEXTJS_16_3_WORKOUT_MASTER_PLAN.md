@@ -3,14 +3,12 @@
 > **Project:** Workout Video Platform  
 > **Purpose:** A production-minded learning project for practicing Next.js 16.3 with Better Auth, Prisma ORM, Neon PostgreSQL, Server Components, Server Actions, caching, mutations, testing, and deployment.
 
-> **Status:** The roadmap is being implemented incrementally. The repository
-> currently provides the web
-> foundation, shared UI library, Tailwind design system, Storybook workspace,
-> monorepo tooling, and an initial Better Auth/Prisma authentication slice.
-> Authentication is not yet production-ready. Database access beyond the
-> initial User schema, workout domain
-> features, and the full-stack flows below are planned work unless explicitly
-> marked as implemented in the repository.
+> **Status (2026-09-22):** The roadmap is being implemented incrementally.
+> Phases 0–4 have working local vertical slices and CI/browser coverage, while
+> production hardening and several consumer discovery features remain planned.
+> This document is a roadmap, so conceptual sections below describe the target
+> architecture; the status ledger and implementation notes are the source of
+> truth for what exists today.
 
 ## Current implementation baseline
 
@@ -26,18 +24,25 @@ Implemented:
 - Login, registration, protected `/home`, and route protection through
   `proxy.ts` plus a server-side application layout guard.
 - Better Auth Prisma schema for users, accounts, sessions, and verification.
-- Onboarding vertical slice: normalized interests, experience level, server
-  action persistence, seed data, and incomplete-user redirect guard.
+- Onboarding state-machine slice: normalized interests, experience level,
+  weekly schedule/focus fields, server-action persistence, seed data, and
+  incomplete-user redirect guard.
 - Human-centered onboarding UI using shared Button and semantic design tokens.
-- Focused authentication validation and authorization tests.
+- Workout discovery/detail, coach/category metadata, likes, favourites, profile
+  presentation, theme preference, and explicit MP4/HLS Video.js playback.
+- Focused unit, integration, policy, public browser, database browser, and admin
+  browser coverage, including the CI PostgreSQL/Chromium gate.
+- Admin cursor pagination and URL state (admin scope only).
 
 Still planned:
 
 - Production database migration and seed workflow against Neon PostgreSQL.
-- Authentication recovery, verification, rate limiting, and browser E2E flow.
-- Workout, coach, category, like, and favourite domain models.
-- Search, pagination, and profile flows.
-- Full integration and browser E2E coverage.
+- Authentication recovery, email verification, production rate limiting, and
+  their production browser flows.
+- Consumer search, URL filters, category browsing, and consumer pagination.
+- Profile preference editing and workout completion/progress tracking.
+- Cache Components/use-cache coverage and explicit invalidation documentation.
+- Formal quality audits plus Vercel/Neon deployment and production smoke tests.
 
 The phase definitions in this document describe the intended destination and
 learning sequence. They are not a claim that those features already exist.
@@ -303,9 +308,9 @@ Login
    ↓
 Auth Session
    ↓
-Check onboardingCompleted
-   ├── false → /onboarding
-   └── true  → /home
+Check onboardingStatus/currentStep
+   ├── incomplete → /onboarding?step=...
+   └── completed  → /home
 ```
 
 Protected routes:
@@ -439,7 +444,7 @@ Conceptual layout:
 Route:
 
 ```text
-/items/[id]
+/workouts/[slug]
 ```
 
 Conceptual layout:
@@ -538,7 +543,7 @@ Initial domain:
 ```text
 User
 Coach
-WorkoutVideo
+Workout
 Category
 Interest
 UserInterest
@@ -554,7 +559,7 @@ User
  ├── Like
  └── Favourite
 
-WorkoutVideo
+Workout
  ├── Coach
  ├── Category
  ├── Like
@@ -578,7 +583,9 @@ User
 - emailVerified
 - image
 - Better Auth relations to Account and Session
-- onboardingCompleted
+- onboardingStatus
+- currentStep
+- completedSteps / skippedSteps
 - experienceLevel
 - createdAt
 - updatedAt
@@ -623,10 +630,10 @@ UserInterest
 - interestId
 ```
 
-## WorkoutVideo
+## Workout
 
 ```text
-WorkoutVideo
+Workout
 - id
 - title
 - slug
@@ -1069,7 +1076,7 @@ Understand how partial route data can affect navigation performance.
 Generate metadata for:
 
 ```text
-/items/[id]
+/workouts/[slug]
 ```
 
 ---
@@ -1174,7 +1181,8 @@ Important principle:
 
 ## Phase 0 — Foundation
 
-**Status:** Foundation completed; database migration and seed workflow remain
+**Status:** Local foundation and disposable PostgreSQL migration/seed workflows
+are implemented. Neon production provisioning and operational runbooks remain
 planned.
 
 Deliver:
@@ -1226,10 +1234,9 @@ Implemented in the initial slice:
 
 Remaining before this phase is complete:
 
-- Database migration and seed workflow
-- Logout UI and session revocation strategy
-- Rate limiting and account recovery/verification
-- Integration and browser E2E coverage
+- Production migration/seed rollout and operational rollback policy
+- Rate limiting and account recovery/email verification
+- Production browser smoke coverage for those hardening flows
 
 Definition of Done:
 
@@ -1243,8 +1250,9 @@ Logout → Login
 
 ## Phase 2 — Onboarding
 
-Status: foundation implemented. Apply the migration and seed command locally
-after PostgreSQL connectivity is available.
+**Status:** Implemented locally, including the state-machine fields, persisted
+preferences, redirect guard, deterministic fixtures, and browser coverage.
+Production database rollout remains planned.
 
 Deliver:
 
@@ -1260,10 +1268,10 @@ Implementation notes:
   interest IDs against the database, and writes the user plus join rows in one
   Prisma transaction.
 - `Interest` is reference data seeded by `pnpm --filter web db:seed`.
-- `/home` performs a server-side completion check and redirects incomplete
-  users to `/onboarding`.
-- Component-level interaction and browser E2E coverage remain the next quality
-  increment for this slice.
+- `/home` performs a server-side onboarding-state check and redirects incomplete
+  users to the current onboarding step.
+- Component, integration, and browser E2E coverage exercise validation,
+  persistence, redirect behavior, and completed-user access.
 
 Definition of Done:
 
@@ -1281,8 +1289,9 @@ Home
 
 ## Phase 3 — Workout Discovery
 
-Status: initial discovery slice implemented. Apply the workout migration and
-run the seed command against the configured PostgreSQL database.
+**Status:** Implemented locally with deterministic seed data and browser
+coverage. Production migration/seed rollout, consumer search/filtering, and
+pagination remain planned.
 
 Deliver:
 
@@ -1300,9 +1309,9 @@ Implementation notes:
 - `/home` is a Server Component that reads published content directly through
   Prisma and derives recommendations from onboarding interests.
 - `/workouts/[slug]` provides the detail boundary and dynamic metadata.
-- The detail page uses a media placeholder until storage, transcoding, and
-  playback requirements are known.
-- Search, pagination, admin CRUD, likes, and favourites remain separate phases.
+- The detail page uses the explicit MP4/HLS Video.js player and workout poster.
+- Search, URL filters, consumer pagination, and admin CRUD remain separate
+  phases; likes and favourites are implemented in Phase 4.
 
 Definition of Done:
 
@@ -1313,6 +1322,11 @@ User can discover and open real DB-backed workouts.
 ---
 
 ## Phase 4 — Interaction
+
+**Status:** Implemented locally with persisted likes/favourites, duplicate-safe
+database constraints, per-user isolation, optimistic client state, favourites
+listing, and browser coverage. Production hardening and broader mutation audits
+remain planned.
 
 Deliver:
 
@@ -1333,6 +1347,11 @@ UI reflects mutation
 ---
 
 ## Phase 5 — Next.js 16.3 Deep Dive
+
+**Status:** Partially implemented. Suspense, streaming, Server Actions,
+transitions, dynamic metadata, and a scoped `use cache` workout-detail example
+exist. A complete Cache Components/invalidation contract and accompanying docs
+remain planned.
 
 Deliver:
 

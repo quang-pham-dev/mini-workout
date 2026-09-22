@@ -99,6 +99,7 @@ database persistence and per-user state.
 Playwright currently covers public themes, authentication, onboarding, route
 guards, saved/liked workout interactions, deterministic workout playback and
 safe media errors, responsive mobile navigation, and profile theme preferences.
-Workout completion remains planned product work. Profile preference editing and
-replacement of the current root starter entry also require separate product
-decisions.
+Workout completion remains planned product work. Video playback is implemented
+on workout detail pages with explicit MP4/HLS source selection. Profile
+preference editing and replacement of the current root redirect entry also
+require separate product decisions.

@@ -160,32 +160,15 @@ Playwright 1.62.1 supports `reducedMotion` as a browser context option (includin
 `use.contextOptions`) but not as a first-class Playwright Test fixture option.
 Tests that need per-page emulation use `page.emulateMedia`.
 
-Theme visual coverage uses the production server and named snapshots on
-`/theme-preview` and the public landing page. The System-theme snapshot sets a
-`1280x900` viewport; landing snapshots use Desktop Chrome's default `1280x720`.
-The canonical renderer is lockfile-pinned Playwright Chromium on
-`ubuntu-24.04`. Visual comparisons use strict defaults with no suite-wide
-differing-pixel allowance. CI sets snapshot updates to `none`; local runs use
-`missing`, which creates absent platform-specific baselines without replacing
-existing images.
+The current public theme checks are behavioral rather than visual snapshots and
+run against the `/login` auth entry route. They cover pre-hydration bootstrap,
+persisted preferences, system preference changes, and keyboard behavior. The
+old `/theme-preview` route and landing screenshot claims are not part of the
+implemented suite. The canonical browser renderer remains lockfile-pinned
+Playwright Chromium on `ubuntu-24.04`; CI does not update snapshots.
 
-The configured snapshot template is
-`__screenshots__/{platform}/{projectName}/{testFilePath}/{arg}{ext}`. Approved CI
-images are stored under
-`e2e/__screenshots__/linux/public/tests/public/theme.spec.ts/`, while macOS output
-uses a separate platform path. To intentionally replace a reviewed baseline, run
-the following command in the canonical Ubuntu 24.04 environment:
-
-```bash
-pnpm --filter @mini-workout/e2e test:e2e:update -- --project=public tests/public/theme.spec.ts -g 'captures the System theme'
-```
-
-Run the same public visual selection without `--update-snapshots` before
-approving the changed image.
-
-Do not update snapshots on macOS to satisfy Linux CI. macOS uses separate
-platform paths; canonical approval requires Ubuntu 24.04 with the pinned
-Chromium, followed by the same visual selection without snapshot updates.
+The snapshot template remains available for future reviewed visual coverage,
+but current public tests do not claim screenshot baselines.
 
 ## Required local checks
 
@@ -200,8 +183,10 @@ pnpm docs:check
 ```
 
 CI additionally starts disposable PostgreSQL 16, installs Chromium, builds
-Storybook, and runs the public and database-backed Playwright projects. CI never
-updates snapshots; visual changes must be reviewed and committed locally.
+Storybook, and runs the public, database-backed, and admin Playwright projects.
+The admin gate covers ADMIN/MEMBER authorization, headers, navigation, cursor
+URL state, and responsive behavior. CI never updates snapshots; visual changes
+must be reviewed and committed locally.
 Failed-run artifacts are limited to `e2e/playwright-report/` and
 `e2e/test-results/` with seven-day retention. `.auth` storage state is excluded,
 and DB project traces are disabled to keep auth bodies and cookies out of

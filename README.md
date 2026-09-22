@@ -28,7 +28,8 @@ The full product roadmap remains incomplete. Authentication has implemented E2E
 coverage but is not production-ready without deployed database migrations, rate
 limiting, account recovery/verification flows, and an approved production
 operations policy. Profile preference editing, the product root entry
-experience, and real video playback/completion also remain follow-ups.
+experience, and workout completion remain follow-ups. Video playback is
+implemented on workout detail pages with explicit MP4/HLS source selection.
 
 ## Requirements
 
