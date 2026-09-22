@@ -7,8 +7,13 @@ import { RecommendedSection } from './components/recommended-section';
 import { AnimatedSuspense } from '@/components/animated-suspense';
 import { MainLayout } from '@/components/layout/main-layout';
 import { HomeFeedSkeleton } from '@/components/skeletons/home-feed-skeleton';
+import { connection } from 'next/server';
 
 export async function HomeContent() {
+  // Home is an authenticated surface. Opt into request-time rendering before
+  // any cached catalogue read so production builds never touch Prisma.
+  await connection();
+
   return (
     <MainLayout>
       <div className="pb-[clamp(2.5rem,8vw,6rem)]">

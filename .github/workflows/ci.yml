@@ -73,6 +73,13 @@ jobs:
     name: Type-check & build
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      # The build must have a complete auth/config contract, but authenticated
+      # pages opt into request-time rendering and must not connect to a DB here.
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_build
+      BETTER_AUTH_SECRET: ci-only-web-build-secret-at-least-thirty-two-characters
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_TRUSTED_ORIGINS: http://localhost:3000
     permissions:
       contents: read
       id-token: write
