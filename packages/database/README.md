@@ -17,3 +17,9 @@ Application code must not import this package directly for feature reads or
 writes; those go through `@mini-workout/core`. The only direct Web application
 database import is `apps/web/src/app/api/health/ready/route.ts`, where the
 readiness probe calls the package-owned `pingDatabase()` health primitive.
+
+The additive `rateLimit` migration is required by production authentication.
+It stores only pseudonymous bucket keys, counters, and millisecond timestamps;
+it is shared by all application instances so limits remain effective across a
+multi-instance Vercel deployment. Apply it before deploying code that enables
+database-backed auth limiting.

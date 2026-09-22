@@ -1,4 +1,7 @@
 import { SESSION_COOKIE_NAME } from './constants';
+import { createAuthEmailSender } from './email';
+import { getAuthRateLimitOptions } from './rate-limit';
+import { prismaAuthRateLimitStore } from './rate-limit-prisma';
 import { prismaAdapter } from '@better-auth/prisma-adapter';
 import { prisma } from '@mini-workout/database';
 import type { BetterAuthOptions } from 'better-auth';
@@ -29,22 +32,28 @@ function getTrustedOrigins(): string[] | undefined {
   return origins.size > 0 ? Array.from(origins) : undefined;
 }
 
-export function getE2ERateLimitOverride(
-  env: NodeJS.ProcessEnv,
-): Pick<BetterAuthOptions, 'rateLimit'> {
-  return env.E2E_AUTH_RATE_LIMIT_DISABLED === '1'
-    ? { rateLimit: { enabled: false } }
-    : {};
-}
+const authEmailSender = createAuthEmailSender(process.env);
 
 export const baseAuthOptions = {
   baseURL: process.env.BETTER_AUTH_URL,
   trustedOrigins: getTrustedOrigins(),
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
-  ...getE2ERateLimitOverride(process.env),
+  rateLimit: getAuthRateLimitOptions(process.env, prismaAuthRateLimitStore),
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
+    requireEmailVerification: false,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ user, url }) => {
+      await authEmailSender({ kind: 'password-reset', to: user.email, url });
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: false,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await authEmailSender({ kind: 'verification', to: user.email, url });
+    },
   },
   user: {
     additionalFields: {

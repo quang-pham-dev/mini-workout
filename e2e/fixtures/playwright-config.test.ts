@@ -453,11 +453,13 @@ test('does not merge unrelated inherited environment variables into public start
   });
 
   assert.deepEqual(Object.keys(env).sort(), [
+    'AUTH_FEATURE_FLAG_PROVIDER',
     'BETTER_AUTH_SECRET',
     'BETTER_AUTH_URL',
     'DATABASE_URL',
     'E2E_DATABASE_URL',
     'HOME',
+    'MW_FEATURE_AUTH_EMAIL_VERIFICATION',
     'NEXT_TELEMETRY_DISABLED',
     'NODE_ENV',
     'PATH',

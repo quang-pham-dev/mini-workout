@@ -17,3 +17,17 @@ domains, HTTPS, and trusted origins are confirmed. Both apps must use the same
 `BETTER_AUTH_SECRET`, database, and compatible auth configuration to share
 sessions. The additive role migration in `@mini-workout/database` must be
 deployed before enabling role-aware auth in production.
+
+Production auth traffic is rate-limited through the shared PostgreSQL
+`rateLimit` table. Better Auth protects direct `/api/auth/**` requests, while
+the provider-neutral Server Action limiter protects Web actions that call
+`auth.api.*` in-process. A provider-neutral store decorator HMACs Better Auth's
+HTTP key, and Server Actions independently HMAC account and client-address
+buckets. Raw emails and IP addresses are therefore never stored. The bypass
+switch works only with matching loopback URLs for a database whose name
+contains `e2e`.
+
+Deploy database migrations before deploying auth code. Missing the
+`rateLimit` table intentionally fails sensitive production operations closed.
+Password reset tokens are one-time and a successful reset revokes all existing
+sessions.

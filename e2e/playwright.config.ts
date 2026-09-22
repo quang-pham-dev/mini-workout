@@ -82,6 +82,8 @@ export function publicServerEnv(
     DATABASE_URL:
       'postgresql://invalid:invalid@127.0.0.1:1/mini_workout_public_test',
     E2E_DATABASE_URL: '',
+    AUTH_FEATURE_FLAG_PROVIDER: 'local',
+    MW_FEATURE_AUTH_EMAIL_VERIFICATION: '0',
   };
 }
 

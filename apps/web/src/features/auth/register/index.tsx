@@ -9,6 +9,7 @@ export async function RegisterContent({ searchParams }: RegisterContentProps) {
   const params = await searchParams;
   const callbackUrl =
     typeof params.callbackUrl === 'string' ? params.callbackUrl : '/home';
+  const isRateLimited = params.error === 'rate-limited';
 
   return (
     <main className="grid min-h-[100svh] place-items-center bg-background px-4 py-8">
@@ -30,7 +31,9 @@ export async function RegisterContent({ searchParams }: RegisterContentProps) {
             className="rounded-lg bg-[color-mix(in_srgb,var(--color-destructive)_12%,transparent)] p-3 text-center text-sm text-destructive"
             role="alert"
           >
-            Unable to create your account. Check your details and try again.
+            {isRateLimited
+              ? 'Too many account creation attempts. Please wait and try again.'
+              : 'Unable to create your account. Check your details and try again.'}
           </p>
         ) : null}
 

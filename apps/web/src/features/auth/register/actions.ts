@@ -5,8 +5,11 @@ import {
   ONBOARDING_COOKIE_NAME,
   ONBOARDING_COOKIE_VALUES,
 } from '@/lib/auth/constants';
+import { getAuthErrorCode } from '@/lib/auth/errors';
 import { registerSchema } from '@/lib/auth/validation';
 import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
+import { AuthRateLimitedError } from '@mini-workout/auth/rate-limit';
+import { authActionRateLimiter } from '@mini-workout/auth/rate-limit-prisma';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -40,18 +43,44 @@ async function registerActionImpl(
     redirect('/register?error=invalid');
   }
 
+  const requestHeaders = await headers();
   try {
-    await auth.api.signUpEmail({
+    await authActionRateLimiter.check({
+      path: '/sign-up/email',
+      identifier: parsed.data.email,
+      headers: requestHeaders,
+    });
+  } catch (error) {
+    if (error instanceof AuthRateLimitedError) {
+      redirect('/register?error=rate-limited');
+    }
+    throw error;
+  }
+
+  let requiresEmailVerification = false;
+  try {
+    const registration = await auth.api.signUpEmail({
       body: {
         name: parsed.data.name,
         email: parsed.data.email,
         password: parsed.data.password,
+        callbackURL: '/verify-email',
       },
-      headers: await headers(),
+      headers: requestHeaders,
     });
-  } catch {
-    redirect('/register?error=unavailable');
+    requiresEmailVerification = registration.token === null;
+  } catch (error) {
+    const code = getAuthErrorCode(error);
+    if (
+      code === 'USER_ALREADY_EXISTS' ||
+      code === 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL'
+    ) {
+      redirect('/register?error=unavailable');
+    }
+    throw error;
   }
+
+  if (requiresEmailVerification) redirect('/verify-email');
 
   const cookieStore = await cookies();
   cookieStore.set(

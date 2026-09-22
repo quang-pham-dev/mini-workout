@@ -1,5 +1,6 @@
 import type { ErrorReporter } from './errors';
 import type { LogContext } from './logger';
+import { createPostHogServerClient } from '@mini-workout/analytics/server';
 
 type ServerPostHogOptions = {
   apiKey?: string;
@@ -37,6 +38,18 @@ function toProperties(context: LogContext | undefined) {
 export function createPostHogServerReporter(
   options: ServerPostHogOptions,
 ): ErrorReporter {
+  if (!options.fetcher) {
+    const analytics = createPostHogServerClient({
+      apiKey: options.apiKey,
+      host: options.host,
+    });
+    return {
+      report: ({ error, context }) => {
+        analytics.captureException(error, context);
+      },
+    };
+  }
+
   const fetcher = options.fetcher ?? fetch;
   const endpoint = `${options.host ?? 'https://us.i.posthog.com'}/capture/`;
 

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@mini-workout/auth": "workspace:*",
+    "@mini-workout/analytics": "workspace:*",
     "@mini-workout/core": "workspace:*",
     "@mini-workout/database": "workspace:*",
     "@mini-workout/observability": "workspace:*",
@@ -28,7 +29,6 @@
     "eslint-plugin-boundaries": "^7.2.0",
     "lucide-react": "catalog:ui-styling",
     "next": "catalog:",
-    "posthog-js": "catalog:analysis",
     "react": "catalog:",
     "react-dom": "catalog:",
     "server-only": "^0.0.1",

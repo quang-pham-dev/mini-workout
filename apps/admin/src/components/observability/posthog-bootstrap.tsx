@@ -1,8 +1,8 @@
 'use client';
 
 import {
+  type AnalyticsClient,
   type SafeProperties,
-  createPostHogAdapter,
 } from '@/lib/observability/posthog-client';
 import { useEffect } from 'react';
 
@@ -12,7 +12,7 @@ type AdminErrorDetail = {
   properties: SafeProperties;
 };
 
-let adapterPromise: Promise<ReturnType<typeof createPostHogAdapter> | null>;
+let adapterPromise: Promise<AnalyticsClient | null>;
 
 function getPostHogClient() {
   if (typeof window === 'undefined') return Promise.resolve(null);
@@ -30,15 +30,16 @@ function getPostHogClient() {
         } | null,
       ) =>
         config?.key
-          ? import('posthog-js').then(({ default: sdk }) =>
-              createPostHogAdapter(sdk, config.key, config.host, {
-                enabled: config.enabled,
-                hasConsent: () =>
-                  !config.requireConsent ||
-                  window.localStorage.getItem(
-                    'mini-workout:analytics-consent',
-                  ) === 'granted',
-              }),
+          ? import('@mini-workout/analytics/posthog-browser').then(
+              ({ createPostHogBrowserClient }) =>
+                createPostHogBrowserClient(config.key, config.host, {
+                  enabled: config.enabled,
+                  hasConsent: () =>
+                    !config.requireConsent ||
+                    window.localStorage.getItem(
+                      'mini-workout:analytics-consent',
+                    ) === 'granted',
+                }),
             )
           : null,
     )

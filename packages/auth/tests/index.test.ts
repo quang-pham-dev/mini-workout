@@ -1,4 +1,3 @@
-import { getE2ERateLimitOverride } from '../src/base';
 import { SESSION_COOKIE_NAME } from '../src/constants';
 import { authOptions } from '../src/index';
 import { describe, expect, it, vi } from 'vitest';
@@ -14,32 +13,35 @@ vi.mock('better-auth/next-js', () => ({
 
 describe('shared auth configuration', () => {
   it('preserves the existing session cookie contract', () => {
-    expect(authOptions.advanced.cookies.session_token.name).toBe(
+    expect(authOptions.advanced?.cookies?.session_token?.name).toBe(
       SESSION_COOKIE_NAME,
     );
-    expect(authOptions.advanced.cookies.session_token.attributes).toMatchObject(
-      {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: true,
-      },
-    );
+    expect(
+      authOptions.advanced?.cookies?.session_token?.attributes,
+    ).toMatchObject({
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: true,
+    });
   });
 
   it('never lets a sign-up request choose a role', () => {
-    expect(authOptions.user.additionalFields.role).toMatchObject({
+    expect(authOptions.user?.additionalFields?.role).toMatchObject({
       input: false,
       defaultValue: 'MEMBER',
     });
   });
 
-  it('disables rate limiting only for an explicit E2E server override', () => {
-    expect(getE2ERateLimitOverride({})).toEqual({});
-    expect(
-      getE2ERateLimitOverride({ E2E_AUTH_RATE_LIMIT_DISABLED: 'true' }),
-    ).toEqual({});
-    expect(
-      getE2ERateLimitOverride({ E2E_AUTH_RATE_LIMIT_DISABLED: '1' }),
-    ).toEqual({ rateLimit: { enabled: false } });
+  it('keeps shared defaults compatible and applies verification per request', () => {
+    expect(authOptions.emailAndPassword).toMatchObject({
+      autoSignIn: true,
+      requireEmailVerification: false,
+      revokeSessionsOnPasswordReset: true,
+    });
+    expect(authOptions.emailVerification).toMatchObject({
+      sendOnSignUp: false,
+      autoSignInAfterVerification: true,
+    });
+    expect(authOptions.hooks?.before).toEqual(expect.any(Function));
   });
 });

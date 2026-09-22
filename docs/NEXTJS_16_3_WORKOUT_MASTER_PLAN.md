@@ -39,8 +39,9 @@ Implemented:
 Still planned:
 
 - Production database migration and seed workflow against Neon PostgreSQL.
-- Authentication recovery, email verification, production rate limiting, and
-  their production browser flows.
+- Authentication recovery and database-backed production rate limiting are
+  implemented. Email verification remains default-off behind PostHog; its
+  staging/production browser rollout is still pending.
 - Profile preference editing and workout completion/progress tracking.
 - Cache Components/use-cache coverage and explicit invalidation documentation.
 - Formal quality audits plus Vercel/Neon deployment and production smoke tests.
@@ -1236,8 +1237,9 @@ Implemented in the initial slice:
 Remaining before this phase is complete:
 
 - Production migration/seed rollout and operational rollback policy
-- Rate limiting and account recovery/email verification
-- Production browser smoke coverage for those hardening flows
+- Deploy the additive auth rate-limit migration before application code
+- Staging/production browser smoke coverage for recovery and flagged email
+  verification
 
 Definition of Done:
 

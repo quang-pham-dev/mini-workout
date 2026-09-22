@@ -3,6 +3,7 @@
 import { type LoginFormState, loginAction } from '../actions';
 import { LoginFormFooter } from './login-form-footer';
 import { SubmitButton } from '@/components/auth/submit-button';
+import Link from 'next/link';
 import { useActionState } from 'react';
 
 const initialState: LoginFormState = { error: null };
@@ -28,6 +29,13 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
             role="alert"
           >
             {state.error}
+          </p>
+        ) : null}
+        {state.needsVerification ? (
+          <p className="-mt-2 text-center text-sm">
+            <Link className="font-semibold text-primary" href="/verify-email">
+              Resend verification email
+            </Link>
           </p>
         ) : null}
 

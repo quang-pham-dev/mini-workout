@@ -1,0 +1,35 @@
+{
+  "name": "@mini-workout/feature-flags",
+  "private": true,
+  "type": "module",
+  "description": "Framework-agnostic feature flag contracts for Mini Workout",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

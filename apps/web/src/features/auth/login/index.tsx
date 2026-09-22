@@ -10,6 +10,7 @@ export async function LoginContent({ searchParams }: LoginContentProps) {
   const callbackUrl =
     typeof params.callbackUrl === 'string' ? params.callbackUrl : '/home';
   const hasRegistrationSuccess = params.registered === '1';
+  const hasPasswordResetSuccess = params.reset === '1';
 
   return (
     <main className="grid min-h-[100svh] place-items-center bg-background px-4 py-8">
@@ -29,6 +30,11 @@ export async function LoginContent({ searchParams }: LoginContentProps) {
         {hasRegistrationSuccess ? (
           <p role="status" className="text-center">
             Your account is ready. Please sign in.
+          </p>
+        ) : null}
+        {hasPasswordResetSuccess ? (
+          <p role="status" className="text-center">
+            Your password was updated. Please sign in.
           </p>
         ) : null}
 

@@ -13,7 +13,9 @@
   "files": [
     "dist"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "@mini-workout/analytics": "workspace:*"
+  },
   "scripts": {
     "build": "tsup",
     "check-types": "tsc --noEmit",

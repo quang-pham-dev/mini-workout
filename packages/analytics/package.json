@@ -1,0 +1,51 @@
+{
+  "name": "@mini-workout/analytics",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Provider-neutral analytics and feature flag contracts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./posthog-browser": {
+      "types": "./dist/posthog-browser.d.ts",
+      "import": "./dist/posthog-browser.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@mini-workout/feature-flags": "workspace:*",
+    "posthog-js": "catalog:analysis",
+    "posthog-node": "^5.52.5"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

@@ -1,0 +1,1 @@
+- define constant and reuse: example: INTERNAL_ERROR

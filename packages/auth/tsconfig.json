@@ -9,7 +9,13 @@
     "src",
     "tests/authorization.test.ts",
     "tests/tanstack-start.test.ts",
-    "tests/index.test.ts"
+    "tests/index.test.ts",
+    "tests/email.test.ts",
+    "tests/feature-flags.test.ts",
+    "tests/rate-limit-prisma.test.ts",
+    "tests/rate-limit.test.ts",
+    "tests/recovery.test.ts",
+    "tests/verification-policy.test.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

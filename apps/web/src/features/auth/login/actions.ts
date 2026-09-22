@@ -3,6 +3,7 @@
 import { auth } from '@/auth';
 import { getSafeRedirectPath } from '@/lib/auth/authorization';
 import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
+import { getAuthErrorCode } from '@/lib/auth/errors';
 import { getUserProfile } from '@/lib/auth/session';
 import { loginSchema } from '@/lib/auth/validation';
 import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
@@ -10,6 +11,8 @@ import {
   getOnboardingCookieValue,
   isReadyForApp,
 } from '@/lib/onboarding/state-machine';
+import { AuthRateLimitedError } from '@mini-workout/auth/rate-limit';
+import { authActionRateLimiter } from '@mini-workout/auth/rate-limit-prisma';
 import type { Route } from 'next';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -17,6 +20,7 @@ import { redirect } from 'next/navigation';
 export type LoginFormState = {
   error: string | null;
   email?: string;
+  needsVerification?: boolean;
 };
 
 export async function loginAction(
@@ -49,6 +53,23 @@ async function loginActionImpl(
   const callbackUrl = getSafeRedirectPath(
     formData.get('callbackUrl')?.toString(),
   );
+  const requestHeaders = await headers();
+
+  try {
+    await authActionRateLimiter.check({
+      path: '/sign-in/email',
+      identifier: parsed.data.email,
+      headers: requestHeaders,
+    });
+  } catch (error) {
+    if (error instanceof AuthRateLimitedError) {
+      return {
+        error: 'Too many sign-in attempts. Please wait and try again.',
+        email: rawEmail,
+      };
+    }
+    throw error;
+  }
 
   try {
     await auth.api.signInEmail({
@@ -57,16 +78,29 @@ async function loginActionImpl(
         password: parsed.data.password,
         rememberMe: true,
       },
-      headers: await headers(),
+      headers: requestHeaders,
     });
-  } catch {
-    return {
-      error: 'Invalid email or password.',
-      email: rawEmail,
-    };
+  } catch (error) {
+    const code = getAuthErrorCode(error);
+    if (code === 'EMAIL_NOT_VERIFIED') {
+      return {
+        error: 'Please verify your email before signing in.',
+        email: rawEmail,
+        needsVerification: true,
+      };
+    }
+
+    if (code === 'INVALID_EMAIL_OR_PASSWORD') {
+      return {
+        error: 'Invalid email or password.',
+        email: rawEmail,
+      };
+    }
+
+    throw error;
   }
 
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await auth.api.getSession({ headers: requestHeaders });
   let destination = callbackUrl;
 
   if (session?.user?.id) {

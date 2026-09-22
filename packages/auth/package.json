@@ -19,6 +19,26 @@
     "./tanstack-start": {
       "types": "./dist/tanstack-start.d.ts",
       "import": "./dist/tanstack-start.js"
+    },
+    "./email": {
+      "types": "./dist/email.d.ts",
+      "import": "./dist/email.js"
+    },
+    "./feature-flags": {
+      "types": "./dist/feature-flags.d.ts",
+      "import": "./dist/feature-flags.js"
+    },
+    "./rate-limit": {
+      "types": "./dist/rate-limit.d.ts",
+      "import": "./dist/rate-limit.js"
+    },
+    "./rate-limit-prisma": {
+      "types": "./dist/rate-limit-prisma.d.ts",
+      "import": "./dist/rate-limit-prisma.js"
+    },
+    "./verification-policy": {
+      "types": "./dist/verification-policy.d.ts",
+      "import": "./dist/verification-policy.js"
     }
   },
   "files": [
@@ -36,7 +56,9 @@
   "dependencies": {
     "@better-auth/prisma-adapter": "1.7.1",
     "@better-auth/utils": "0.4.2",
+    "@mini-workout/analytics": "workspace:*",
     "@mini-workout/database": "workspace:*",
+    "@mini-workout/feature-flags": "workspace:*",
     "better-auth": "catalog:better-auth"
   },
   "devDependencies": {

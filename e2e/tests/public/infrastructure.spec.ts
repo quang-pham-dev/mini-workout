@@ -52,3 +52,34 @@ test('applies the stored theme through the inline bootstrap before hydration', a
     'oklch(0.14 0.008 250)',
   );
 });
+
+for (const recoveryRoute of [
+  {
+    path: '/forgot-password',
+    heading: 'Reset your password',
+    action: 'Send reset link',
+  },
+  {
+    path: '/reset-password?token=browser-smoke-token',
+    heading: 'Choose a new password',
+    action: 'Update password',
+  },
+  {
+    path: '/verify-email?error=INVALID_TOKEN',
+    heading: 'Check your email',
+    action: 'Resend verification email',
+  },
+]) {
+  test(`renders ${recoveryRoute.path.split('?')[0]} from the production artifact`, async ({
+    page,
+  }) => {
+    await page.goto(recoveryRoute.path);
+
+    await expect(
+      page.getByRole('heading', { name: recoveryRoute.heading }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: recoveryRoute.action }),
+    ).toBeVisible();
+  });
+}
