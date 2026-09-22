@@ -277,6 +277,9 @@ jobs:
       - name: Run disposable admin E2E
         run: pnpm test:e2e:admin
 
+      - name: Run flag-on email verification E2E
+        run: pnpm --filter @mini-workout/e2e test:e2e:verification
+
       - name: Upload sanitized Playwright failures
         if: failure()
         uses: actions/upload-artifact@v4

@@ -112,6 +112,17 @@ export function databaseServerEnv(
   };
 }
 
+export function verificationServerEnv(
+  env: NodeJS.ProcessEnv,
+  databaseUrl: string,
+): Record<string, string> {
+  return {
+    ...databaseServerEnv(env, databaseUrl),
+    AUTH_FEATURE_FLAG_PROVIDER: 'local',
+    MW_FEATURE_AUTH_EMAIL_VERIFICATION: '1',
+  };
+}
+
 export function adminServerEnv(
   env: NodeJS.ProcessEnv,
   databaseUrl: string,

@@ -10,6 +10,7 @@ import {
   publicServerEnv,
   resolveE2EPorts,
   serverCommand,
+  verificationServerEnv,
 } from '../playwright.config.ts';
 import { strict as assert } from 'node:assert';
 import { execFileSync } from 'node:child_process';
@@ -61,6 +62,10 @@ test('uses distinct default or environment-configured unprivileged E2E ports', (
   assert.match(
     databaseServerEnv(env, databaseUrl).AUTH_EMAIL_CAPTURE_FILE!,
     /mini-workout-e2e-email-[a-f0-9]{64}\.jsonl$/,
+  );
+  assert.equal(
+    verificationServerEnv(env, databaseUrl).MW_FEATURE_AUTH_EMAIL_VERIFICATION,
+    '1',
   );
   assert.equal(
     projectDefinitions(env).find(({ name }) => name === 'public')?.use?.baseURL,
