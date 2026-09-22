@@ -1,3 +1,4 @@
+import { CategoryDiscoverySection } from './components/category-discovery-section';
 import { HeroFallbackSection } from './components/hero-fallback-section';
 import { HeroSection } from './components/hero-section';
 import { LatestSection } from './components/latest-section';
@@ -18,6 +19,10 @@ export async function HomeContent() {
         {/* TODO: add skeleton fallback for onboarding banner section */}
         <AnimatedSuspense fallback={null}>
           <OnboardingBannerSection />
+        </AnimatedSuspense>
+
+        <AnimatedSuspense fallback={null}>
+          <CategoryDiscoverySection />
         </AnimatedSuspense>
 
         <section className="mt-12" aria-labelledby="recommended-title">

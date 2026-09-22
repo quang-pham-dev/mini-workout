@@ -4,12 +4,16 @@ import { WorkoutDetailSkeleton } from '@/components/skeletons/workout-detail-ske
 import { DirectionalPageTransition } from '@/components/view-transitions';
 import type { WorkoutTransitionSource } from '@/components/view-transitions/workout-thumbnail';
 import { BackButton, WorkoutContent } from '@/features/workouts';
+import { CACHE_TAGS } from '@/lib/cache/tags';
 import { getPublishedWorkoutMeta as findWorkoutMeta } from '@mini-workout/core/workouts';
 import type { Metadata } from 'next';
+import { cacheLife, cacheTag } from 'next/cache';
 import { Suspense } from 'react';
 
 async function getPublishedWorkoutMeta(slug: string) {
   'use cache';
+  cacheLife('hours');
+  cacheTag(CACHE_TAGS.workouts, CACHE_TAGS.workout(slug));
   return findWorkoutMeta({ slug });
 }
 

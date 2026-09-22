@@ -177,5 +177,5 @@ async function finishOptionalStep({
   await setOnboardingCookie('COMPLETED');
   revalidatePath('/home');
   revalidatePath('/profile');
-  redirect('/home');
+  redirect('/onboarding?step=DONE');
 }

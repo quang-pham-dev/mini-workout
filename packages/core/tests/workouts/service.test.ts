@@ -5,6 +5,7 @@ import {
   getRecommendedWorkouts,
   getSavedWorkouts,
   getWorkoutEngagement,
+  searchPublishedWorkouts,
   setWorkoutFavorite,
   setWorkoutLike,
 } from '../../src/workouts/service';
@@ -27,6 +28,46 @@ beforeEach(() => {
 });
 
 describe('workout interactions', () => {
+  it('returns a bounded search page with a cursor only when more rows exist', async () => {
+    vi.mocked(repository.findPublishedWorkoutSearch).mockResolvedValue([
+      { id: 'a' },
+      { id: 'b' },
+      { id: 'c' },
+    ] as never);
+
+    await expect(
+      searchPublishedWorkouts({
+        userId: 'user-1',
+        query: 'mobility',
+        limit: 2,
+      }),
+    ).resolves.toEqual({
+      items: [{ id: 'a' }, { id: 'b' }],
+      nextCursor: 'b',
+    });
+  });
+
+  it('treats blank URL filter values as omitted search filters', async () => {
+    vi.mocked(repository.findPublishedWorkoutSearch).mockResolvedValue([]);
+
+    await expect(
+      searchPublishedWorkouts({
+        userId: 'user-1',
+        query: '  ',
+        categorySlug: '',
+        cursor: '   ',
+      }),
+    ).resolves.toEqual({ items: [], nextCursor: null });
+
+    expect(repository.findPublishedWorkoutSearch).toHaveBeenCalledWith({
+      userId: 'user-1',
+      query: undefined,
+      categorySlug: undefined,
+      cursor: undefined,
+      take: 7,
+    });
+  });
+
   it('fills recommendations with level matches without repeating interests', async () => {
     vi.mocked(repository.findByInterest).mockResolvedValue([
       { id: 'a' },

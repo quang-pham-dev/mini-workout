@@ -90,7 +90,8 @@ Application imports use the `@/*` alias for `src/*`. Keep relative imports for
 same-folder files such as a page's CSS Module or a feature's local action.
 
 Current authentication and product routes include `/login`, `/register`,
-`/onboarding`, `/home`, `/favourites`, `/profile`, `/workouts/[slug]`, and
+`/onboarding`, `/home`, `/categories/[slug]`, `/workouts` (URL search/filter/
+cursor pagination), `/favourites`, `/profile`, `/workouts/[slug]`, and
 `/api/auth/[...all]`. Unauthenticated access to protected routes is redirected
 to `/login`; users who have not completed onboarding are redirected to
 `/onboarding`. Saving favourites and liking workouts are implemented with

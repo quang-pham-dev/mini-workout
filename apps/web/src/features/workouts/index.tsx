@@ -6,6 +6,7 @@ import { WorkoutEngagementHydration } from '@/components/workout-engagement-hydr
 import { notFound } from 'next/navigation';
 
 export { BackButton } from './components/back-button';
+export { WorkoutSearchContent } from './components/workout-search-content';
 
 type WorkoutContentProps = {
   slug: string;

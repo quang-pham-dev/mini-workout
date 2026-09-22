@@ -87,6 +87,7 @@ export function NavLinks({
   }
 
   const isHome = pathname === '/home';
+  const isWorkouts = pathname?.startsWith('/workouts');
   const isFavourites = pathname?.startsWith('/favourites');
   const isProfile = pathname?.startsWith('/profile');
 
@@ -133,6 +134,22 @@ export function NavLinks({
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <span>Home</span>
+                  <span
+                    className="text-[1.5rem] font-normal text-text-tertiary transition-transform duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
+                    aria-hidden="true"
+                  >
+                    ›
+                  </span>
+                </Link>
+                <Link
+                  className={cn(
+                    'group flex items-center justify-between px-0 py-[0.6rem] font-display text-[clamp(2.25rem,8vw,3.25rem)] font-extrabold leading-[1.1] tracking-[-0.05em] text-text-primary no-underline transition-[transform,color]',
+                    isWorkouts && 'translate-x-1 text-highlight-foreground',
+                  )}
+                  href="/workouts"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>Explore</span>
                   <span
                     className="text-[1.5rem] font-normal text-text-tertiary transition-transform duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
                     aria-hidden="true"
@@ -222,6 +239,16 @@ export function NavLinks({
         <Link
           className={cn(
             'relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline transition-[color,background-color,box-shadow] hover:bg-surface-sunken hover:text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
+            isWorkouts &&
+              'bg-surface-raised font-semibold text-text-primary shadow-[0_1px_3px_oklch(0_0_0/0.08)]',
+          )}
+          href="/workouts"
+        >
+          Explore
+        </Link>
+        <Link
+          className={cn(
+            'relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline transition-[color,background-color,box-shadow] hover:bg-surface-sunken hover:text-text-primary focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2',
             isFavourites &&
               'bg-surface-raised font-semibold text-text-primary shadow-[0_1px_3px_oklch(0_0_0/0.08)]',
           )}
@@ -284,6 +311,12 @@ export function NavLinksFallback() {
           href="/home"
         >
           Home
+        </Link>
+        <Link
+          className="relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline"
+          href="/workouts"
+        >
+          Explore
         </Link>
         <Link
           className="relative inline-flex items-center rounded-full px-4 py-[0.45rem] text-sm font-medium text-text-secondary no-underline"

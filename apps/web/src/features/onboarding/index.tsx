@@ -1,3 +1,4 @@
+import { OnboardingComplete } from './components/onboarding-complete';
 import { OnboardingForm } from './components/onboarding-form';
 import { StartingLine } from './components/starting-line';
 import { StepSchedule } from './components/step-schedule';
@@ -51,6 +52,14 @@ export async function OnboardingContent({
   );
 
   const showSchedule = activeStep === 'WEEKLY_SCHEDULE' && !isEditMode;
+
+  if (activeStep === 'DONE' && user?.onboardingStatus === 'COMPLETED') {
+    return (
+      <MainLayout>
+        <OnboardingComplete />
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

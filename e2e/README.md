@@ -274,6 +274,7 @@ e2e/
       theme.spec.ts
       theme-mobile.spec.ts
     db/
+      category-discovery.spec.ts
       fixtures.spec.ts
       auth.spec.ts
       authenticated-theme.spec.ts
@@ -281,6 +282,7 @@ e2e/
       navigation-mobile.spec.ts
       route-guards.spec.ts
       workout-interactions.spec.ts
+      workout-search.spec.ts
 ```
 
 Tests should describe user behavior, use accessible selectors, remain

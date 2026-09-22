@@ -1,11 +1,24 @@
 import { expect, test } from '@playwright/test';
 
-test('loads the public authentication entry point', async ({ page }) => {
+test('loads the public landing and exposes clear auth entry points', async ({
+  page,
+}) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
-  await expect(page).toHaveURL(/\/login$/);
-  await expect(page).toHaveTitle('Login');
-  await expect(page.locator('body')).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveTitle('Mini Workout');
+  await expect(
+    page.getByRole('heading', {
+      name: 'Make room for the way you want to feel.',
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Start free' })).toHaveAttribute(
+    'href',
+    '/register',
+  );
+  await expect(
+    page.getByRole('link', { name: 'I already have an account' }),
+  ).toHaveAttribute('href', '/login');
 });
 
 test('applies the stored theme through the inline bootstrap before hydration', async ({

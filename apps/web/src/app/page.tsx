@@ -1,4 +1,5 @@
 import { AnimatedSuspense } from '@/components/animated-suspense';
+import { LandingContent } from '@/features/landing';
 import { getCurrentSession, getUserProfile } from '@/lib/auth/session';
 import {
   getRedirectStepParam,
@@ -6,24 +7,22 @@ import {
 } from '@/lib/onboarding/state-machine';
 import { redirect } from 'next/navigation';
 
-async function RootRedirect(): Promise<null> {
+export default function RootPage() {
+  return (
+    <AnimatedSuspense fallback={null}>
+      <RootPageContent />
+    </AnimatedSuspense>
+  );
+}
+
+async function RootPageContent() {
   const session = await getCurrentSession();
 
   if (session?.user?.id) {
     const profile = await getUserProfile(session.user.id);
-    if (isReadyForApp(profile?.onboardingStatus)) {
-      redirect('/home');
-    }
+    if (isReadyForApp(profile?.onboardingStatus)) redirect('/home');
     redirect(`/onboarding?step=${getRedirectStepParam(profile?.currentStep)}`);
   }
 
-  redirect('/login');
-}
-
-export default function RootPage() {
-  return (
-    <AnimatedSuspense fallback={null}>
-      <RootRedirect />
-    </AnimatedSuspense>
-  );
+  return <LandingContent />;
 }

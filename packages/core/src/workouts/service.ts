@@ -9,6 +9,7 @@ import { parseInput } from '../parse-input';
 import { requireAdminActor } from '../users/service';
 import * as repository from './repository';
 import {
+  type CategorySlugInput,
   type RecommendationInput,
   type SetWorkoutFavoriteInput,
   type SetWorkoutLikeInput,
@@ -16,6 +17,8 @@ import {
   type WorkoutInteractionInput,
   type WorkoutListInput,
   type WorkoutMetaInput,
+  type WorkoutSearchInput,
+  categorySlugInput,
   recommendationInput,
   setWorkoutFavoriteInput,
   setWorkoutLikeInput,
@@ -23,6 +26,7 @@ import {
   workoutInteractionInput,
   workoutListInput,
   workoutMetaInput,
+  workoutSearchInput,
 } from './schema';
 
 async function requirePublishedWorkout(workoutId: string) {
@@ -86,6 +90,37 @@ export async function getLatestWorkouts(
 ): Promise<repository.WorkoutCard[]> {
   const { userId } = parseInput(workoutListInput, input);
   return repository.findLatest(userId);
+}
+
+export async function getPublishedCategories() {
+  return repository.findPublishedCategories();
+}
+
+export async function getPublishedWorkoutsByCategory(
+  input: CategorySlugInput & { userId: string },
+) {
+  const { slug, userId } = parseInput(
+    categorySlugInput.extend({ userId: workoutListInput.shape.userId }),
+    input,
+  );
+  return repository.findPublishedWorkoutsByCategory(slug, userId);
+}
+
+export async function searchPublishedWorkouts(
+  input: WorkoutSearchInput,
+): Promise<repository.WorkoutSearchResult> {
+  const parsed = parseInput(workoutSearchInput, input);
+  const { limit, ...filters } = parsed;
+  const rows = await repository.findPublishedWorkoutSearch({
+    ...filters,
+    take: limit + 1,
+  });
+  const items = rows.slice(0, limit);
+
+  return {
+    items,
+    nextCursor: rows.length > limit ? (items.at(-1)?.id ?? null) : null,
+  };
 }
 
 export async function getSavedWorkouts(

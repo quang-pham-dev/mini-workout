@@ -25,10 +25,10 @@ export function OnboardingProgressBanner() {
             className="mb-2 text-sm font-bold tracking-[-0.01em]"
             id="onboarding-progress-title"
           >
-            Movement profile: 2/4 steps complete
+            Movement profile: 3/4 steps complete
           </p>
           <div className="mb-3 h-2 overflow-hidden rounded-full bg-surface">
-            <div className="h-full w-1/2 rounded-full bg-highlight" />
+            <div className="h-full w-3/4 rounded-full bg-highlight" />
           </div>
           <p className="max-w-2xl text-sm leading-6 text-text-secondary">
             Add your weekly schedule so Mini Workout can tune reminders and make

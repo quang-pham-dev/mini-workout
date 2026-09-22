@@ -33,13 +33,14 @@ Implemented:
 - Focused unit, integration, policy, public browser, database browser, and admin
   browser coverage, including the CI PostgreSQL/Chromium gate.
 - Admin cursor pagination and URL state (admin scope only).
+- Consumer `/workouts` search, category/level URL filters, shareable filter
+  links, and cursor pagination.
 
 Still planned:
 
 - Production database migration and seed workflow against Neon PostgreSQL.
 - Authentication recovery, email verification, production rate limiting, and
   their production browser flows.
-- Consumer search, URL filters, category browsing, and consumer pagination.
 - Profile preference editing and workout completion/progress tracking.
 - Cache Components/use-cache coverage and explicit invalidation documentation.
 - Formal quality audits plus Vercel/Neon deployment and production smoke tests.
@@ -1291,7 +1292,8 @@ Home
 
 **Status:** Implemented locally with deterministic seed data and browser
 coverage. Production migration/seed rollout, consumer search/filtering, and
-pagination remain planned.
+pagination remain planned; category browsing is implemented at
+`/categories/[slug]`.
 
 Deliver:
 
@@ -1299,6 +1301,7 @@ Deliver:
 - Workout list
 - Recommendation section
 - Latest section
+- Category discovery and category collection
 - Workout detail
 - Coach information
 
@@ -1310,8 +1313,8 @@ Implementation notes:
   Prisma and derives recommendations from onboarding interests.
 - `/workouts/[slug]` provides the detail boundary and dynamic metadata.
 - The detail page uses the explicit MP4/HLS Video.js player and workout poster.
-- Search, URL filters, consumer pagination, and admin CRUD remain separate
-  phases; likes and favourites are implemented in Phase 4.
+- Admin CRUD remains a separate phase; likes and favourites are implemented in
+  Phase 4.
 
 Definition of Done:
 
@@ -1344,14 +1347,25 @@ Duplicate records are impossible
 UI reflects mutation
 ```
 
+### Consumer search and pagination
+
+**Status:** Implemented locally at `/workouts`. The page accepts `q`,
+`category`, `level`, and cursor parameters, preserves them in pagination links,
+and applies published-only, user-scoped queries through the core package.
+
+The remaining discovery follow-up is richer ranking and search analytics; those
+are intentionally outside this phase.
+
 ---
 
 ## Phase 5 — Next.js 16.3 Deep Dive
 
-**Status:** Partially implemented. Suspense, streaming, Server Actions,
-transitions, dynamic metadata, and a scoped `use cache` workout-detail example
-exist. A complete Cache Components/invalidation contract and accompanying docs
-remain planned.
+**Status:** Cache Components and invalidation foundations implemented. Shared
+published category and workout-metadata reads use explicit `use cache`,
+`cacheLife`, and feature-owned tags. Personalized workout results remain
+outside the shared cache boundary. The experiments are documented in
+`docs/nextjs-16.3/05-cache-components.md` and
+`docs/nextjs-16.3/06-cache-invalidation.md`.
 
 Deliver:
 

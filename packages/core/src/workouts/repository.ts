@@ -44,6 +44,17 @@ export type WorkoutEngagement = {
   favorited: boolean;
 };
 
+export type CategorySummary = {
+  name: string;
+  slug: string;
+  workoutCount: number;
+};
+
+export type WorkoutSearchResult = {
+  items: WorkoutCard[];
+  nextCursor: string | null;
+};
+
 export type AdminWorkoutRow = {
   id: string;
   title: string;
@@ -84,6 +95,91 @@ export function findLatest(userId: string, take = 6) {
     orderBy: { publishedAt: 'desc' },
     take,
     select: withUserId(userId),
+  });
+}
+
+export function findPublishedCategories(): Promise<CategorySummary[]> {
+  return prisma.category
+    .findMany({
+      where: { workouts: { some: { isPublished: true } } },
+      orderBy: { name: 'asc' },
+      select: {
+        name: true,
+        slug: true,
+        _count: { select: { workouts: { where: { isPublished: true } } } },
+      },
+    })
+    .then((categories) =>
+      categories.map(({ name, slug, _count }) => ({
+        name,
+        slug,
+        workoutCount: _count.workouts,
+      })),
+    );
+}
+
+export async function findPublishedWorkoutsByCategory(
+  slug: string,
+  userId: string,
+) {
+  const category = await prisma.category.findUnique({
+    where: { slug },
+    select: { name: true, slug: true },
+  });
+  if (!category) return null;
+
+  const workouts = await prisma.workout.findMany({
+    where: { category: { slug }, isPublished: true },
+    orderBy: { publishedAt: 'desc' },
+    select: withUserId(userId),
+  });
+
+  return { category, workouts };
+}
+
+export async function findPublishedWorkoutSearch(input: {
+  userId: string;
+  query?: string;
+  categorySlug?: string;
+  level?: ExperienceLevel;
+  cursor?: string;
+  take: number;
+}): Promise<WorkoutCard[]> {
+  const search = input.query
+    ? {
+        OR: [
+          { title: { contains: input.query, mode: 'insensitive' as const } },
+          {
+            description: {
+              contains: input.query,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            coach: {
+              name: { contains: input.query, mode: 'insensitive' as const },
+            },
+          },
+          {
+            category: {
+              name: { contains: input.query, mode: 'insensitive' as const },
+            },
+          },
+        ],
+      }
+    : {};
+
+  return prisma.workout.findMany({
+    where: {
+      isPublished: true,
+      ...(input.categorySlug ? { category: { slug: input.categorySlug } } : {}),
+      ...(input.level ? { level: input.level } : {}),
+      ...search,
+    },
+    ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
+    orderBy: [{ publishedAt: 'desc' }, { id: 'desc' }],
+    take: input.take,
+    select: withUserId(input.userId),
   });
 }
 

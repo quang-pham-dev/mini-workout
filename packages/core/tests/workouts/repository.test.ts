@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@mini-workout/database', () => ({
   prisma: {
     workout: { findFirst: vi.fn(), findUnique: vi.fn(), findMany: vi.fn() },
+    category: { findMany: vi.fn(), findUnique: vi.fn() },
     workoutLike: {
       findUnique: vi.fn(),
       create: vi.fn(),
@@ -78,6 +79,33 @@ describe('workout repository', () => {
       expect(query?.select).not.toHaveProperty('videoUrl');
       expect(query?.select).not.toHaveProperty('videoSourceType');
     }
+  });
+
+  it('applies search filters and keeps pagination bounded', async () => {
+    await repository.findPublishedWorkoutSearch({
+      userId: 'user-1',
+      query: 'mobility',
+      categorySlug: 'mobility',
+      level: 'BEGINNER',
+      cursor: 'previous',
+      take: 7,
+    });
+
+    expect(prisma.workout.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        cursor: { id: 'previous' },
+        skip: 1,
+        take: 7,
+        where: expect.objectContaining({
+          isPublished: true,
+          level: 'BEGINNER',
+          category: { slug: 'mobility' },
+          OR: expect.arrayContaining([
+            { title: { contains: 'mobility', mode: 'insensitive' } },
+          ]),
+        }),
+      }),
+    );
   });
 
   it('reads metadata only for published workouts', async () => {

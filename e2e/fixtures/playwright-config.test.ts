@@ -260,7 +260,7 @@ test('uses strict platform-and-project-specific snapshots with explicit update p
   assert.equal(ciPolicy, 'none');
 });
 
-test('documents the strict canonical visual policy and current update command', () => {
+test('documents the current behavioral public visual policy', () => {
   const e2eReadme = readFileSync(
     fileURLToPath(new URL('../README.md', import.meta.url)),
     'utf8',
@@ -278,18 +278,10 @@ test('documents the strict canonical visual policy and current update command', 
   );
   assert.match(
     testingGuide,
-    /__screenshots__\/linux\/public\/tests\/public\/theme\.spec\.ts/,
+    /current public theme checks are behavioral rather than visual snapshots/i,
   );
-  assert.match(
-    testingGuide,
-    /\{platform\}\/\{projectName\}\/\{testFilePath\}\/\{arg\}\{ext\}/,
-  );
-  assert.match(testingGuide, /CI[^.]*`none`/s);
-  assert.match(testingGuide, /local[^.]*`missing`/is);
-  assert.match(
-    testingGuide,
-    /test:e2e:update -- --project=public tests\/public\/theme\.spec\.ts/,
-  );
+  assert.match(testingGuide, /snapshot template remains available/i);
+  assert.match(testingGuide, /CI does not update snapshots/i);
 });
 
 test('targets mobile behavior with Pixel projects instead of duplicating suites', () => {

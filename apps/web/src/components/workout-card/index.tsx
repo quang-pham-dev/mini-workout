@@ -44,6 +44,7 @@ export function WorkoutCard({
             className="block aspect-[1.35] w-full bg-surface-sunken object-cover"
             src={thumbnailUrl}
             alt=""
+            loading="eager"
             width={1200}
             height={900}
           />

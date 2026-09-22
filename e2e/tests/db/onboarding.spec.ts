@@ -102,3 +102,45 @@ test('@critical onboarding persists a completed personalized profile', async ({
   await expect(preferences).toContainText('beginner');
   await expect(preferences).toContainText('Mobility');
 });
+
+test('@critical onboarding shows a completion handoff after the weekly rhythm', async ({
+  mutationUser,
+}) => {
+  const signup = await mutationUser.context.request.post(
+    '/api/auth/sign-up/email',
+    {
+      headers: { Origin: origin },
+      data: {
+        name: mutationUser.name,
+        email: mutationUser.email,
+        password: mutationUser.password,
+      },
+    },
+  );
+  await assertAuthResponse(signup, 'Onboarding signup');
+
+  await mutationUser.page.goto('/onboarding');
+  await mutationUser.page.getByLabel(/Mobility/).check();
+  await mutationUser.page.getByLabel(/Beginner/).check();
+  await mutationUser.page
+    .getByRole('button', { name: 'Create my starting plan' })
+    .click();
+  await expect(mutationUser.page).toHaveURL('/home');
+
+  await mutationUser.page.goto('/onboarding?step=WEEKLY_SCHEDULE');
+  await mutationUser.page.getByLabel('3 days').check();
+  await mutationUser.page
+    .getByRole('button', { name: 'Save schedule' })
+    .click();
+
+  await expect(mutationUser.page).toHaveURL('/onboarding?step=DONE');
+  await expect(
+    mutationUser.page.getByRole('heading', {
+      name: "You're ready to move.",
+    }),
+  ).toBeVisible();
+  await mutationUser.page
+    .getByRole('link', { name: 'See my first week' })
+    .click();
+  await expect(mutationUser.page).toHaveURL('/home');
+});

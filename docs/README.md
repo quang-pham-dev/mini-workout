@@ -17,6 +17,13 @@ guidance, testing strategy, and product roadmap.
 - [`NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) —
   product scope and learning roadmap, with implementation status.
 
+## Next.js 16.3 experiments
+
+- [`nextjs-16.3/05-cache-components.md`](nextjs-16.3/05-cache-components.md) —
+  shared Cache Components boundaries and `use cache` observations.
+- [`nextjs-16.3/06-cache-invalidation.md`](nextjs-16.3/06-cache-invalidation.md)
+  — cache tags, invalidation helpers, and mutation rules.
+
 ## Repository policies
 
 - [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — setup, contribution workflow,
