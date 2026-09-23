@@ -110,11 +110,16 @@ test('flag-on password recovery is generic, revokes sessions, and consumes its t
         candidate.to === email && candidate.kind === 'password-reset',
     );
     expect(message).toBeDefined();
+    const resetToken = new URL(message!.url).searchParams.get('token');
+    expect(resetToken).toBeTruthy();
 
     await page.goto(message!.url);
     const resetRegion = page.getByRole('region', {
       name: 'Choose a new password',
     });
+    await expect(resetRegion.locator('input[name="token"]')).toHaveValue(
+      resetToken!,
+    );
     await resetRegion.getByLabel('New password').fill(newPassword);
     await resetRegion.getByRole('button', { name: 'Update password' }).click();
     await expect(page).toHaveURL('/login?reset=1');
@@ -126,6 +131,9 @@ test('flag-on password recovery is generic, revokes sessions, and consumes its t
     const replayResetRegion = page.getByRole('region', {
       name: 'Choose a new password',
     });
+    await expect(replayResetRegion.locator('input[name="token"]')).toHaveValue(
+      resetToken!,
+    );
     await replayResetRegion
       .getByLabel('New password')
       .fill('RecoveryReplay123!');

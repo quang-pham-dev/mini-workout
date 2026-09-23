@@ -34,6 +34,22 @@ function parseLevel(value: string | undefined) {
     : undefined;
 }
 
+async function WorkoutSearchPageContent({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  return (
+    <WorkoutSearchContent
+      query={optionalParam(first(params.q))}
+      categorySlug={optionalParam(first(params.category))}
+      level={parseLevel(first(params.level))}
+      cursor={optionalParam(first(params.cursor))}
+    />
+  );
+}
+
 export default function WorkoutsPage({
   searchParams,
 }: {
@@ -43,14 +59,7 @@ export default function WorkoutsPage({
     <DirectionalPageTransition>
       <MainLayout>
         <AnimatedSuspense fallback={<HomeFeedSkeleton count={6} />}>
-          {searchParams.then((params) => (
-            <WorkoutSearchContent
-              query={optionalParam(first(params.q))}
-              categorySlug={optionalParam(first(params.category))}
-              level={parseLevel(first(params.level))}
-              cursor={optionalParam(first(params.cursor))}
-            />
-          ))}
+          <WorkoutSearchPageContent searchParams={searchParams} />
         </AnimatedSuspense>
       </MainLayout>
     </DirectionalPageTransition>

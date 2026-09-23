@@ -49,6 +49,20 @@ function parseTransitionSource(
   return undefined;
 }
 
+async function WorkoutDetailPageContent({
+  params,
+  searchParams,
+}: WorkoutDetailPageProps) {
+  const [{ slug }, { transition }] = await Promise.all([params, searchParams]);
+
+  return (
+    <WorkoutContent
+      slug={slug}
+      transitionSource={parseTransitionSource(transition)}
+    />
+  );
+}
+
 export default function WorkoutDetailPage({
   params,
   searchParams,
@@ -64,14 +78,10 @@ export default function WorkoutDetailPage({
             fallback={<WorkoutDetailSkeleton />}
             variant="reveal"
           >
-            {Promise.all([params, searchParams]).then(
-              ([{ slug }, { transition }]) => (
-                <WorkoutContent
-                  slug={slug}
-                  transitionSource={parseTransitionSource(transition)}
-                />
-              ),
-            )}
+            <WorkoutDetailPageContent
+              params={params}
+              searchParams={searchParams}
+            />
           </AnimatedSuspense>
         </article>
       </MainLayout>

@@ -3,10 +3,20 @@ import {
   VerificationNotice,
   VerificationNoticeSkeleton,
 } from '@/features/auth/recovery';
+import type { SearchParams } from '@/types/common';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = { title: 'Verify email' };
+
+async function VerificationNoticeContent({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  return <VerificationNotice hasError={typeof params.error === 'string'} />;
+}
 
 export default function VerifyEmailPage({
   searchParams,
@@ -24,9 +34,7 @@ export default function VerifyEmailPage({
           Open the verification link to activate your account.
         </p>
         <Suspense fallback={<VerificationNoticeSkeleton />}>
-          {searchParams.then((params) => (
-            <VerificationNotice hasError={typeof params.error === 'string'} />
-          ))}
+          <VerificationNoticeContent searchParams={searchParams} />
         </Suspense>
         <ResendVerificationForm />
       </section>

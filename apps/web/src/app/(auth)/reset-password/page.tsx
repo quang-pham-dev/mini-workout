@@ -1,11 +1,21 @@
-import {
-  ResetPasswordForm,
-  ResetPasswordFormSkeleton,
-} from '@/features/auth/recovery';
+import { ResetPasswordForm } from '@/features/auth/recovery';
+import { ResetPasswordFormSkeleton } from '@/features/auth/recovery';
+import type { SearchParams } from '@/types/common';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = { title: 'Reset password' };
+
+async function ResetPasswordContent({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const token = typeof params.token === 'string' ? params.token : '';
+
+  return <ResetPasswordForm token={token} />;
+}
 
 export default function ResetPasswordPage({
   searchParams,
@@ -26,11 +36,7 @@ export default function ResetPasswordPage({
           Use at least 8 characters.
         </p>
         <Suspense fallback={<ResetPasswordFormSkeleton />}>
-          {searchParams.then((params) => (
-            <ResetPasswordForm
-              token={typeof params.token === 'string' ? params.token : ''}
-            />
-          ))}
+          <ResetPasswordContent searchParams={searchParams} />
         </Suspense>
       </section>
     </main>
