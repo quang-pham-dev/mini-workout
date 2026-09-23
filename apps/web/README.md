@@ -60,6 +60,13 @@ Prisma CLI reads `packages/database/.env` or an exported `DATABASE_URL`.
 Next.js reads `apps/web/.env.local` for development. Keep both URLs pointed at
 the same local database and never commit either file.
 
+Email verification is disabled by default with
+`MW_FEATURE_AUTH_EMAIL_VERIFICATION=0`. Keep it disabled until a verified
+Resend sender (`RESEND_API_KEY` and `AUTH_EMAIL_FROM`) and the PostHog server
+flag configuration are ready. Missing credentials or a disabled flag preserve
+the existing sign-in and registration behavior; provider secrets are
+server-only.
+
 Its route, data, error, network, security, testing, and observability
 conventions are documented in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).

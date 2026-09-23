@@ -10,8 +10,8 @@ import {
 const logger = createLogger({ service: 'admin' });
 const loggerReporter = createLoggerErrorReporter(logger);
 const postHogReporter = createPostHogServerReporter({
-  apiKey: process.env.POSTHOG_SERVER_API_KEY,
-  host: process.env.POSTHOG_HOST,
+  apiKey: process.env.ADMIN_POSTHOG_SERVER_API_KEY,
+  host: process.env.ADMIN_POSTHOG_HOST,
 });
 const defaultReporter = {
   report: (report: Parameters<typeof loggerReporter.report>[0]) => {

@@ -40,6 +40,7 @@ export function cleanupUserWhere(claimedEmails: readonly string[]) {
 
 export type ConfigureUserInput = {
   onboardingCompleted: boolean;
+  emailVerified?: boolean;
   role?: 'MEMBER' | 'ADMIN';
   experienceLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   interestSlugs?: string[];
@@ -141,6 +142,9 @@ export async function configureUser(
         ...(input.experienceLevel === undefined
           ? {}
           : { experienceLevel: input.experienceLevel }),
+        ...(input.emailVerified === undefined
+          ? {}
+          : { emailVerified: input.emailVerified }),
         interests: {
           deleteMany: {},
           create: interests.map(({ id }) => ({ interestId: id })),

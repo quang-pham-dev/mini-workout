@@ -123,6 +123,17 @@ export function verificationServerEnv(
   };
 }
 
+export function rateLimitServerEnv(
+  env: NodeJS.ProcessEnv,
+  databaseUrl: string,
+): Record<string, string> {
+  const serverEnv = databaseServerEnv(env, databaseUrl);
+  // Keep the normal database E2E bypass for the broad suite, but explicitly
+  // exercise durable auth limits in the dedicated rate-limit gate.
+  delete serverEnv.E2E_AUTH_RATE_LIMIT_DISABLED;
+  return serverEnv;
+}
+
 export function adminServerEnv(
   env: NodeJS.ProcessEnv,
   databaseUrl: string,

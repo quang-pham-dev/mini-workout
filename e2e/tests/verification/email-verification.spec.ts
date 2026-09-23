@@ -1,9 +1,10 @@
 import { resolveDatabaseUrl } from '../../fixtures/database-env.ts';
-import { cleanupDatabase } from '../../fixtures/database.ts';
+import { cleanupDatabase, configureUser } from '../../fixtures/database.ts';
 import {
   type CapturedAuthEmail,
   readCapturedAuthEmails,
 } from '../../fixtures/email-capture.ts';
+import { databaseBaseURL } from '../../playwright.config.ts';
 import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 
@@ -58,6 +59,85 @@ test('flag-on signup requires verification and reaches onboarding after the capt
     await expect(
       page.getByRole('heading', { name: 'A plan that feels like yours.' }),
     ).toBeVisible();
+  } finally {
+    await cleanupDatabase(databaseUrl, [email]);
+  }
+});
+
+test('flag-on password recovery is generic, revokes sessions, and consumes its token once', async ({
+  page,
+}) => {
+  const email = `recovery-${randomUUID()}@example.test`;
+  const password = 'RecoveryOld123!';
+  const newPassword = 'RecoveryNew123!';
+
+  try {
+    const signup = await page.request.post('/api/auth/sign-up/email', {
+      headers: { Origin: databaseBaseURL },
+      data: { name: 'Recovery user', email, password },
+    });
+    expect(signup.ok()).toBeTruthy();
+    await configureUser(databaseUrl, email, {
+      onboardingCompleted: false,
+      emailVerified: true,
+    });
+
+    await page.goto('/login');
+    await page.getByLabel('Email').fill(email);
+    await page.getByLabel('Password').fill(password);
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page).toHaveURL(/\/onboarding/);
+
+    await page.goto('/forgot-password');
+    await page.getByLabel('Email').fill(email);
+    await page.getByRole('button', { name: 'Send reset link' }).click();
+    await expect(page.getByRole('status')).toHaveText(
+      'If an account matches, we sent a password reset link.',
+    );
+
+    await expect
+      .poll(
+        () =>
+          readCapturedAuthEmails(databaseUrl).filter(
+            (message) =>
+              message.to === email && message.kind === 'password-reset',
+          ),
+        { timeout: 10_000 },
+      )
+      .toHaveLength(1);
+    const message = readCapturedAuthEmails(databaseUrl).find(
+      (candidate): candidate is CapturedAuthEmail =>
+        candidate.to === email && candidate.kind === 'password-reset',
+    );
+    expect(message).toBeDefined();
+
+    await page.goto(message!.url);
+    await page.getByLabel('New password').fill(newPassword);
+    await page.getByRole('button', { name: 'Update password' }).click();
+    await expect(page).toHaveURL('/login?reset=1');
+
+    await page.goto('/home');
+    await expect(page).toHaveURL(/\/login\?callbackUrl=%2Fhome/);
+
+    await page.goto(message!.url);
+    await page.getByLabel('New password').fill('RecoveryReplay123!');
+    await page.getByRole('button', { name: 'Update password' }).click();
+    await expect(page.getByRole('alert')).toHaveText(
+      'This reset link is invalid or has expired.',
+    );
+
+    await page.goto('/reset-password?token=invalid-token');
+    await page.getByLabel('New password').fill('RecoveryInvalid123!');
+    await page.getByRole('button', { name: 'Update password' }).click();
+    await expect(page.getByRole('alert')).toHaveText(
+      'This reset link is invalid or has expired.',
+    );
+
+    await page.goto('/login');
+    await page.getByLabel('Email').fill(email);
+    await page.getByLabel('Password').fill(newPassword);
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page).toHaveURL(/\/onboarding/);
   } finally {
     await cleanupDatabase(databaseUrl, [email]);
   }

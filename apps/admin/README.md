@@ -17,6 +17,11 @@ pnpm --filter @mini-workout/admin dev
 The application runs on <http://localhost:3001>. Only users whose current
 database role is `ADMIN` can access `/workouts` and `/coaches`.
 
+Optional server integrations are documented in `.env.example`: Resend values
+power auth email delivery, while `ADMIN_POSTHOG_SERVER_API_KEY` is used only
+for server-side error reporting. Empty values keep those integrations
+best-effort/no-op and never expose secrets to the browser.
+
 ## Verification
 
 ```bash

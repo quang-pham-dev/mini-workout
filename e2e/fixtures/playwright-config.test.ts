@@ -8,6 +8,7 @@ import {
   projectDefinitions,
   publicBaseURL,
   publicServerEnv,
+  rateLimitServerEnv,
   resolveE2EPorts,
   serverCommand,
   verificationServerEnv,
@@ -66,6 +67,10 @@ test('uses distinct default or environment-configured unprivileged E2E ports', (
   assert.equal(
     verificationServerEnv(env, databaseUrl).MW_FEATURE_AUTH_EMAIL_VERIFICATION,
     '1',
+  );
+  assert.equal(
+    rateLimitServerEnv(env, databaseUrl).E2E_AUTH_RATE_LIMIT_DISABLED,
+    undefined,
   );
   assert.equal(
     projectDefinitions(env).find(({ name }) => name === 'public')?.use?.baseURL,
