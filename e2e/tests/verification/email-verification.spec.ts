@@ -29,7 +29,7 @@ test('flag-on signup requires verification and reaches onboarding after the capt
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password').fill(password);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    await expect(page.getByRole('alert')).toHaveText(
+    await expect(page.locator('p[role="alert"]')).toHaveText(
       'Please verify your email before signing in.',
     );
     await expect(
@@ -112,24 +112,41 @@ test('flag-on password recovery is generic, revokes sessions, and consumes its t
     expect(message).toBeDefined();
 
     await page.goto(message!.url);
-    await page.getByLabel('New password').fill(newPassword);
-    await page.getByRole('button', { name: 'Update password' }).click();
+    const resetRegion = page.getByRole('region', {
+      name: 'Choose a new password',
+    });
+    await resetRegion.getByLabel('New password').fill(newPassword);
+    await resetRegion.getByRole('button', { name: 'Update password' }).click();
     await expect(page).toHaveURL('/login?reset=1');
 
     await page.goto('/home');
     await expect(page).toHaveURL(/\/login\?callbackUrl=%2Fhome/);
 
     await page.goto(message!.url);
-    await page.getByLabel('New password').fill('RecoveryReplay123!');
-    await page.getByRole('button', { name: 'Update password' }).click();
-    await expect(page.getByRole('alert')).toHaveText(
+    const replayResetRegion = page.getByRole('region', {
+      name: 'Choose a new password',
+    });
+    await replayResetRegion
+      .getByLabel('New password')
+      .fill('RecoveryReplay123!');
+    await replayResetRegion
+      .getByRole('button', { name: 'Update password' })
+      .click();
+    await expect(replayResetRegion.locator('p[role="alert"]')).toHaveText(
       'This reset link is invalid or has expired.',
     );
 
     await page.goto('/reset-password?token=invalid-token');
-    await page.getByLabel('New password').fill('RecoveryInvalid123!');
-    await page.getByRole('button', { name: 'Update password' }).click();
-    await expect(page.getByRole('alert')).toHaveText(
+    const invalidResetRegion = page.getByRole('region', {
+      name: 'Choose a new password',
+    });
+    await invalidResetRegion
+      .getByLabel('New password')
+      .fill('RecoveryInvalid123!');
+    await invalidResetRegion
+      .getByRole('button', { name: 'Update password' })
+      .click();
+    await expect(invalidResetRegion.locator('p[role="alert"]')).toHaveText(
       'This reset link is invalid or has expired.',
     );
 
