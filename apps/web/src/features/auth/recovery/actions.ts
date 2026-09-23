@@ -1,6 +1,7 @@
 'use server';
 
 import { auth } from '@/auth';
+import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
 import { getAuthErrorCode } from '@/lib/auth/errors';
 import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
 import {
@@ -8,7 +9,7 @@ import {
   AuthRateLimitedError,
 } from '@mini-workout/auth/rate-limit';
 import { authActionRateLimiter } from '@mini-workout/auth/rate-limit-prisma';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export type RecoveryFormState = { error: string | null; submitted?: boolean };
@@ -105,7 +106,15 @@ export async function resetPasswordAction(
     return { error: "We couldn't update your password. Please try again." };
   }
 
-  if (result.completed) redirect('/login?reset=1');
+  if (result.completed) {
+    // Password reset revokes all auth sessions. The onboarding cookie is a
+    // derived session hint and must not survive that boundary, otherwise the
+    // edge guard can redirect a signed-out user through stale onboarding
+    // state before the login callback is evaluated.
+    const cookieStore = await cookies();
+    cookieStore.delete(ONBOARDING_COOKIE_NAME);
+    redirect('/login?reset=1');
+  }
   return result;
 }
 

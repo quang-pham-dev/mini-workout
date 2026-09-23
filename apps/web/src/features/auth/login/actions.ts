@@ -71,8 +71,9 @@ async function loginActionImpl(
     throw error;
   }
 
+  let signedInUserId: string | undefined;
   try {
-    await auth.api.signInEmail({
+    const signInResult = await auth.api.signInEmail({
       body: {
         email: parsed.data.email,
         password: parsed.data.password,
@@ -80,6 +81,8 @@ async function loginActionImpl(
       },
       headers: requestHeaders,
     });
+
+    signedInUserId = signInResult.user?.id;
   } catch (error) {
     const code = getAuthErrorCode(error);
     if (code === 'EMAIL_NOT_VERIFIED') {
@@ -100,11 +103,9 @@ async function loginActionImpl(
     throw error;
   }
 
-  const session = await auth.api.getSession({ headers: requestHeaders });
   let destination = callbackUrl;
-
-  if (session?.user?.id) {
-    const profile = await getUserProfile(session.user.id);
+  if (signedInUserId) {
+    const profile = await getUserProfile(signedInUserId);
     const isOnboarded = isReadyForApp(profile?.onboardingStatus);
 
     const cookieStore = await cookies();
