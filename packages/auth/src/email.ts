@@ -57,6 +57,10 @@ function assertFakeAuthEmailConfiguration(env: AuthEmailEnvironment) {
 export function assertAuthEmailConfiguration(
   env: AuthEmailEnvironment = process.env,
 ) {
+  if (env.AUTH_EMAIL_PROVIDER?.trim() === 'fake') {
+    assertFakeAuthEmailConfiguration(env);
+    return;
+  }
   if (!env.RESEND_API_KEY?.trim() || !env.AUTH_EMAIL_FROM?.trim()) {
     throw new AuthEmailConfigurationError();
   }

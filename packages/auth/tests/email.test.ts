@@ -33,6 +33,17 @@ describe('auth email sender', () => {
         AUTH_EMAIL_FROM: 'from@example.test',
       }),
     ).not.toThrow();
+    expect(() =>
+      assertAuthEmailConfiguration({
+        NODE_ENV: 'production',
+        AUTH_EMAIL_PROVIDER: 'fake',
+        AUTH_EMAIL_CAPTURE_FILE: '/tmp/messages.jsonl',
+        DATABASE_URL:
+          'postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e',
+        E2E_DATABASE_URL:
+          'postgresql://postgres:postgres@127.0.0.1:5432/mini_workout_e2e',
+      }),
+    ).not.toThrow();
   });
 
   it('sends provider-neutral verification content through Resend', async () => {
