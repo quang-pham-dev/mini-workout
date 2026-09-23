@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import { getLoginRedirectPath } from '@/lib/auth/authorization';
 import {
   getRedirectStepParam,
   isReadyForApp,
@@ -41,7 +42,7 @@ export async function requireSession() {
   const session = await getCurrentSession();
 
   if (!session?.user.id) {
-    redirect('/login');
+    redirect(getLoginRedirectPath((await headers()).get('x-pathname')));
   }
 
   return session;
@@ -57,7 +58,7 @@ export async function requireOnboardedUser() {
   const profile = await getUserProfile(session.user.id);
 
   if (!profile) {
-    redirect('/login');
+    redirect(getLoginRedirectPath((await headers()).get('x-pathname')));
   }
 
   if (!isReadyForApp(profile.onboardingStatus)) {

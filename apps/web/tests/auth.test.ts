@@ -1,4 +1,8 @@
-import { getSafeRedirectPath, isProtectedPath } from '@/lib/auth/authorization';
+import {
+  getLoginRedirectPath,
+  getSafeRedirectPath,
+  isProtectedPath,
+} from '@/lib/auth/authorization';
 import { loginSchema, registerSchema } from '@/lib/auth/validation';
 import { describe, expect, it } from 'vitest';
 
@@ -62,5 +66,13 @@ describe('authentication route boundaries', () => {
     expect(getSafeRedirectPath('/home')).toBe('/home');
     expect(getSafeRedirectPath('https://evil.example')).toBe('/home');
     expect(getSafeRedirectPath('//evil.example')).toBe('/home');
+  });
+
+  it('builds a canonical login redirect for a protected request', () => {
+    expect(getLoginRedirectPath('/home')).toBe('/login?callbackUrl=%2Fhome');
+    expect(getLoginRedirectPath('/workouts?q=calm')).toBe(
+      '/login?callbackUrl=%2Fworkouts%3Fq%3Dcalm',
+    );
+    expect(getLoginRedirectPath(undefined)).toBe('/login');
   });
 });

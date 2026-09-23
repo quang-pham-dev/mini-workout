@@ -5,7 +5,9 @@ import { ProfileHeaderSection } from './components/profile-header-section';
 import { ProfileMovementFocusSection } from './components/profile-movement-focus-section';
 import { ProfileProgressSection } from './components/profile-progress.section';
 import { getUserProfile } from './queries';
+import { getLoginRedirectPath } from '@/lib/auth/authorization';
 import { isReadyForApp } from '@/lib/onboarding/state-machine';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function ProfileContent() {
@@ -24,7 +26,7 @@ export async function ProfileContent() {
   const { likes, favorites } = _count || {};
 
   if (!userProfile) {
-    redirect('/login');
+    redirect(getLoginRedirectPath((await headers()).get('x-pathname')));
   }
 
   if (!isReadyForApp(onboardingStatus)) {

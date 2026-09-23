@@ -1,4 +1,7 @@
-import { getSafeRedirectPath, isProtectedPath } from '@/lib/auth/authorization';
+import {
+  getLoginRedirectPath,
+  isProtectedPath,
+} from '@/lib/auth/authorization';
 import {
   ONBOARDING_COOKIE_NAME,
   ONBOARDING_COOKIE_VALUES,
@@ -12,13 +15,12 @@ export function proxy(request: NextRequest) {
   const hasSession = Boolean(request.cookies.get(SESSION_COOKIE_NAME)?.value);
 
   if (isProtectedPath(pathname) && !hasSession) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set(
-      'callbackUrl',
-      getSafeRedirectPath(`${pathname}${request.nextUrl.search}`),
+    return NextResponse.redirect(
+      new URL(
+        getLoginRedirectPath(`${pathname}${request.nextUrl.search}`),
+        request.url,
+      ),
     );
-
-    return NextResponse.redirect(loginUrl);
   }
 
   // Optimistic edge guard for onboarding to eliminate layout flash
@@ -54,7 +56,7 @@ export function proxy(request: NextRequest) {
   }
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-pathname', pathname);
+  requestHeaders.set('x-pathname', `${pathname}${request.nextUrl.search}`);
 
   return NextResponse.next({
     request: { headers: requestHeaders },

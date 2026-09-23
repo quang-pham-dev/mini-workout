@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const getSessionMock = vi.fn();
 const findUniqueMock = vi.fn();
 const redirectMock = vi.fn();
+let requestPath: string | null = null;
 
 vi.mock('next/navigation', () => ({
   redirect: (url: string) => {
@@ -18,7 +19,11 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('next/headers', () => ({
-  headers: vi.fn(async () => new Headers({ 'x-test': '1' })),
+  headers: vi.fn(async () => {
+    const result = new Headers({ 'x-test': '1' });
+    if (requestPath) result.set('x-pathname', requestPath);
+    return result;
+  }),
 }));
 
 vi.mock('next/server', () => ({
@@ -89,6 +94,7 @@ describe('getUserProfile', () => {
 describe('requireSession', () => {
   beforeEach(() => {
     redirectMock.mockReset();
+    requestPath = null;
   });
 
   it('redirects to /login when session has no user', async () => {
@@ -104,6 +110,16 @@ describe('requireSession', () => {
     const session = await requireSession();
     expect(session).toEqual({ user: { id: 'u1' } });
     expect(redirectMock).not.toHaveBeenCalled();
+  });
+
+  it('preserves the protected destination when the edge session cookie is stale', async () => {
+    requestPath = '/home';
+    getSessionMock.mockResolvedValueOnce(null);
+
+    await expect(requireSession()).rejects.toThrow(
+      'REDIRECT: /login?callbackUrl=%2Fhome',
+    );
+    expect(redirectMock).toHaveBeenCalledWith('/login?callbackUrl=%2Fhome');
   });
 });
 

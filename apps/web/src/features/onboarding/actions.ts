@@ -7,6 +7,7 @@ import {
   onboardingSchema,
   scheduleStepSchema,
 } from '@/features/onboarding/schema';
+import { getLoginRedirectPath } from '@/lib/auth/authorization';
 import { ONBOARDING_COOKIE_NAME } from '@/lib/auth/constants';
 import { withServerActionErrorBoundary } from '@/lib/observability/action-error';
 import {
@@ -25,7 +26,9 @@ import { redirect } from 'next/navigation';
 
 async function requireOnboardingUser() {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user.id) redirect('/login?callbackUrl=%2Fonboarding');
+  if (!session?.user.id) {
+    redirect(getLoginRedirectPath('/onboarding'));
+  }
   return session.user.id;
 }
 
@@ -170,7 +173,9 @@ async function finishOptionalStep({
       skipped,
     });
   } catch (error) {
-    if (error instanceof NotFoundError) redirect('/login');
+    if (error instanceof NotFoundError) {
+      redirect(getLoginRedirectPath('/onboarding'));
+    }
     throw error;
   }
 
