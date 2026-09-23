@@ -34,6 +34,18 @@ Run the default public-only suite without a database:
 pnpm test:e2e
 ```
 
+Run the static Astro Landing smoke suite independently from the Next.js public
+suite. It builds Landing, starts `astro preview` on port 4173 by default, and
+checks desktop/mobile semantics, SEO output, crawler policy, and 404 behavior:
+
+```bash
+pnpm test:e2e:landing
+```
+
+Set `E2E_LANDING_PORT` to choose another local port. Like the rest of this
+workspace, the Landing project is built from its production artifact and does
+not need a database or app secrets.
+
 To select the public project explicitly, run:
 
 ```bash

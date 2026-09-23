@@ -17,6 +17,7 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e --filter=@mini-workout/e2e",
+    "test:e2e:landing": "turbo run test:e2e:landing --filter=@mini-workout/e2e",
     "test:e2e:admin": "turbo run test:e2e:admin --filter=@mini-workout/e2e",
     "test:e2e:db": "turbo run test:e2e:db --filter=@mini-workout/e2e",
     "test:e2e:ci-local": "pnpm --filter @mini-workout/e2e test:e2e:ci-local",

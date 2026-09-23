@@ -1,0 +1,27 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import type { JsonLd } from '../lib/seo/index.js';
+
+const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const jsonLd: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Mini Workout',
+  url: siteUrl,
+};
+---
+
+<SiteLayout
+  title="Mini Workout | Public site foundation"
+  description="The public Mini Workout website is being prepared for campaign and editorial content."
+  canonicalPath="/"
+  jsonLd={jsonLd}
+>
+  <section class="page-content" aria-labelledby="page-title">
+    <h1 id="page-title">A home for Mini Workout stories and campaigns.</h1>
+    <p>
+      The static site foundation is in place. Reviewed home, campaign, pricing,
+      and editorial content will be added in the next implementation phase.
+    </p>
+  </section>
+</SiteLayout>

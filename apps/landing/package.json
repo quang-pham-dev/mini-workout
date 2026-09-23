@@ -1,0 +1,38 @@
+{
+  "name": "@mini-workout/landing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "start": "astro preview --host 0.0.0.0",
+    "check-types": "astro check",
+    "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts' astro.config.mjs vitest.config.ts --max-warnings 0",
+    "format": "prettier --plugin prettier-plugin-astro --check .",
+    "format:fix": "prettier --plugin prettier-plugin-astro --write .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "astro": "7.3.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@mini-workout/design-system": "workspace:*",
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/typescript-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@tailwindcss/vite": "catalog:ui-styling",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-astro": "1.0.1",
+    "tailwindcss": "catalog:ui-styling",
+    "typescript": "catalog:",
+    "vitest": "catalog:test-unit"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

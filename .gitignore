@@ -34,6 +34,7 @@ playwright/.cache/
 
 # Build Outputs
 .next/
+apps/landing/.astro/
 out/
 build/
 dist/

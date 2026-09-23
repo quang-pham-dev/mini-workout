@@ -1,0 +1,905 @@
+# Landing Platform Architecture and Delivery Plan
+
+**Status:** Architecture and MVP fallbacks approved; static foundation may proceed; preview/publish integration gates remain open
+**Date:** 2026-09-22
+**Owner:** Frontend / Growth Platform
+**Decision class:** Cross-app architecture, content platform, experimentation, SEO
+
+## 1. Executive decision
+
+Create `apps/landing` as an independently deployable Astro application for
+public acquisition content. Keep `apps/web` as the authenticated Next.js product
+application and `apps/admin` as the operational TanStack Start admin.
+
+Recommended production topology:
+
+```text
+example.com                    -> apps/landing
+app.example.com                -> apps/web
+admin.example.com              -> apps/admin
+studio.example.com             -> hosted Sanity Studio
+```
+
+Recommended stack:
+
+- Astro 7, TypeScript and Tailwind CSS 4 for static-first public pages.
+- React 19.2 islands only where browser state or interaction is required.
+- `@mini-workout/design-system` for shared brand semantics; use
+  `@mini-workout/ui` selectively rather than making all Landing sections React.
+- Sanity as the headless CMS and editor preview system.
+- PostHog for analytics, feature flags and experiment analysis, behind a
+  consent-aware app adapter.
+- Vercel with independent projects for Landing and Web; re-evaluate Cloudflare
+  only when edge economics or Workers-specific requirements justify a second
+  platform.
+- Playwright for public journeys, metadata/canonical checks and visual
+  regression; Vitest for schemas, content mapping and experiment policy.
+
+This separation is intentional. Marketing releases, CMS publication, cache
+invalidation, SEO crawling and traffic spikes have a different lifecycle from
+authenticated product releases and database/session availability.
+
+## 2. Discovery findings
+
+### Current system
+
+- The monorepo already standardizes React 19.2, TypeScript 5.9, Tailwind CSS 4,
+  pnpm and Turborepo. Astro adds a second frontend framework intentionally for
+  a content-first workload.
+- `apps/web` currently owns `/`, `/login`, `/register` and authenticated product
+  routes. The root route checks the database-backed session and onboarding
+  profile before rendering landing content.
+- The root metadata only defines a title and description. No application-owned
+  `robots.ts`, `sitemap.ts`, canonical policy, Open Graph/Twitter assets or
+  structured-data policy was found.
+- `apps/web` has Cache Components enabled, but the root acquisition route is
+  coupled to per-request session reads and redirects.
+- PostHog is already installed and wrapped by a consent-aware adapter. The
+  adapter is currently focused on error capture/identity; it does not define a
+  growth-event or experiment contract.
+- Browser PostHog configuration in Web reads server-style environment names
+  from a client module. Landing must define an Astro-specific, validated public
+  configuration contract and must not copy this ambiguity.
+- `apps/admin` manages product operations. It should not become a custom CMS in
+  the first landing release.
+- The worktree has unrelated in-progress Web/Core/E2E changes. Implementation
+  must avoid modifying or reverting those changes accidentally.
+
+### Problem classification
+
+This is cross-cutting work involving Astro architecture, React islands,
+external content data, static builds, preview SSR, analytics, privacy,
+routing/deployment, SEO and browser testing.
+
+### Scope
+
+In scope:
+
+- Public home, campaigns, pricing, articles and category SEO pages.
+- Editorial workflow: draft, preview, schedule/release, publish and rollback.
+- Controlled CTA/island A/B tests in the MVP; broader page/content experiments
+  remain a follow-up behind CDN and SEO validation.
+- Technical SEO, performance budgets, accessibility and observability.
+- Migration of the public root from `apps/web` to `apps/landing`.
+
+Out of scope for the first release:
+
+- Rebuilding Sanity features inside `apps/admin`.
+- Moving authenticated product pages, auth or product data into Landing.
+- Personalizing crawlable SEO body content by user profile.
+- An unrestricted drag-and-drop page builder or arbitrary editor-authored HTML.
+- A generic `types` or `contracts` package without a second runtime consumer.
+
+## 3. Architecture decision record
+
+### ADR-1: Separate Landing deployable
+
+**Decision:** Add `apps/landing`; do not continue growing the root landing page
+inside `apps/web`.
+
+**Why:**
+
+- Public pages can prerender and cache without touching auth or PostgreSQL.
+- A product outage or migration does not need to make acquisition pages fail.
+- Marketing can publish content without releasing the product app.
+- Independent analytics consent, CSP, scripts and performance budgets are easier
+  to enforce.
+- Traffic, ownership and release cadence can scale independently.
+
+**Cost:** Another deployment, environment set and E2E server. Shared navigation
+between domains becomes a real external boundary. Authentication cookies and
+redirect URLs must be reviewed during domain migration.
+
+**Rejected for target state:** A `(marketing)` route group in `apps/web` is a
+reasonable short-lived MVP, but it retains deployment/runtime coupling and does
+not satisfy the stated growth-platform direction.
+
+### ADR-2: Use Astro for Landing
+
+**Decision:** Use Astro 7 for `apps/landing`; retain Next.js for `apps/web` and
+TanStack Start for `apps/admin`.
+
+**Why:** The MVP is predominantly public, content-heavy and non-personalized.
+Astro produces static HTML by default, minimizes browser JavaScript and provides
+explicit hydration boundaries for the limited interactive areas. This makes the
+desired SEO/performance architecture the default rather than a convention that
+every contributor must remember.
+
+**Cost:** The monorepo gains a second frontend framework, Astro adapter/runtime
+configuration, Astro-specific tests and a more involved Sanity preview
+integration. The technical spike in Section 9 must prove these costs are
+bounded before implementation proceeds.
+
+**Guardrails:**
+
+- Primary content and page sections are `.astro` components by default.
+- React is used only for genuine islands such as pricing controls, forms,
+  calculators, media players, consent and experiment exposure.
+- Do not add `client:*` hydration to a component without documenting the browser
+  capability it requires.
+- Do not turn production pages into SSR merely to support editorial preview.
+- Do not force existing React UI primitives into Landing where semantic HTML and
+  an Astro component are smaller and clearer.
+
+### ADR-3: Sanity as CMS
+
+**Decision:** Use Sanity for landing/editorial content, with a separately hosted
+Studio and an Astro SSR preview surface.
+
+**Why:** Structured schemas, references, image pipeline, draft/published
+perspectives, Presentation/visual editing and the official Astro integration
+match the marketing/content workflow without building a CMS in product admin.
+
+**Alternatives:**
+
+- Contentful is viable if procurement or the organization already standardizes
+  it. Re-evaluate pricing, locale/release limits and preview workflow first.
+- Payload is viable when self-hosting/data ownership is mandatory, but the team
+  then owns CMS availability, upgrades, security and media operations.
+- Markdown/MDX is insufficient for non-engineering campaign ownership and
+  scheduled editorial workflows.
+
+**Exit strategy:** Keep GROQ queries and Sanity value mapping inside
+`apps/landing/src/lib/cms` and feature query modules. Astro components and React
+islands consume validated app-owned view models, not raw vendor documents.
+
+### ADR-4: Constrained section system, not free-form pages
+
+Model pages as an ordered union of approved section types, for example:
+
+```text
+hero | logoCloud | valueProposition | featureGrid | testimonialSet |
+workoutCollection | comparison | faq | richText | conversionCta
+```
+
+Every section has a schema version, explicit fields, design variants and
+accessibility constraints. Editors can order approved sections and choose
+supported variants, but cannot inject scripts, arbitrary CSS or arbitrary HTML.
+
+This keeps design quality, Core Web Vitals, schema migrations and automated
+testing manageable. Unknown section versions fail closed in preview and are
+reported; production skips the invalid section and reports once without
+bringing down the entire page.
+
+### ADR-5: Separate content publication from experimentation
+
+CMS documents define content and eligible variants. PostHog owns assignment,
+exposure and experiment analysis. Do not encode experiment allocation logic in
+CMS documents.
+
+Experiment policy:
+
+- The default, indexable page is complete and meaningful without JavaScript.
+- Never show special content only to crawlers.
+- MVP tests are limited to small CTA/island variants with reserved, equivalent
+  layout. The control renders by default; variant assignment and exposure are
+  enabled only after consent. If consent is absent, serve the control and do not
+  emit experiment analytics.
+- Do not change the indexable page title, description, `h1`, primary body,
+  canonical, structured data or crawl directive in an MVP experiment.
+- Tests that materially change indexable copy use stable variant URLs or
+  platform rewrites, a canonical link to the control URL and temporary (`302`)
+  redirects where redirects are used.
+- Canonical, robots directives, structured data and primary page topic do not
+  vary by experiment assignment.
+- Assignment is sticky; exposure is recorded once only after the user actually
+  sees the variant. Conversion events include experiment/variant identifiers
+  from an allowlist and no PII.
+- Tests have owner, hypothesis, primary metric, guardrail metrics, start/end
+  dates, sample-size/stopping rule and cleanup date.
+
+Do not read an experiment cookie in the top-level layout by default: it would
+make otherwise cacheable pages request-dependent. For high-volume server-side
+tests, prefer CDN/platform assignment and rewrites to separately prerendered
+variant routes.
+
+## 4. Target repository design
+
+```text
+apps/landing/
+  src/pages/
+    index.astro
+    pricing.astro
+    campaigns/[slug].astro
+    articles/[slug].astro
+    categories/[slug].astro
+    api/draft-mode/enable.ts
+    api/draft-mode/disable.ts
+    api/health/live.ts
+  src/layouts/
+    site-layout.astro
+    article-layout.astro
+    preview-layout.astro
+  src/features/
+    marketing-page/
+      components/*.astro
+      marketing-page-queries.ts
+      marketing-page-schema.ts
+    campaign/
+    article/
+    category/
+    pricing/
+    seo/
+    experimentation/
+  src/components/
+    sections/*.astro
+    analytics/
+    consent/
+    navigation/
+  src/islands/
+    pricing/
+    forms/
+    experimentation/
+  src/lib/
+    cms/
+      client.ts
+      image.ts
+      preview.ts
+      query.ts
+      view-models.ts
+    analytics/
+    env/
+    observability/
+  public/
+  tests/
+  docs/ARCHITECTURE.md
+  astro.config.mjs
+  package.json
+  turbo.json
+```
+
+Sanity Studio should be a vendor-hosted project initially. If source-controlled
+Studio configuration is required, add `apps/studio` as a separate workspace;
+do not embed it into the public production route tree.
+
+Dependency direction:
+
+```text
+apps/landing -> packages/ui -> packages/design-system
+             -> packages/design-system directly
+             -> packages/observability
+             -> packages/core/errors (stable error contract only)
+             -> config packages
+             -> Sanity/PostHog adapters owned by apps/landing
+```
+
+`@mini-workout/ui` remains optional for React islands. Static Astro sections
+consume design tokens and app-owned Astro components directly.
+
+Landing must not depend on `@mini-workout/database`, `@mini-workout/auth` or
+product repositories. If it imports `@mini-workout/core/errors`, Spike B must
+prove the public subpath does not pull database runtime code into Landing. Links
+to sign-up/login are external, environment-derived URLs targeting `apps/web`.
+
+## 5. Content model
+
+Minimum document types:
+
+- `siteSettings`: brand defaults, organization data, default SEO and social
+  images; singleton.
+- `navigation` and `footer`: named menus with validated internal/external links.
+- `marketingPage`: title, slug, lifecycle state, ordered sections, SEO fields,
+  locale, publication dates and redirect predecessor.
+- `campaignPage`: campaign identifier, audience description, start/end dates,
+  acquisition metadata and sections.
+- `article`, `author`, `category` and `topic`: required in the MVP for organic
+  editorial and category SEO pages.
+- Reusable `testimonial`, `faqSet`, `mediaAsset` and `cta` references where
+  governance or reuse is real.
+- `experimentContentVariant`: content references only; no allocation percentages
+  or analytics credentials.
+
+Required validation:
+
+- Unique normalized slugs and reserved-path denylist.
+- Required title/meta description and canonical policy.
+- Image dimensions, focal point and meaningful alt text; explicit decorative
+  image option.
+- Link validation and safe protocols.
+- Heading hierarchy represented structurally, not as arbitrary rich text.
+- Schedule/end-date consistency and campaign expiry behavior.
+- Locale fallback policy before localization is enabled.
+
+Model evolution uses schema versions plus mapping functions. Do not render raw
+Portable Text or URL fields without a controlled component map and protocol
+validation.
+
+## 6. Rendering, cache and publication flow
+
+Production publication and read flow:
+
+```text
+Sanity publish -> signed webhook -> Vercel deploy hook -> Astro static build
+               -> atomic CDN deployment
+
+request -> static HTML/CDN -> Astro-rendered sections
+        -> optional React islands for interaction only
+```
+
+- Production uses static output for home, pricing, campaigns, articles and
+  categories. A CMS outage cannot remove already deployed HTML.
+- A signed Sanity webhook triggers a new build. The deployment is atomic and the
+  previous successful deployment remains the rollback target.
+- Initial publication SLA is 2-5 minutes. Measure real build duration before
+  agreeing a stricter SLA.
+- Preview runs through a separate Astro server deployment, validates the Sanity
+  preview URL secret, reads draft/release perspective and sets Sanity's secure
+  perspective cookie. It is always `noindex` and uncached.
+- The SSR preview deployment must be protected by Vercel Deployment Protection
+  (or equivalent access control). The perspective cookie is a mode indicator,
+  not a signed authorization token; a forged cookie can activate draft reads on
+  an otherwise public SSR preview host. Never expose that host unprotected.
+- Production and preview may be separate Vercel projects or separate deployment
+  modes from the same source. The spike must prove the simplest secure option.
+- CMS tokens never enter normal production HTML, client bundles or logs.
+- Introduce selective on-demand rendering only after measured build time,
+  activation precision or page volume makes full static deploys insufficient.
+- Campaign expiry must be explicit: unpublish plus `410`, redirect to an
+  evergreen successor, or retain an archived canonical page. Avoid silent soft
+  404s.
+
+## 7. SEO contract
+
+Every indexable route must have:
+
+- Unique title, description, canonical URL and crawl directive.
+- Stable server-rendered `h1` and meaningful primary content.
+- Open Graph and Twitter metadata with a deterministic image fallback.
+- Correct `html lang`; `hreflang` and localized sitemap entries only when real
+  translated pages exist.
+- Breadcrumbs for nested editorial routes and valid JSON-LD chosen by page
+  semantics (`Organization`, `WebSite`, `WebPage`, `Article`, `BreadcrumbList`,
+  and `FAQPage` only where eligible).
+- Sitemap entries sourced only from published/indexable documents, with real
+  `lastModified` values; no experiment or preview URLs.
+- Generated `robots.txt` excludes preview/internal paths but does not use robots
+  as a duplicate-content strategy.
+- Real 404/410 status for absent/expired pages; permanent redirects for approved
+  slug migrations and temporary redirects for experiments.
+
+Quality budgets at p75 field data, segmented mobile/desktop:
+
+- LCP <= 2.5 s, INP <= 200 ms, CLS <= 0.1.
+- Set an initial page JavaScript budget (target <= 120 KB compressed first-party
+  JS on a standard content page) and revise using measured requirements.
+- No client-only primary content and no analytics/CMS vendor scripts in the
+  critical render path.
+- Use Astro's image service or controlled Sanity image URLs, declared
+  dimensions/aspect ratio, responsive `sizes`, local fonts and limited font
+  weights.
+
+Automated metadata tests are necessary but not sufficient. Pre-launch requires
+rendered HTML inspection, Rich Results validation where relevant, Lighthouse
+CI/synthetic checks and Search Console verification after release.
+
+## 8. Analytics and privacy contract
+
+Define a small typed event vocabulary before adding tracking:
+
+- `landing_page_view`
+- `campaign_view`
+- `cta_clicked`
+- `signup_started`
+- `experiment_exposure`
+- `content_engaged` only with a precise threshold definition
+
+Required properties are allowlisted: route template, campaign ID, content ID,
+CTA ID, experiment key, variant key, referrer class and UTM values after length
+and character validation. Never send free-form form fields, email, full URL
+query strings, auth tokens or CMS draft data.
+
+Use a conservative global baseline: non-essential analytics and experimentation
+start only after consent, the site remains fully usable after denial, consent is
+versioned and the banner reserves layout space. Product/legal must still approve
+jurisdictions, retention and exact copy. Analytics failure is always best-effort
+and must not fail navigation or conversion.
+
+Do not share the Product auth cookie across `.example.com`. MVP attribution is
+aggregate-only: measure consented Landing campaign/CTA activity and Product
+conversion totals separately, without joining a Landing identity or campaign to
+an individual Product signup. Do not pass attribution tokens or user-level
+campaign payloads to Product in the MVP. Revisit a privacy-safe exchange only
+after an explicit product/privacy decision and a dedicated replay/logging test.
+
+Start with one primary locale at root paths. Keep schemas locale-aware, but do
+not add `/vi`, `/en` or `hreflang` until a second locale has complete translated
+content, editorial ownership and support. Avoid speculative locale URL churn.
+
+Every HTTP boundary—preview enable/disable, publish webhook and health—uses the
+repository error convention: validate untrusted
+input, classify with stable codes, attach/return `x-request-id`, map expected
+errors safely, report unexpected errors once at the outer boundary and keep
+telemetry best-effort. Never log tokens, cookies, raw query strings, request
+bodies, email or CMS provider details. Boundary tests cover expected status
+mapping, generic unexpected fallback, retry policy, replay/tampering, reporter
+failure, redaction and duplicate-report prevention.
+
+## 9. Delivery plan
+
+### Phase 0 — Risk-reduction spikes
+
+Spikes are disposable, evidence-producing investigations. They are not the
+foundation to quietly evolve into production. Put spike code under a temporary
+branch or `apps/landing-spike`; retain the written findings, measurements and
+minimal reproducible examples, then delete or explicitly rewrite prototype code.
+Each spike has a timebox, owner, hypothesis and binary decision gate. If a gate
+fails, update this ADR before starting the phase that consumes that capability;
+an unresolved preview gate does not block the independent static foundation.
+
+Initial local evidence and unresolved gates are recorded in
+[`2026-09-23-landing-spike-a-results.md`](2026-09-23-landing-spike-a-results.md),
+[`2026-09-23-landing-spike-b-results.md`](2026-09-23-landing-spike-b-results.md),
+[`2026-09-23-landing-spike-c-results.md`](2026-09-23-landing-spike-c-results.md),
+[`2026-09-23-landing-spike-d-results.md`](2026-09-23-landing-spike-d-results.md),
+[`2026-09-23-landing-spike-e-results.md`](2026-09-23-landing-spike-e-results.md)
+and [`2026-09-23-landing-spike-f-results.md`](2026-09-23-landing-spike-f-results.md).
+These reports are checkpoints, not approvals to start production implementation.
+
+| Spike                      | Current evidence                                                            | Gate still needed                                                                               |
+| -------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| A — Astro + Sanity preview | Static/SSR builds and local route behavior pass                             | Real Sanity draft handshake; built Vercel runtime; Deployment Protection and Studio iframe flow |
+| B — workspace UI/CSS       | Static CSS/island fixture and Node public-export resolution pass separately | In-workspace Astro/Vite build and boundary check                                                |
+| C — static scale           | Synthetic 100/1k/10k route builds pass on local Node 25                     | Pinned Node 22 run, representative Sanity data/images, Vercel queue/deploy/rollback measurement |
+| D — static A/B             | Static metadata invariants pass; CTA/island fallback approved               | Full-page/CDN assignment deferred beyond MVP                                                    |
+| E — attribution            | Threat analysis complete; aggregate-only fallback approved                  | Individual-level exchange deferred beyond MVP                                                   |
+| F — SEO/performance        | Static metadata/content and 79.4 KB gzip island-module estimate             | Sanity images, complete page transfer, Lighthouse/a11y and field CWV                            |
+
+**MVP decisions are now recorded:** D uses the CTA/island-only fallback; E uses
+aggregate-only reporting with no user-level cross-domain join. These fallbacks
+close the Phase 0 decision gates for the MVP, while the full CDN experiment and
+attribution protocols remain deferred.
+
+**Phase 1–2 may start with the static foundation.** Spikes A and C do not block
+the Astro workspace shell, SEO shell or static page work. They remain mandatory
+before enabling Sanity draft preview, automated publishing, or promising the
+2–5 minute publish SLA. Spike B's open workspace integration check must be
+completed before adding the shared React UI dependency; until then, use
+design-system CSS exports and Astro-native markup. Spike F's production budget
+and launch checks remain required before rollout.
+
+#### Spike A — Astro + Sanity preview architecture
+
+**Timebox:** 3 engineering days.
+
+**Question:** Can one source tree provide static production output and editorial
+preview on a protected SSR deployment with acceptable complexity on Vercel?
+
+**Prototype:**
+
+- One campaign, one article and one category route.
+- Three section types: hero, rich text and CTA.
+- Published and draft perspectives, click-to-edit overlays and perspective
+  changes in Sanity Presentation.
+- Validated preview enable/disable endpoints, secure bounded cookies and
+  deployment access protection for the SSR preview host. Use HttpOnly, Secure,
+  `SameSite=None` and partitioned cookies when the Presentation iframe requires
+  them; strip secret query parameters before redirecting.
+- Production build that contains no token/stega data and loads no
+  Visual Editing client code.
+- A publish webhook that triggers a preview/protected deployment build.
+
+**Evidence:** architecture diagram, file/dependency inventory, production bundle
+inspection, rendered HTML captures, security checklist, build duration and a
+short editor screen recording.
+
+**Pass:** editor preview updates reliably; production is static and clean;
+preview host access is protected; invalid/expired secrets are rejected;
+iframe cookies persist on supported browsers; secrets are removed from the final
+URL; integration needs no forked vendor package or brittle global monkey patch
+owned by the product team.
+
+**Fail/fallback:** use Next.js for Landing if secure Astro preview remains
+materially more complex or unreliable after the timebox. Do not weaken preview
+security or ship a permanently SSR production site merely to preserve Astro.
+
+#### Spike B — Monorepo UI and CSS interoperability
+
+**Timebox:** 2 engineering days.
+
+**Question:** Can Astro consume the shared Tailwind/design-system foundation
+without duplicated CSS, broken content scanning or shipping unnecessary React?
+
+**Prototype:** render an Astro Button/Card equivalent, one existing React UI
+primitive without hydration and one interactive React island with hydration.
+Test light/dark tokens, fonts, focus states and production CSS output.
+
+**Evidence:** JS/CSS bundle comparison, accessibility scan, dependency graph and
+documented rule for Astro component versus shared React component ownership.
+
+**Pass:** a static content page has no React runtime; tokens render consistently;
+hydrating one island does not hydrate its page ancestors; no source-path imports
+or package-boundary exception is required.
+
+**Fail/fallback:** keep only design tokens shared and build Landing-local Astro
+primitives. Do not convert static sections to React to maximize code reuse.
+
+#### Spike C — Static publication, scale and rollback
+
+**Timebox:** 2 engineering days.
+
+**Question:** Does rebuild-on-publish satisfy the 2-5 minute editorial SLA and
+remain predictable at projected content volume?
+
+**Prototype:** generate representative datasets at 100, 1,000 and 10,000 pages;
+measure cold/cached builds, CMS query volume, artifact size and deployment time.
+Simulate failed CMS fetch, failed build, concurrent publishes and rollback.
+
+**Evidence:** benchmark table with CI-equivalent resources, cost estimate,
+webhook coalescing proposal and thresholds that trigger hybrid/on-demand render.
+
+**Pass:** projected 12-month content volume deploys inside the SLA with bounded
+query/cost behavior; failed builds leave the previous site online.
+
+**Fail/fallback:** selectively render volatile campaign routes on demand or move
+to Next.js/tag invalidation. Do not introduce hybrid rendering without measured
+need and an explicit cache contract.
+
+#### Spike D — Static A/B assignment without SEO or CLS regression
+
+**Timebox:** 3 engineering days.
+
+**Question:** Can Vercel/CDN routing assign sticky variants over prerendered HTML
+while preserving one public URL, canonical control and accurate exposure?
+
+**Prototype:** control and variant static artifacts for one campaign; anonymous
+sticky assignment; no-cookie/bot control; kill switch; consent-aware PostHog
+exposure only after viewport visibility; preview-only forced variant.
+
+**Evidence:** request/response traces, cache-key analysis, rendered canonical and
+robots HTML for each path, CLS measurement and duplicate-exposure test results.
+
+**Pass:** no content flash, canonical does not vary, assignment is stable,
+control is served without cookies and exposure is recorded exactly once.
+
+**Fail/fallback:** limit MVP tests to layout-reserved client islands or explicit
+temporary variant URLs with canonical/302 policy. Do not make every request SSR.
+
+#### Spike E — Cross-subdomain conversion attribution
+
+**Timebox:** 2 engineering days.
+
+**Question:** Can Landing attribution survive navigation to Product without a
+shared auth cookie, PII in URLs or spoofable campaign properties?
+
+**Prototype:** Landing creates/receives sanitized UTM data, issues an opaque
+short-lived signed token, Product exchanges it server-side and associates it
+with a test signup. Cover expiry, replay, tampering, consent denial and missing
+JavaScript.
+
+**Evidence:** sequence diagram, threat notes, payload/log inspection and E2E
+trace with secrets/cookies disabled in retained artifacts.
+
+**Pass:** no PII/raw analytics identity appears in URL or logs; token is bounded,
+expiring and tamper-evident; signup works without the token; auth cookies remain
+host-only.
+
+**Fail/fallback:** use aggregate campaign conversion only until a privacy-safe
+join exists. Never broaden the auth cookie domain to solve attribution.
+
+#### Spike F — SEO, image and JavaScript budget baseline
+
+**Timebox:** 2 engineering days.
+
+**Question:** Can representative Astro pages meet the proposed output and CWV
+budgets with Sanity images, consent and one React island?
+
+**Prototype:** a realistic article and campaign with local fonts, responsive
+images, JSON-LD, PostHog disabled/consented states and one interactive island.
+
+**Evidence:** production bundle report, Lighthouse runs at mobile/desktop,
+no-JavaScript crawl, image candidate inspection and accessibility report.
+
+**Pass:** primary content exists without JavaScript; no hydration mismatch; the
+standard page stays under the 120 KB compressed first-party JS ceiling and meets
+the lab proxies for the stated p75 CWV targets.
+
+**Fail/fallback:** remove/defer islands and third-party scripts, revise image/font
+delivery and remeasure before accepting a higher budget.
+
+#### Spike review gate
+
+At the end of Phase 0, publish one spike report containing:
+
+- decision and confidence for each hypothesis;
+- measurements and reproducible commands;
+- risks retired, risks remaining and explicit fallback selected;
+- dependency/version pins and known vendor limitations;
+- changes required to this execution plan.
+
+Staff Frontend, Growth/Product, Content and Security/Privacy owners sign off the
+relevant gates. The Phase 1–2 static foundation may start with the approved
+fallbacks and the Astro-native/design-token-only boundary. Spike A must pass or
+have an explicitly accepted secure fallback before Phase 3 preview/publishing
+integration; Spike C must have representative evidence or an explicitly revised
+publish SLA before automated publishing is enabled. Spike B must pass before
+the shared React UI package is added. D/E are closed for MVP scope by the
+fallbacks recorded above; broader variants or user-level attribution require
+new spikes. Spike F's SEO/performance checks are a launch gate, not a scaffold
+gate.
+
+### Phase 1 — Workspace foundation
+
+**Implementation status (2026-09-23):** In progress; Phase 1–2 foundation
+commit prepared. Implemented: static Astro workspace, design-token CSS boundary,
+validated canonical-origin environment, package scripts, Turbo build hashing,
+fail-closed crawler policy, static SEO shell (layout, metadata, JSON-LD,
+robots/sitemap/manifest and 404), and separate Landing browser coverage. The
+Landing package, E2E project and CI-facing scripts are covered by workspace
+format/lint/type/test/build checks. Not yet complete: Astro file-level
+feature-boundary enforcement, comprehensive SEO route/sitemap assertions,
+brand-provided icon/social assets, campaign-specific 410/expiry behavior,
+performance budget enforcement in CI, and production domain/indexing rollout.
+Preview/SSR and publish automation remain gated by Spikes A and C; do not treat
+this foundation as launch-ready.
+
+1. Scaffold `apps/landing` with package-local `dev`, `build`, `start`, `lint`,
+   `format`, `check-types`, `test` and `test:coverage` scripts.
+2. Register only required Turbo environment inputs/outputs. Root scripts remain
+   delegators through `turbo run`.
+3. Configure Astro static production output and Tailwind/design-system CSS.
+   Defer the Vercel SSR adapter and preview-only integrations to Phase 3 after
+   Spike A; add React integration only after Spike B or when a measured MVP
+   island requires it.
+4. Establish Landing feature-boundary ESLint rules and an initial
+   Astro-native/design-token-only ownership rule. Add the shared React UI
+   boundary only after Spike B passes.
+5. Add validated server/public environment modules and `.env.example` without
+   credentials.
+6. Initialize observability with service name `landing`; defer runtime health
+   routes until the server adapter is selected in Phase 3.
+7. Extend E2E port/server orchestration with a distinct Landing project rather
+   than renaming the existing Web public fixture in one large step.
+
+**Tests:** config/env unit tests, boundary negative fixtures, health smoke and
+desktop/mobile empty-shell E2E.
+
+### Phase 2 — SEO and static shell baseline
+
+1. Build root layout, semantic header/footer, skip link, focus behavior and
+   responsive navigation.
+2. Add reusable head/SEO component, canonical utility, generated `robots.txt`,
+   sitemap, web manifest, icons and generated/static social fallback.
+3. Add safe JSON-LD serializer that escapes `<` and accepts schema-owned view
+   models only.
+4. Establish adapter-appropriate 404/410, error and campaign-expiry behavior.
+5. Add performance budgets and bundle inspection to CI.
+
+**Tests:** rendered metadata/canonical/robots/sitemap, heading landmarks,
+keyboard navigation, no-JS content, 404 status and structured-data snapshots.
+
+**Next implementation slice:** finish the Phase 1–2 exit criteria before
+starting CMS preview/publishing or production rollout:
+
+1. Add Astro-aware lint/boundary checks so `.astro` files follow the
+   Astro-native/design-token-only ownership rule and cannot silently import
+   app internals across package boundaries.
+2. Add automated rendered-output contracts for canonical/meta, JSON-LD,
+   robots, sitemap URL membership, semantic landmarks, keyboard skip-link and
+   no-JavaScript content. Include explicit production-indexing opt-in and
+   default fail-closed cases.
+3. Establish an initial compressed-JavaScript and static artifact budget in
+   CI, then record a representative article/campaign baseline for Spike F.
+4. Request approved brand icons/social fallback assets before closing the
+   asset-dependent SEO items. Define campaign expiry/410 behavior when the
+   campaign content model and retention policy are agreed; do not invent
+   campaign URLs or expiry dates in the shell.
+5. After these gates, proceed with Phase 3 schemas and published-content
+   mapping against local fixtures. Keep preview endpoints and publish webhooks
+   disabled until Spikes A/C pass or their fallbacks are explicitly accepted.
+
+**Phase 1–2 exit gate:** every item above is either implemented with tests or
+recorded as an explicit input/gate with an owner; static output remains
+noindex/disallowed by default, and the production indexing switch is exercised
+only in an isolated build test.
+
+### Phase 3 — CMS foundation and editorial preview
+
+This phase may proceed in two subtracks. CMS schemas and published-content
+mapping may be developed against local fixtures. Do not expose draft-preview
+routes until Spike A's secure-preview gate passes (or a secure fallback is
+explicitly accepted). Do not expose the publish webhook until Spike C has
+representative build/deploy evidence or the team approves a revised SLA. Keep
+both capabilities off the Phase 1–2 static deployment.
+
+1. Create Sanity schemas and desk structure for settings, navigation, pages,
+   campaigns and approved sections.
+2. Implement server-only client, image builder, query modules and Zod/value
+   mapping at the CMS boundary.
+3. Build the section registry with exhaustive handling and versioned contracts.
+4. Add signed preview-mode enable/disable routes and Presentation/visual editing
+   using the architecture accepted by Spike A.
+5. Add signed/coalesced publish webhook to trigger atomic static deployments;
+   authenticate both Sanity and deployment-provider boundaries.
+6. Document publish, rollback, broken-link and emergency-unpublish runbooks.
+
+**Tests:** query mapper fixtures, invalid/unknown sections, webhook signature,
+replay/coalescing behavior, preview authorization, preview `noindex`, no token or
+stega leakage in production, failed-build rollback and CMS-outage static serving.
+
+### Phase 4 — MVP pages and design system
+
+1. Implement approved page templates and section components from design specs.
+2. Add new shared primitives to `packages/ui` only when both Landing and another
+   app have a real reusable contract; add Storybook stories and a11y checks.
+3. Implement responsive images and reserved media dimensions.
+4. Seed representative home, campaign, pricing, article and category content.
+5. Validate authoring constraints with marketing/content users.
+
+**Tests:** section unit/component tests, Storybook a11y, visual snapshots at
+agreed breakpoints, CMS empty states, long-copy stress and reduced motion.
+
+### Phase 5 — Analytics and experimentation
+
+1. Define typed event and property schemas; extend the PostHog adapter without
+   letting features call the SDK directly.
+2. Implement the conservative consent baseline and explicit Astro public PostHog
+   configuration validation.
+3. Keep cross-domain attribution aggregate-only for the MVP; do not mint or
+   exchange per-user tokens and keep Product auth cookies host-only.
+4. Implement only deterministic, consent-gated CTA/island variants with
+   reserved layout and one-time visible exposure semantics. Keep primary SEO
+   content on the control; do not add CDN/full-page assignment in the MVP.
+5. Implement experiment registry, kill switch, preview override restricted to
+   staff/preview mode and expiry enforcement.
+6. Launch an A/A test before the first A/B test to validate allocation and event
+   joins.
+
+**Tests:** deterministic island allocation, consent denied/granted, no PII
+property acceptance, no duplicate exposures, control behavior without consent,
+reserved-layout CLS and analytics-provider failure. Verify aggregate reporting
+does not join campaign activity to individual signup identities.
+
+### Phase 6 — Domain migration and rollout
+
+1. Deploy Landing and editorial preview to approved non-production domains; keep
+   all non-production surfaces excluded from indexing.
+2. Crawl the rendered preview and compare URL/status/canonical/sitemap maps.
+3. Configure `example.com`, `app.example.com`, `admin.example.com` and
+   `studio.example.com`, plus TLS, security headers, CSP and allowed
+   frame/image/connect origins.
+4. Update Better Auth base/trusted origins, OAuth/email callback URLs if present,
+   cross-domain navigation and cookie policy. Keep Product auth cookies
+   host-only.
+5. Apply explicit permanent redirects for moved marketing URLs. Keep login and
+   registration redirects intentional and tested.
+6. Run smoke, a11y, visual, performance and synthetic monitoring checks; then
+   cut traffic gradually with a documented rollback switch.
+7. Submit sitemap/Search Console configuration and watch crawl, CWV, conversion,
+   error and CMS webhook metrics.
+
+**Rollback:** restore previous domain routing; keep old Web root available for
+one release window; do not delete old routes until crawl and conversion metrics
+are stable.
+
+### Phase 7 — Operational hardening
+
+1. Add scheduled broken-link, stale campaign and experiment-expiry reports.
+2. Add editor preview/publish SLOs and webhook failure alerts.
+3. Review search queries, content performance and CWV monthly.
+4. Revisit CMS/vendor costs and content model complexity after real usage.
+
+## 10. Acceptance criteria
+
+- `apps/landing` builds and deploys without database or auth secrets.
+- Phase 0 spike report records reproducible evidence and every mandatory gate has
+  passed or has an explicitly approved fallback.
+- Published public pages render meaningful HTML with JavaScript disabled.
+- Content editors can create, preview, review, publish and roll back an approved
+  page without a code deployment.
+- Publishing triggers an authenticated, atomic static deployment and becomes
+  visible within the agreed 2-5 minute initial SLA; a failed build leaves the
+  previous deployment available.
+- Draft/preview content is authenticated, uncached and excluded from indexing.
+- Sitemap, robots, canonical, metadata, social image and JSON-LD contracts pass
+  automated tests for every indexable page type.
+- MVP CTA/island assignment is stable after consent, exposure is not
+  double-counted, and SEO primary content/metadata always match the control.
+- MVP conversion reporting is aggregate-only; no Landing identity or campaign
+  is joined to an individual Product signup.
+- Landing meets agreed p75 CWV thresholds and accessibility checks on target
+  devices.
+- Product login/register/onboarding flows remain functional after domain split.
+- Analytics is consent-aware, sanitized and never blocks conversion.
+- CMS/PostHog outages degrade safely and are observable; an already deployed
+  static site continues to serve during a CMS outage.
+
+## 11. Verification commands (target state)
+
+```bash
+pnpm --filter @mini-workout/landing lint
+pnpm --filter @mini-workout/landing check-types
+pnpm --filter @mini-workout/landing test
+pnpm --filter @mini-workout/landing build
+pnpm --filter @mini-workout/storybook build
+pnpm --filter @mini-workout/e2e test
+pnpm --filter @mini-workout/e2e test:e2e --project=landing --project=landing-mobile
+pnpm exec turbo boundaries
+pnpm exec turbo run build lint check-types test --affected
+```
+
+Add Lighthouse/performance and link/crawl commands only after the team selects
+the CI tool; do not hide vendor-specific commands behind root task logic.
+
+## 12. Principal concerns and mitigations
+
+| Concern                                      | Impact                                           | Mitigation / decision gate                                                                                                 |
+| -------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Domain split changes auth and attribution    | Broken login/callbacks or privacy-invasive joins | Explicit URL/cookie/callback inventory; E2E auth journeys; MVP keeps auth cookies host-only and attribution aggregate-only |
+| Astro adds a second framework                | More tooling and cognitive load                  | Spike A/B, narrow app boundary, local architecture docs, no framework leakage into shared packages                         |
+| Astro/Sanity preview is more custom          | Editor friction or draft leakage                 | Mandatory Spike A; SSR only for preview; signed secret; production bundle inspection; Next.js fallback                     |
+| Full static rebuild becomes too slow         | Missed publishing SLA                            | Spike C at projected scale; webhook coalescing; measured threshold for selective on-demand rendering                       |
+| CMS becomes an unbounded page builder        | Design drift, regressions, slow pages            | Constrained typed sections, variants, schema validation, content governance                                                |
+| Per-request experiments destroy cacheability | Higher TTFB/cost and weaker resilience           | MVP is CTA/island-only; no per-request SSR or CDN rewrite; re-open a spike before material page variants                   |
+| Client-side flags cause flicker/CLS          | Poor UX and unreliable exposure                  | Control by default; consent-gated island variant in equivalent reserved layout; measure visibility before exposure         |
+| Experiment content harms SEO                 | Duplicate/cloaked pages and unstable snippets    | Same bot/user policy, canonical control, 302 for temporary redirect tests, finite duration                                 |
+| Preview token or draft leakage               | Confidential content exposure                    | Server-only least-privilege token, signed preview endpoint, `noindex`, redacted logs, token rotation                       |
+| CMS outage blocks publication                | Stale content, not site downtime                 | Static deployed output, failed-build isolation, publish alert and rollback runbook                                         |
+| Third-party scripts hurt CWV/privacy         | Search/conversion loss and compliance risk       | Consent gate, lazy load, CSP, script inventory and performance budget                                                      |
+| Sharing UI couples brand releases            | Cross-app regressions                            | Share primitives/tokens only; keep page sections app-owned; Storybook and affected builds                                  |
+| Two public apps confuse ownership            | Duplicate routes/canonicals                      | One canonical domain owner per path, routing manifest and redirect test suite                                              |
+| Editorial schema changes break old pages     | Runtime failures                                 | Versioned section contracts, migration scripts, exhaustive registry, safe unknown handling                                 |
+| Measurement is statistically invalid         | Wrong product decisions                          | A/A test, experiment brief, one primary metric, stopping rule, guardrail metrics, cleanup owner                            |
+
+## 13. Confirmed decisions and remaining organizational gates
+
+Confirmed:
+
+- Domains: `example.com`, `app.example.com`, `admin.example.com` and
+  `studio.example.com`.
+- MVP routes: home, campaign, pricing, article and category SEO pages.
+- Landing framework: Astro, subject to the mandatory technical spike gates.
+- CMS: Sanity with separately deployed Studio.
+- Analytics/experimentation: PostHog behind app-owned adapters and consent.
+- Deployment default: Vercel, static production plus SSR editorial preview.
+- Localization: one primary root locale initially; schemas are locale-ready but
+  no speculative locale paths or `hreflang`.
+- MVP experimentation: consent-gated CTA/island variants only; SEO primary
+  content and metadata remain unchanged. Full-page/CDN experiments are deferred.
+- MVP attribution: aggregate Landing and Product counts only; no user-level
+  cross-subdomain join and no shared auth cookie.
+- Editorial roles: Author, Reviewer/Editor, Publisher and restricted Admin.
+- Experiment roles: Growth proposes, Product/Analytics approves methodology,
+  Publisher activates, Engineering approves new technical capabilities.
+
+Before production rollout, organizational owners still approve:
+
+1. Sanity and PostHog procurement, region/data-residency and retention settings.
+2. Applicable consent jurisdictions, legal copy and deletion/subject-request
+   process.
+3. Primary aggregate conversion definition and reporting retention window.
+4. Named publishers, incident contacts and emergency rollback SLA.
+5. Twelve-month page-volume forecast used by Spike C.
+6. Whether publication scheduling must be accurate to the minute; if so, the
+   static webhook/deploy latency may require a selective runtime route.
+
+## 14. Reference rationale
+
+- Astro defaults to prerendered static HTML and supports opt-in on-demand routes
+  through official Vercel, Cloudflare, Netlify and Node adapters.
+- Astro framework components render without client JavaScript unless an explicit
+  `client:*` hydration directive is used.
+- Sanity provides an official Astro integration and documented Presentation,
+  draft perspective and Visual Editing workflow, but preview needs SSR and more
+  application-owned integration than Next.js; Spike A validates that trade-off.
+- Google recommends avoiding cloaking, canonicalizing alternate experiment URLs,
+  using temporary redirects for redirect tests and ending experiments promptly.

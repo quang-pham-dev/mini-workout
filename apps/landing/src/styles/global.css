@@ -1,0 +1,92 @@
+@import '@mini-workout/design-system';
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  min-width: 20rem;
+}
+
+a {
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+.site-header,
+.site-footer,
+.page-content {
+  width: min(100% - 2rem, 72rem);
+  margin-inline: auto;
+}
+
+.site-header,
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-header {
+  min-height: 4.5rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.site-footer {
+  min-height: 4rem;
+  border-top: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.page-content {
+  min-height: min(60vh, 40rem);
+  padding-block: clamp(4rem, 12vw, 9rem);
+}
+
+.page-content h1 {
+  max-width: 16ch;
+  color: var(--color-text-primary);
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.page-content p {
+  max-width: 62ch;
+  margin-top: 1.5rem;
+  color: var(--color-text-secondary);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.7;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+  transform: translateY(-150%);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 36rem) {
+  .site-header,
+  .site-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 1rem;
+  }
+}

@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+import SeoHead from '../components/SeoHead.astro';
+import type { JsonLd } from '../lib/seo/index.js';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  noindex?: boolean;
+  jsonLd?: JsonLd;
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  noindex = !import.meta.env.LANDING_INDEXABLE,
+  jsonLd,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <SeoHead
+      title={title}
+      description={description}
+      canonicalPath={canonicalPath}
+      noindex={noindex}
+      jsonLd={jsonLd}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">
+      Skip to content
+    </a>
+    <header class="site-header">
+      <a href="/" aria-label="Mini Workout home">
+        <strong>Mini Workout</strong>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/">Home</a>
+      </nav>
+    </header>
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <span>Mini Workout</span>
+      <span>Small steps, built to last.</span>
+    </footer>
+  </body>
+</html>

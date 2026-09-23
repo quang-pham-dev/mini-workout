@@ -1,0 +1,12 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["LANDING_INDEXING_ENABLED", "LANDING_SITE_URL", "VERCEL_ENV"],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"]
+    },
+    "dev": {
+      "persistent": true
+    }
+  }
+}

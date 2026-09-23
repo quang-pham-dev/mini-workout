@@ -13,6 +13,7 @@
     "test": "pnpm test:policy",
     "test:policy": "node --test --test-concurrency=1 --experimental-strip-types fixtures/*.test.ts",
     "test:e2e": "playwright test",
+    "test:e2e:landing": "playwright test --config=playwright.landing.config.ts",
     "test:e2e:admin": "playwright test --project=admin --project=admin-mobile",
     "test:e2e:db": "playwright test --project=db",
     "test:e2e:verification": "playwright test --config=playwright.verification.config.ts",

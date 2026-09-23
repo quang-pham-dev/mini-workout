@@ -1,0 +1,17 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Page not found | Mini Workout"
+  description="The page you requested could not be found."
+  canonicalPath="/404/"
+  noindex={true}
+>
+  <section class="page-content" aria-labelledby="page-title">
+    <h1 id="page-title">This page could not be found.</h1>
+    <p>
+      <a href="/">Return to the Mini Workout home page.</a>
+    </p>
+  </section>
+</SiteLayout>

@@ -99,6 +99,17 @@
       "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT", "E2E_ADMIN_PORT"],
       "cache": false
     },
+    "test:e2e:landing": {
+      "dependsOn": ["@mini-workout/landing#build"],
+      "env": [
+        "E2E_LANDING_PORT",
+        "LANDING_INDEXING_ENABLED",
+        "VERCEL_ENV",
+        "PLAYWRIGHT_HTML_OUTPUT_DIR",
+        "PLAYWRIGHT_OUTPUT_DIR"
+      ],
+      "cache": false
+    },
     "test:e2e:admin": {
       "dependsOn": ["@mini-workout/web#build", "@mini-workout/admin#build"],
       "env": ["E2E_PUBLIC_PORT", "E2E_DATABASE_PORT", "E2E_ADMIN_PORT"],

@@ -1,0 +1,38 @@
+---
+import type { JsonLd } from '../lib/seo/index.js';
+import { canonicalUrl, serializeJsonLd } from '../lib/seo/index.js';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  noindex?: boolean;
+  jsonLd?: JsonLd;
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  noindex = !import.meta.env.LANDING_INDEXABLE,
+  jsonLd,
+} = Astro.props;
+const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const canonical = canonicalUrl(canonicalPath, siteUrl);
+const serializedJsonLd = jsonLd ? serializeJsonLd(jsonLd) : undefined;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+<link rel="canonical" href={canonical} />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{serializedJsonLd && (
+  <script type="application/ld+json" set:html={serializedJsonLd}></script>
+)}
