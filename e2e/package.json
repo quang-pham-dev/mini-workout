@@ -17,6 +17,7 @@
     "test:e2e:db": "playwright test --project=db",
     "test:e2e:verification": "playwright test --config=playwright.verification.config.ts",
     "test:e2e:rate-limit": "playwright test --config=playwright.rate-limit.config.ts",
+    "test:e2e:ci-local": "node scripts/run-ci-local.mjs",
     "test:e2e:update": "playwright test --update-snapshots"
   },
   "devDependencies": {

@@ -6,6 +6,16 @@ export default [
   },
   ...config,
   {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        URL: 'readonly',
+        console: 'readonly',
+        process: 'readonly',
+      },
+    },
+  },
+  {
     // These values are generated within the run, not inherited Turbo inputs.
     rules: {
       'turbo/no-undeclared-env-vars': [

@@ -19,6 +19,7 @@
     "test:e2e": "turbo run test:e2e --filter=@mini-workout/e2e",
     "test:e2e:admin": "turbo run test:e2e:admin --filter=@mini-workout/e2e",
     "test:e2e:db": "turbo run test:e2e:db --filter=@mini-workout/e2e",
+    "test:e2e:ci-local": "pnpm --filter @mini-workout/e2e test:e2e:ci-local",
     "test:watch": "turbo run test:watch",
     "test:coverage": "turbo run test:coverage",
     "docs:check": "node scripts/check-docs.mjs",

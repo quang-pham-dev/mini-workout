@@ -1,4 +1,5 @@
 import { assertAuthResponse } from '../../fixtures/auth-request.ts';
+import { getFormAlert } from '../../fixtures/locators.ts';
 import { expect, test } from '../../fixtures/user.ts';
 import { databaseBaseURL } from '../../playwright.config.ts';
 
@@ -26,7 +27,7 @@ test('@critical onboarding requires an interest when a level is selected', async
     .getByRole('button', { name: 'Create my starting plan' })
     .click();
   await expect(mutationUser.page).toHaveURL(/\/onboarding\?error=invalid$/);
-  await expect(mutationUser.page.getByRole('alert')).toHaveText(
+  await expect(getFormAlert(mutationUser.page)).toHaveText(
     'Choose at least one focus and a pace to continue.',
   );
 });
@@ -53,7 +54,7 @@ test('@critical onboarding requires a level when an interest is selected', async
     .getByRole('button', { name: 'Create my starting plan' })
     .click();
   await expect(mutationUser.page).toHaveURL(/\/onboarding\?error=invalid$/);
-  await expect(mutationUser.page.getByRole('alert')).toHaveText(
+  await expect(getFormAlert(mutationUser.page)).toHaveText(
     'Choose at least one focus and a pace to continue.',
   );
 });

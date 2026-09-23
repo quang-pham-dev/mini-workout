@@ -1,5 +1,6 @@
 import { assertAuthResponse } from '../../fixtures/auth-request.ts';
 import { configureUser } from '../../fixtures/database.ts';
+import { getFormAlert } from '../../fixtures/locators.ts';
 import { type MutationUserSession, expect, test } from '../../fixtures/user.ts';
 import { databaseBaseURL } from '../../playwright.config.ts';
 
@@ -66,7 +67,7 @@ test('@critical registration validates input and creates a signed-in account', a
     .click();
 
   await expect(mutationUser.page).toHaveURL(/\/register\?error=invalid$/);
-  await expect(mutationUser.page.getByRole('alert')).toContainText(
+  await expect(getFormAlert(mutationUser.page)).toContainText(
     'Unable to create your account',
   );
 
@@ -93,7 +94,7 @@ test('@critical registration reports a duplicate account through the UI', async 
   await expect(duplicateAttempt.page).toHaveURL(
     /\/register\?error=unavailable$/,
   );
-  await expect(duplicateAttempt.page.getByRole('alert')).toContainText(
+  await expect(getFormAlert(duplicateAttempt.page)).toContainText(
     'Unable to create your account',
   );
 });
@@ -111,7 +112,7 @@ test('@critical login rejects invalid credentials', async ({
     .fill(`${mutationUser.password}x`);
   await mutationUser.page.getByRole('button', { name: 'Sign in' }).click();
   await expect(mutationUser.page).toHaveURL(/\/login\?error=invalid$/);
-  await expect(mutationUser.page.getByRole('alert')).toHaveText(
+  await expect(getFormAlert(mutationUser.page)).toHaveText(
     'Invalid email or password.',
   );
 

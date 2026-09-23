@@ -257,6 +257,9 @@ const databaseUrl = hasDatabaseEnvironment
 export default defineConfig({
   globalSetup: './coordinator.setup.ts',
   testDir: '.',
+  // Keep all artifacts configurable so local CI runs never touch stale or
+  // root-owned files left in the workspace by previous containers.
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? 'test-results',
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,

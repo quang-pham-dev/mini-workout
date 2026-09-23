@@ -1,3 +1,4 @@
+import { getFormAlert } from '../../fixtures/locators.ts';
 import { expect, test } from '@playwright/test';
 import { randomInt, randomUUID } from 'node:crypto';
 
@@ -15,7 +16,7 @@ test('sign-in shows safe rate-limit copy after the configured budget', async ({
     await page.getByLabel('Password').fill('IncorrectPassword123!');
     await page.getByRole('button', { name: 'Sign in' }).click();
 
-    await expect(page.getByRole('alert')).toHaveText(
+    await expect(getFormAlert(page)).toHaveText(
       attempt < 5
         ? 'Invalid email or password.'
         : 'Too many sign-in attempts. Please wait and try again.',

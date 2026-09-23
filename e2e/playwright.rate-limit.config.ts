@@ -13,6 +13,7 @@ const baseURL = `http://localhost:${ports.database}`;
 
 export default defineConfig({
   testDir: './tests/rate-limit',
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? 'test-results',
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,

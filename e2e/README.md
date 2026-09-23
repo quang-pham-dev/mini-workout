@@ -104,6 +104,21 @@ load. Override both when a local development server occupies a default port:
 E2E_PUBLIC_PORT=3100 E2E_DATABASE_PORT=3101 E2E_ADMIN_PORT=3102 pnpm test:e2e
 ```
 
+## Local CI-equivalent browser gate
+
+With the disposable PostgreSQL container running on `127.0.0.1:5432`, run the
+same migration, seed, build, policy, public, admin, verification, and
+rate-limit gates used by CI:
+
+```bash
+pnpm test:e2e:ci-local
+```
+
+The command defaults to the local E2E database URL and ports above. Override
+`E2E_DATABASE_URL`, `E2E_PUBLIC_PORT`, `E2E_DATABASE_PORT`, or
+`E2E_ADMIN_PORT` when another disposable environment is in use. It stops on
+the first failed gate and exits non-zero, so it is safe to run before pushing.
+
 The three ports default to `3000`, `3001`, and `3002` and must be distinct. The
 selected ports drive Playwright base URLs, health checks, app `PORT` and
 `BETTER_AUTH_URL`, auth setup origins, and mutation-user browser contexts. CI

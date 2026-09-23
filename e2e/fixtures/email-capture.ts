@@ -30,3 +30,13 @@ export function readCapturedAuthEmails(
     .filter(Boolean)
     .map((line) => JSON.parse(line) as CapturedAuthEmail);
 }
+
+export function extractEmailToken(
+  capturedEmail: CapturedAuthEmail,
+): string | null {
+  const url = new URL(capturedEmail.url);
+  const searchToken = url.searchParams.get('token');
+  if (searchToken) return searchToken;
+  const pathSegment = url.pathname.split('/').at(-1);
+  return pathSegment && pathSegment !== '' ? pathSegment : null;
+}

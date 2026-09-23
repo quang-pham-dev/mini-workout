@@ -4,6 +4,7 @@ import {
   type CapturedAuthEmail,
   readCapturedAuthEmails,
 } from '../../fixtures/email-capture.ts';
+import { getFormAlert } from '../../fixtures/locators.ts';
 import { databaseBaseURL } from '../../playwright.config.ts';
 import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
@@ -29,7 +30,7 @@ test('flag-on signup requires verification and reaches onboarding after the capt
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password').fill(password);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    await expect(page.locator('p[role="alert"]')).toHaveText(
+    await expect(getFormAlert(page)).toHaveText(
       'Please verify your email before signing in.',
     );
     await expect(
