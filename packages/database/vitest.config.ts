@@ -6,6 +6,10 @@ export default mergeConfig(
   defineConfig({
     test: {
       include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+      coverage: {
+        include: ['src/**/*.ts'],
+        exclude: ['src/index.ts'],
+      },
     },
   }),
 );

@@ -710,6 +710,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
+      '@vitest/coverage-v8':
+        specifier: catalog:test-unit
+        version: 3.2.7(vitest@3.2.7)
       eslint:
         specifier: 'catalog:'
         version: 9.39.5(jiti@2.7.0)

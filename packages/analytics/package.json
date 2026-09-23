@@ -36,6 +36,7 @@
     "posthog-node": "^5.52.5"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "catalog:test-unit",
     "@mini-workout/eslint-config": "workspace:*",
     "@mini-workout/prettier-config": "workspace:*",
     "@mini-workout/typescript-config": "workspace:*",

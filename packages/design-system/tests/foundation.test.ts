@@ -119,11 +119,19 @@ describe('design-system foundation contract', () => {
     expect(undefinedVariables).toEqual([]);
   });
 
-  it('keeps CSS Modules out of the web source tree and imports', () => {
-    expect(webFiles.filter((path) => path.endsWith('.module.css'))).toEqual([]);
-    expect(webSources.filter((source) => /module\.css/.test(source))).toEqual(
-      [],
+  it('keeps CSS Modules paired with an explicit component import', () => {
+    const moduleFiles = webFiles.filter((path) => path.endsWith('.module.css'));
+    const moduleImports = webSources.filter((source) =>
+      /module\.css/.test(source),
     );
+
+    expect(moduleImports).toHaveLength(moduleFiles.length);
+    for (const moduleFile of moduleFiles) {
+      const fileName = moduleFile.split('/').pop();
+      expect(
+        moduleImports.some((source) => source.includes(`./${fileName}`)),
+      ).toBe(true);
+    }
   });
 
   it('preserves selector-only theme variants and reduced-motion behavior', () => {

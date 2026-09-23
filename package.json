@@ -21,7 +21,7 @@
     "test:e2e:db": "turbo run test:e2e:db --filter=@mini-workout/e2e",
     "test:e2e:ci-local": "pnpm --filter @mini-workout/e2e test:e2e:ci-local",
     "test:watch": "turbo run test:watch",
-    "test:coverage": "turbo run test:coverage",
+    "test:coverage": "turbo run test:coverage --concurrency=1",
     "docs:check": "node scripts/check-docs.mjs",
     "clean": "turbo run clean && rm -rf node_modules",
     "prepare": "husky"

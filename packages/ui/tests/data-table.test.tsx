@@ -52,6 +52,8 @@ describe('DataTable', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(screen.getByRole('cell', { name: 'Two' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Previous' }));
+    expect(screen.getByRole('cell', { name: 'One' })).toBeInTheDocument();
   });
 
   it('renders custom empty content', () => {
