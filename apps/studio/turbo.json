@@ -1,0 +1,45 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": [
+        "SANITY_PROJECT_ID",
+        "SANITY_DATASET",
+        "LANDING_PREVIEW_URL",
+        "SANITY_STUDIO_PREVIEW_URL",
+        "SANITY_STUDIO_PROJECT_ID",
+        "SANITY_STUDIO_DATASET"
+      ],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"]
+    },
+    "cleanup:baseline-private": {
+      "cache": false,
+      "passThroughEnv": ["SANITY_AUTH_TOKEN"]
+    },
+    "dev": {
+      "env": [
+        "SANITY_PROJECT_ID",
+        "SANITY_DATASET",
+        "LANDING_PREVIEW_URL",
+        "SANITY_STUDIO_PREVIEW_URL",
+        "SANITY_STUDIO_PROJECT_ID",
+        "SANITY_STUDIO_DATASET"
+      ],
+      "persistent": true
+    },
+    "lint": {
+      "env": [
+        "SANITY_PROJECT_ID",
+        "SANITY_DATASET",
+        "LANDING_PREVIEW_URL",
+        "SANITY_STUDIO_PREVIEW_URL",
+        "SANITY_STUDIO_PROJECT_ID",
+        "SANITY_STUDIO_DATASET"
+      ]
+    },
+    "seed:baseline": {
+      "cache": false,
+      "passThroughEnv": ["SANITY_AUTH_TOKEN"]
+    }
+  }
+}

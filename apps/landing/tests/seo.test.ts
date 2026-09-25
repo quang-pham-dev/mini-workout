@@ -11,10 +11,32 @@ describe('parseLandingEnv', () => {
     expect(parseLandingEnv({})).toEqual({
       siteUrl: 'https://example.com/',
       indexable: false,
+      contentSource: 'fixtures',
+      output: 'static',
     });
     expect(
       parseLandingEnv({ LANDING_SITE_URL: 'https://site.example/' }).siteUrl,
     ).toBe('https://site.example/');
+  });
+
+  it('requires complete public Sanity configuration before activation', () => {
+    expect(
+      parseLandingEnv({
+        LANDING_CONTENT_SOURCE: 'sanity',
+        SANITY_PROJECT_ID: 'project123',
+        SANITY_DATASET: 'production',
+      }),
+    ).toMatchObject({
+      contentSource: 'sanity',
+      sanityProjectId: 'project123',
+      sanityDataset: 'production',
+    });
+    expect(() => parseLandingEnv({ LANDING_CONTENT_SOURCE: 'sanity' })).toThrow(
+      'Sanity content source requires SANITY_PROJECT_ID and SANITY_DATASET.',
+    );
+    expect(() =>
+      parseLandingEnv({ LANDING_CONTENT_SOURCE: 'fallback' }),
+    ).toThrow('LANDING_CONTENT_SOURCE must be fixtures or sanity.');
   });
 
   it('allows crawling only for an explicitly enabled production deployment', () => {
@@ -31,6 +53,15 @@ describe('parseLandingEnv', () => {
       }).indexable,
     ).toBe(false);
     expect(parseLandingEnv({ VERCEL_ENV: 'production' }).indexable).toBe(false);
+  });
+
+  it('accepts only the static or preview output modes', () => {
+    expect(parseLandingEnv({ LANDING_OUTPUT: 'preview' }).output).toBe(
+      'preview',
+    );
+    expect(() => parseLandingEnv({ LANDING_OUTPUT: 'hybrid' })).toThrow(
+      'LANDING_OUTPUT must be static or preview.',
+    );
   });
 
   it('rejects credentials, non-HTTP protocols, and path-bearing site URLs', () => {
@@ -97,6 +128,23 @@ describe('serializeJsonLd', () => {
       description: '\u2028 & \u2029',
     });
   });
+
+  it('serializes the schema-owned category CollectionPage shape', () => {
+    expect(
+      JSON.parse(
+        serializeJsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: 'Mobility',
+          description: 'Everyday mobility guidance.',
+          url: 'https://example.com/movement/mobility/',
+        }),
+      ),
+    ).toMatchObject({
+      '@type': 'CollectionPage',
+      name: 'Mobility',
+    });
+  });
 });
 
 describe('sitemapXml', () => {
@@ -108,6 +156,17 @@ describe('sitemapXml', () => {
       sitemapXml('https://example.com', ['/draft/?preview=1']),
     ).toThrow(
       'Canonical paths must be same-site paths without query or hash data.',
+    );
+  });
+
+  it('includes the published Mobility category canonical', () => {
+    const sitemap = sitemapXml('https://example.com', [
+      '/',
+      '/movement/mobility/',
+    ]);
+
+    expect(sitemap).toContain(
+      '<loc>https://example.com/movement/mobility/</loc>',
     );
   });
 });

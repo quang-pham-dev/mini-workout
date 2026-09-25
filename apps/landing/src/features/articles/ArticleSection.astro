@@ -1,0 +1,66 @@
+---
+import {
+  assertNever,
+  type ArticleSection,
+} from '../../content/section-registry.js';
+
+interface Props {
+  section: ArticleSection;
+  index: number;
+}
+
+const { section, index } = Astro.props;
+const headingId = `article-section-${index}`;
+---
+
+{section.type === 'prose.v1' ? (
+  <section class="article-prose-section" aria-labelledby={headingId}>
+    <h2 id={headingId}>{section.heading}</h2>
+    {section.paragraphs.map((paragraph) => (
+      <p>{paragraph}</p>
+    ))}
+  </section>
+) : section.type === 'pullQuote.v1' ? (
+  <blockquote>{section.quote}</blockquote>
+) : (
+  assertNever(section)
+)}
+
+<style>
+  .article-prose-section + .article-prose-section,
+  blockquote + .article-prose-section {
+    margin-top: 4.5rem;
+  }
+
+  h2 {
+    margin-bottom: 1.6rem;
+    color: var(--color-text-primary);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 650;
+    letter-spacing: -0.05em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  p {
+    color: var(--color-text-secondary);
+    font-size: clamp(1.05rem, 1.5vw, 1.18rem);
+    line-height: 1.85;
+  }
+
+  p + p {
+    margin-top: 1.35rem;
+  }
+
+  blockquote {
+    margin: 4rem 0;
+    padding: 0 0 0 1.5rem;
+    border-left: 0.25rem solid var(--color-primary);
+    color: var(--color-text-primary);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+</style>

@@ -1,0 +1,418 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import type { JsonLd } from '../../lib/seo/index.js';
+import type { ArticleSummary } from '../articles/catalog.js';
+import type { CategoryViewModel } from './catalog.js';
+
+interface Props {
+  category: CategoryViewModel;
+  relatedArticles: readonly ArticleSummary[];
+}
+
+const { category, relatedArticles } = Astro.props;
+const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const categoryUrl = new URL(category.seo.canonicalPath, siteUrl).toString();
+const jsonLd: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: category.name,
+  description: category.seo.description,
+  url: categoryUrl,
+};
+---
+
+<SiteLayout
+  title={category.seo.title}
+  description={category.seo.description}
+  canonicalPath={category.seo.canonicalPath}
+  jsonLd={jsonLd}
+>
+  <article class="category-page">
+    <header class="category-hero section-shell">
+      <div class="category-hero-copy">
+        <a class="category-backlink" href={category.backlink.href}>
+          {category.backlink.label}
+        </a>
+        <p class="eyebrow">{category.eyebrow}</p>
+        <h1>{category.headline}</h1>
+        <p class="category-introduction">{category.introduction}</p>
+      </div>
+      <figure class="category-hero-media">
+        <img
+          src={category.image.src}
+          alt={category.image.alt}
+          width={category.image.width}
+          height={category.image.height}
+          fetchpriority="high"
+          decoding="async"
+        />
+        <figcaption>{category.image.caption}</figcaption>
+      </figure>
+      <p class="category-name" aria-label={`Category: ${category.name}`}>
+        {category.name}
+      </p>
+    </header>
+
+    <section class="category-focus section-shell" aria-labelledby="focus-title">
+      <div class="category-focus-intro">
+        <p class="eyebrow">A place to begin</p>
+        <h2 id="focus-title">{category.focusHeading}</h2>
+        <p>{category.focusIntroduction}</p>
+      </div>
+      <ol class="category-focus-list">
+        {category.focuses.map((focus, index) => (
+          <li>
+            <span aria-hidden="true">0{index + 1}</span>
+            <div>
+              <h3>{focus.title}</h3>
+              <p>{focus.description}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    {relatedArticles.length > 0 && (
+      <section
+        class="category-reading section-shell"
+        aria-labelledby="category-reading-title"
+      >
+        <div class="category-reading-intro">
+          <p class="eyebrow">Field notes</p>
+          <h2 id="category-reading-title">Read into the practice</h2>
+        </div>
+        <div class="category-reading-list">
+          {relatedArticles.map((article) => (
+            <article>
+              <img
+                src={article.image.src}
+                alt=""
+                width={article.image.width}
+                height={article.image.height}
+                loading="lazy"
+                decoding="async"
+              />
+              <div>
+                <h3>
+                  <a href={article.canonicalPath}>{article.title}</a>
+                </h3>
+                <p>{article.excerpt}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section
+      class="category-closing section-shell"
+      aria-labelledby="category-closing-title"
+    >
+      <div>
+        <p class="eyebrow">Build from here</p>
+        <h2 id="category-closing-title">{category.closingHeading}</h2>
+        <p>{category.closingCopy}</p>
+      </div>
+      <a class="button button-primary" href="https://app.example.com/register">
+        Build my routine
+      </a>
+    </section>
+  </article>
+</SiteLayout>
+
+<style>
+  .category-page {
+    overflow: clip;
+  }
+
+  .category-hero {
+    position: relative;
+    display: grid;
+    min-height: 47rem;
+    grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 1.1fr);
+    align-items: center;
+    gap: clamp(3rem, 8vw, 8rem);
+    padding-block: 5rem 7rem;
+  }
+
+  .category-hero-copy {
+    position: relative;
+    z-index: 1;
+  }
+
+  .category-backlink {
+    display: inline-block;
+    margin-bottom: 4.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-decoration: underline;
+  }
+
+  .category-hero h1,
+  .category-focus h2,
+  .category-reading h2,
+  .category-closing h2 {
+    color: var(--color-text-primary);
+    font-weight: 650;
+    letter-spacing: -0.055em;
+    text-wrap: balance;
+  }
+
+  .category-hero h1 {
+    max-width: 9ch;
+    font-size: clamp(4rem, 7vw, 7rem);
+    line-height: 0.94;
+  }
+
+  .category-introduction {
+    max-width: 36ch;
+    margin-top: 1.75rem;
+    color: var(--color-text-secondary);
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    line-height: 1.7;
+  }
+
+  .category-hero-media {
+    margin: 0;
+  }
+
+  .category-hero-media img {
+    display: block;
+    width: min(100%, 36rem);
+    aspect-ratio: 0.8;
+    margin-left: auto;
+    border-radius: 50% 50% 1.25rem 1.25rem;
+    object-fit: cover;
+    object-position: center 35%;
+  }
+
+  .category-hero-media figcaption {
+    width: min(100%, 36rem);
+    margin: 0.8rem 0 0 auto;
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+  }
+
+  .category-name {
+    position: absolute;
+    right: min(0rem, 1vw);
+    bottom: 3.4rem;
+    color: var(--color-primary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .category-focus {
+    display: grid;
+    grid-template-columns: 0.82fr 1.18fr;
+    gap: clamp(3rem, 10vw, 10rem);
+    padding-block: 7rem 8rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .category-focus h2,
+  .category-closing h2 {
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    line-height: 1.02;
+  }
+
+  .category-focus-intro > p:last-child,
+  .category-closing div > p:last-child {
+    max-width: 38ch;
+    margin-top: 1.2rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .category-focus-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .category-focus-list li {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    padding-block: 1.5rem 1.7rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .category-focus-list li:first-child {
+    padding-top: 0.3rem;
+  }
+
+  .category-focus-list span {
+    padding-top: 0.32rem;
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .category-focus-list h3 {
+    color: var(--color-text-primary);
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+
+  .category-focus-list p {
+    max-width: 44ch;
+    margin-top: 0.55rem;
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+  }
+
+  .category-closing {
+    display: grid;
+    min-height: 24rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 3rem;
+    margin-bottom: 6rem;
+    padding: clamp(2rem, 6vw, 5rem);
+    border-radius: 1.25rem;
+    background: var(--color-surface-sunken);
+  }
+
+  .category-reading {
+    display: grid;
+    grid-template-columns: 0.65fr 1.35fr;
+    gap: clamp(3rem, 10vw, 10rem);
+    padding-block: 7rem 8rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .category-reading h2 {
+    max-width: 10ch;
+  }
+
+  .category-reading-list article {
+    display: grid;
+    grid-template-columns: minmax(10rem, 0.75fr) 1.25fr;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .category-reading-list img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50% 50% 0.9rem 0.9rem;
+    object-fit: cover;
+  }
+
+  .category-reading-list h3 {
+    color: var(--color-text-primary);
+    font-size: clamp(1.7rem, 3vw, 2.7rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .category-reading-list h3 a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-primary);
+    text-decoration-thickness: 0.08em;
+  }
+
+  .category-reading-list p {
+    margin-top: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+  }
+
+  .category-closing h2 {
+    max-width: 13ch;
+  }
+
+  @media (max-width: 52rem) {
+    .category-hero {
+      min-height: auto;
+      gap: 2.5rem;
+      padding-block: 4rem 5rem;
+    }
+
+    .category-backlink {
+      margin-bottom: 3rem;
+    }
+
+    .category-focus {
+      gap: 3rem;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .category-hero,
+    .category-focus,
+    .category-reading,
+    .category-closing {
+      grid-template-columns: 1fr;
+    }
+
+    .category-hero {
+      padding-block: 3rem 4.5rem;
+    }
+
+    .category-backlink {
+      margin-bottom: 2.5rem;
+    }
+
+    .category-hero h1 {
+      font-size: clamp(3.8rem, 18vw, 5.4rem);
+    }
+
+    .category-hero-media {
+      width: min(88%, 28rem);
+      justify-self: end;
+    }
+
+    .category-name {
+      bottom: 1.7rem;
+    }
+
+    .category-focus {
+      gap: 2.5rem;
+      padding-block: 4.5rem 5rem;
+    }
+
+    .category-reading {
+      gap: 2.5rem;
+      padding-block: 4.5rem 5rem;
+    }
+
+    .category-reading-list article {
+      grid-template-columns: 1fr;
+    }
+
+    .category-reading-list img {
+      width: min(78%, 22rem);
+    }
+
+    .category-focus h2,
+    .category-closing h2 {
+      font-size: clamp(2.7rem, 12vw, 3.8rem);
+    }
+
+    .category-focus-list li {
+      grid-template-columns: 2.5rem 1fr;
+    }
+
+    .category-closing {
+      min-height: 0;
+      align-items: start;
+      gap: 2rem;
+      margin-bottom: 4rem;
+      padding: 2rem 1.5rem;
+    }
+
+    .category-closing .button {
+      justify-self: start;
+    }
+  }
+</style>

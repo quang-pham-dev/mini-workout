@@ -55,7 +55,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm --filter @mini-workout/landing exec astro preview --host 127.0.0.1 --port ${port}`,
+    command: `ASTRO_PREVIEW_BACKGROUND=0 pnpm --filter @mini-workout/landing exec astro preview --host 127.0.0.1 --port ${port}`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120_000,

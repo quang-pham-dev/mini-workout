@@ -1,0 +1,286 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import type { JsonLd } from '../../lib/seo/index.js';
+import ArticleSection from './ArticleSection.astro';
+import type { ArticleViewModel } from './catalog.js';
+
+interface Props {
+  article: ArticleViewModel;
+}
+
+const { article } = Astro.props;
+const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const articleUrl = new URL(article.seo.canonicalPath, siteUrl).toString();
+const imageUrl = new URL(article.image.src, siteUrl).toString();
+const jsonLd: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: article.title,
+  description: article.seo.description,
+  image: imageUrl,
+  author: {
+    '@type': article.author.type,
+    name: article.author.name,
+  },
+  mainEntityOfPage: articleUrl,
+};
+---
+
+<SiteLayout
+  title={article.seo.title}
+  description={article.seo.description}
+  canonicalPath={article.seo.canonicalPath}
+  jsonLd={jsonLd}
+>
+  <article class="article-page">
+    <header class="article-header section-shell">
+      <div class="article-kicker">
+        <a href={`/movement/${article.categorySlug}/`}>
+          {article.categoryName}
+        </a>
+        <span aria-hidden="true">Field note</span>
+      </div>
+      <h1>{article.title}</h1>
+      <div class="article-lead">
+        <p>{article.dek}</p>
+        <p>By {article.author.name}</p>
+      </div>
+    </header>
+
+    <figure class="article-hero section-shell">
+      <img
+        src={article.image.src}
+        alt={article.image.alt}
+        width={article.image.width}
+        height={article.image.height}
+        fetchpriority="high"
+        decoding="async"
+      />
+      <figcaption>{article.image.caption}</figcaption>
+    </figure>
+
+    <div class="article-body section-shell">
+      <aside aria-label="Article context">
+        <p class="eyebrow">In this note</p>
+        <p>Attention, range and making movement your own.</p>
+      </aside>
+      <div class="article-prose">
+        {article.sections.map((section, index) => (
+          <ArticleSection section={section} index={index} />
+        ))}
+      </div>
+    </div>
+
+    <section
+      class="article-closing section-shell"
+      aria-labelledby="article-closing-title"
+    >
+      <div>
+        <p class="eyebrow">Keep exploring</p>
+        <h2 id="article-closing-title">Movement leaves room for choice.</h2>
+      </div>
+      <a href={`/movement/${article.categorySlug}/`}>
+        Explore {article.categoryName.toLowerCase()}
+      </a>
+    </section>
+  </article>
+</SiteLayout>
+
+<style>
+  .article-page {
+    overflow: clip;
+  }
+
+  .article-header {
+    padding-block: clamp(4rem, 9vw, 8rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .article-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .article-kicker a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .article-kicker span::before {
+    content: '/';
+    margin-right: 0.8rem;
+    color: var(--color-border-strong);
+  }
+
+  .article-header h1 {
+    max-width: 14ch;
+    margin-top: 2rem;
+    color: var(--color-text-primary);
+    font-size: clamp(3.5rem, 7.5vw, 7rem);
+    font-weight: 650;
+    letter-spacing: -0.06em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .article-lead {
+    display: grid;
+    grid-template-columns: minmax(0, 38rem) auto;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-top: 2.5rem;
+  }
+
+  .article-lead > p:first-child {
+    color: var(--color-text-secondary);
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    line-height: 1.65;
+  }
+
+  .article-lead > p:last-child {
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+  }
+
+  .article-hero {
+    margin-block: 0 7rem;
+  }
+
+  .article-hero img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.75;
+    border-radius: 1.25rem;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .article-hero figcaption {
+    margin-top: 0.8rem;
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+  }
+
+  .article-body {
+    display: grid;
+    grid-template-columns: minmax(11rem, 0.42fr) minmax(0, 1fr);
+    gap: clamp(3rem, 10vw, 10rem);
+    padding-bottom: 8rem;
+  }
+
+  .article-body aside {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    max-width: 14rem;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .article-prose {
+    max-width: 45rem;
+  }
+
+  .article-closing h2 {
+    color: var(--color-text-primary);
+    font-weight: 650;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .article-closing {
+    display: grid;
+    min-height: 19rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 2rem;
+    margin-bottom: 6rem;
+    padding: clamp(2rem, 6vw, 5rem);
+    border-radius: 1.25rem;
+    background: var(--color-surface-sunken);
+  }
+
+  .article-closing h2 {
+    max-width: 15ch;
+    font-size: clamp(2.4rem, 5vw, 4.5rem);
+    line-height: 1.02;
+  }
+
+  .article-closing > a {
+    color: var(--color-text-primary);
+    font-weight: 650;
+    text-decoration: underline;
+    text-decoration-color: var(--color-primary);
+    text-decoration-thickness: 0.1em;
+  }
+
+  @media (max-width: 40rem) {
+    .article-header {
+      padding-block: 3.5rem 3rem;
+    }
+
+    .article-header h1 {
+      font-size: clamp(3.5rem, 15vw, 5rem);
+    }
+
+    .article-lead,
+    .article-body,
+    .article-closing {
+      grid-template-columns: 1fr;
+    }
+
+    .article-lead {
+      align-items: start;
+      gap: 1.2rem;
+    }
+
+    .article-hero {
+      width: 100%;
+      margin-bottom: 4.5rem;
+    }
+
+    .article-hero img {
+      aspect-ratio: 1.1;
+      border-radius: 0;
+    }
+
+    .article-hero figcaption {
+      padding-inline: 1rem;
+    }
+
+    .article-body {
+      gap: 3rem;
+      padding-bottom: 5rem;
+    }
+
+    .article-body aside {
+      position: static;
+      max-width: 24rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .article-prose section + section {
+      margin-top: 3.5rem;
+    }
+
+    .article-prose blockquote {
+      margin-block: 3rem;
+    }
+
+    .article-closing {
+      min-height: 0;
+      align-items: start;
+      gap: 2rem;
+      margin-bottom: 4rem;
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>

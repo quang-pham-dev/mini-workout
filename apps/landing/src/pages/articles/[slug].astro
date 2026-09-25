@@ -1,0 +1,30 @@
+---
+import ArticlePage from '../../features/articles/ArticlePage.astro';
+import {
+  getContentRepository,
+  publishedContentRepository,
+} from '../../content/published-content-repository.js';
+import type { ArticleViewModel } from '../../features/articles/catalog.js';
+import type { GetStaticPaths } from 'astro';
+
+interface Props {
+  article: ArticleViewModel;
+}
+
+export const getStaticPaths = (async () => {
+  const { articles } = await publishedContentRepository.load();
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}) satisfies GetStaticPaths;
+export const prerender = !import.meta.env.LANDING_PREVIEW;
+
+let { article } = Astro.props;
+if (!article && Astro.params.slug) {
+  const snapshot = await getContentRepository(Astro.request).load();
+  article = snapshot.articles.find(({ slug }) => slug === Astro.params.slug)!;
+}
+---
+
+<ArticlePage article={article} />

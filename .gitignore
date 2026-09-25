@@ -34,6 +34,7 @@ playwright/.cache/
 
 # Build Outputs
 .next/
+.sanity/
 apps/landing/.astro/
 out/
 build/
@@ -77,4 +78,5 @@ Thumbs.db
 # .cursor
 # .opencode
 e2e-web
+.playwright-cli
 # skills-lock.json

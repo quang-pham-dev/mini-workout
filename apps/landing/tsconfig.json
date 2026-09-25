@@ -8,5 +8,5 @@
     "verbatimModuleSyntax": false
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", ".astro", "eslint.config.mjs"]
+  "exclude": ["dist", "coverage", ".astro", "eslint.config.mjs"]
 }

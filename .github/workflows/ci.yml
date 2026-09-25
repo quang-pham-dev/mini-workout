@@ -219,6 +219,9 @@ jobs:
       - name: Check package boundaries
         run: pnpm exec turbo boundaries
 
+      - name: Check Landing artifact budget
+        run: pnpm exec turbo run check-budget --filter=@mini-workout/landing
+
       - name: Check documentation
         run: pnpm docs:check
 

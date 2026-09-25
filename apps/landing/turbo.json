@@ -2,7 +2,18 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "env": ["LANDING_INDEXING_ENABLED", "LANDING_SITE_URL", "VERCEL_ENV"],
+      "env": [
+        "LANDING_CONTENT_SOURCE",
+        "LANDING_INDEXING_ENABLED",
+        "LANDING_OUTPUT",
+        "LANDING_PREVIEW",
+        "LANDING_SITE_URL",
+        "SANITY_API_READ_TOKEN",
+        "SANITY_STUDIO_URL",
+        "SANITY_DATASET",
+        "SANITY_PROJECT_ID",
+        "VERCEL_ENV"
+      ],
       "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"]
     },
     "dev": {

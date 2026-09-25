@@ -491,9 +491,10 @@ preview on a protected SSR deployment with acceptable complexity on Vercel?
 - Published and draft perspectives, click-to-edit overlays and perspective
   changes in Sanity Presentation.
 - Validated preview enable/disable endpoints, secure bounded cookies and
-  deployment access protection for the SSR preview host. Use HttpOnly, Secure,
-  `SameSite=None` and partitioned cookies when the Presentation iframe requires
-  them; strip secret query parameters before redirecting.
+  deployment access protection for the SSR preview host. The perspective cookie
+  is client-readable because Visual Editing updates it; keep it Secure,
+  SameSite and short-lived, and never treat it as authorization. Strip secret
+  query parameters before redirecting.
 - Production build that contains no token/stega data and loads no
   Visual Editing client code.
 - A publish webhook that triggers a preview/protected deployment build.
@@ -645,10 +646,12 @@ validated canonical-origin environment, package scripts, Turbo build hashing,
 fail-closed crawler policy, static SEO shell (layout, metadata, JSON-LD,
 robots/sitemap/manifest and 404), and separate Landing browser coverage. The
 Landing package, E2E project and CI-facing scripts are covered by workspace
-format/lint/type/test/build checks. Not yet complete: Astro file-level
-feature-boundary enforcement, comprehensive SEO route/sitemap assertions,
-brand-provided icon/social assets, campaign-specific 410/expiry behavior,
-performance budget enforcement in CI, and production domain/indexing rollout.
+format/lint/type/test/build checks. Astro file-level boundary enforcement and
+the first CI artifact budget were completed on 2026-09-24; the production build
+reported 0 B gzip JavaScript, 5,596 B gzip CSS, a 132,910 B largest asset and a
+256,454 B total artifact. Not yet complete: brand-provided icon/social assets,
+campaign-specific 410/expiry behavior, an isolated production-indexing build
+case, and production domain/indexing rollout.
 Preview/SSR and publish automation remain gated by Spikes A and C; do not treat
 this foundation as launch-ready.
 
@@ -707,6 +710,12 @@ starting CMS preview/publishing or production rollout:
    mapping against local fixtures. Keep preview endpoints and publish webhooks
    disabled until Spikes A/C pass or their fallbacks are explicitly accepted.
 
+**Progress (2026-09-24):** Items 1 and 3 are implemented with negative fixtures
+and CI wiring. Item 2 covers Home and Mobility canonical/meta, JSON-LD, sitemap,
+landmarks, keyboard, no-external-JavaScript and fail-closed crawler behavior;
+the isolated production-indexing build case remains. Item 4 remains an explicit
+Brand/Content input and campaign-retention decision.
+
 **Phase 1–2 exit gate:** every item above is either implemented with tests or
 recorded as an explicit input/gate with an owner; static output remains
 noindex/disallowed by default, and the production indexing switch is exercised
@@ -732,11 +741,95 @@ both capabilities off the Phase 1–2 static deployment.
    authenticate both Sanity and deployment-provider boundaries.
 6. Document publish, rollback, broken-link and emergency-unpublish runbooks.
 
+**Offline contract progress (2026-09-24):** The first Article and Category
+documents now pass through app-owned unknown-input mappers with schema-version
+gates, published/draft policy, shared slug/SEO/local-media/internal-link
+validation, derived canonical paths and an exhaustive `prose.v1` /
+`pullQuote.v1` Article section registry. Invalid published documents fail the
+static build; drafts generate no route. This closes the Article/Category portion
+of items 2–3 against local fixtures only. Sanity schemas/queries, Zod, preview,
+webhooks, Campaign lifecycle and operational runbooks remain open and retain
+their existing gates.
+
+**Schema/query progress (2026-09-24):** An isolated `apps/studio` implements the
+matching schema-v1 Article, Category, Author, SEO, image, internal-link and
+versioned section definitions. Landing has published-only GROQ projections and
+a provider boundary that maps results through the same contracts. Studio builds
+with its own React 19.3 runtime; Web/Admin pins are untouched. Real dataset
+activation, Zod adoption, preview/Presentation, webhooks and publish runbooks
+remain open.
+
+**Activation-readiness progress (2026-09-24):** Home, Article/Category static
+paths and sitemap generation now share one cached content repository. Fixtures
+remain the default. Explicit Sanity selection requires project/dataset config
+and fails closed for provider or mapping errors with no stale-fixture fallback.
+The real dataset parity/build gate remains open because the reachable dataset
+does not yet contain the approved baseline content and assets.
+
+**Parity-tooling progress (2026-09-24):** A fail-closed activation checker now
+compares the mapped Sanity published snapshot with the reviewed fixture baseline
+for route inventory, canonicals, SEO, Article/Category relationships, ordered
+section identities and media dimensions. Output is limited to stable issue
+codes and slug-scoped paths. Tooling is complete offline; real dataset content,
+asset inspection and a Sanity-sourced build still require infrastructure.
+
+**Studio authoring progress (2026-09-24):** The configured public project/dataset
+is reachable and now contains the baseline Author, Mobility Category and
+Article with real Sanity image assets. Studio provides task-oriented
+Editorial/People desk groups, document previews and Landing-aligned
+slug/internal-link validation. Public parity and a Sanity-sourced static build
+pass; preview/webhook automation and approved launch content remain open.
+
+**Real-dataset gate (2026-09-24):** The idempotent baseline workflow is dry-run
+by default and never overwrites existing editor documents. A dotted-ID bootstrap
+mistake was migrated to public root IDs, assets were reused, and the exact three
+private legacy documents were removed only after replacement/parity checks.
+Anonymous builds require no read token and fail closed on invalid CMS content.
+
+**Site Shell progress (2026-09-24):** Site Settings and Primary Navigation now
+have Landing-owned fail-closed contracts, published-only queries, repository
+mapping and fixed-ID Studio singleton editors. Brand/footer copy and ordered
+internal navigation are CMS-driven. Product sign-in/register destinations stay
+architecture-owned so editorial changes cannot alter the product trust
+boundary. Two public singleton documents were seeded idempotently; parity and a
+Sanity-sourced static build pass. Generic Page, Campaign and Pricing remain
+deferred until their app-owned consumers are designed.
+
+**Secure preview progress (2026-09-24):** One source tree now emits a static
+public artifact or a separate Vercel SSR preview artifact. Preview-only routes
+validate Sanity secrets, set a hardened one-hour perspective cookie and are
+absent from static output. Request-scoped draft reads disable CDN caching and
+reuse the fail-closed content mappers. All preview responses force `noindex` and
+`private, no-store`; Studio Presentation resolves Home, Article and Category
+locations with sharing disabled. The gate remains externally open for a valid
+real-secret/draft handshake and Vercel Deployment Protection/bypass evidence.
+
+**Visual Editing progress (2026-09-25):** The configured Viewer token now reads
+the draft perspective successfully. Preview responses contain stega metadata
+and load the Visual Editing client without browser console errors; the public
+static artifact remains free of preview JavaScript. Studio-generated handshake,
+iframe overlay interaction and Vercel protection/bypass remain deployment
+evidence rather than local implementation work.
+
 **Tests:** query mapper fixtures, invalid/unknown sections, webhook signature,
 replay/coalescing behavior, preview authorization, preview `noindex`, no token or
 stega leakage in production, failed-build rollback and CMS-outage static serving.
 
 ### Phase 4 — MVP pages and design system
+
+**UI design proposal:** [Landing UI Design Proposal](./2026-09-23-landing-ui-design.md)
+defines the shared visual direction and section contracts for Home, Campaign,
+Pricing, Article and Category templates. Treat copy, campaign offers, prices,
+category SEO inventory and production imagery as explicit content-owner inputs;
+do not invent them while implementing the static prototype.
+
+**Vertical-slice status (2026-09-24):** Home, the first Mobility category and a
+related Mobility Article template are implemented against app-owned local
+fixtures. Both editorial routes are included in static generation and sitemap
+output, with controlled structured content and type-specific JSON-LD; other
+categories and articles remain unpublished. This validates page composition,
+cross-linking and SEO contracts but does not close the CMS, approved-content,
+asset or remaining Phase 1–2 engineering gates.
 
 1. Implement approved page templates and section components from design specs.
 2. Add new shared primitives to `packages/ui` only when both Landing and another
@@ -797,6 +890,28 @@ are stable.
 2. Add editor preview/publish SLOs and webhook failure alerts.
 3. Review search queries, content performance and CWV monthly.
 4. Revisit CMS/vendor costs and content model complexity after real usage.
+
+### Rough progress snapshot — 2026-09-24
+
+These percentages are planning estimates, not release-readiness claims. They
+measure the full Phase 0–7 plan with each phase weighted equally; external
+Brand, Content, Security and infrastructure gates remain incomplete work.
+
+| Phase              | Rough completion | Evidence now available                                                                | Material remaining                                                                |
+| ------------------ | ---------------: | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 0 — Spikes         |              70% | Local A–F evidence; D/E MVP fallbacks; Astro/design-system and budget checks          | Real Sanity/Vercel preview, deploy/rollback timing, Lighthouse/a11y and field CWV |
+| 1 — Workspace      |              85% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration              | Landing observability/runtime decision and production-owned assets                |
+| 2 — SEO shell      |              80% | Metadata, JSON-LD, robots, sitemap, 404, navigation, budgets and browser contracts    | Isolated production-indexing case, campaign 410/expiry and approved social assets |
+| 3 — CMS foundation |              75% | Published contracts/parity, isolated SSR drafts, stega and Studio Presentation wiring | Protected deployed handshake, Page/Campaign/Pricing, webhook and runbooks         |
+| 4 — MVP pages      |              45% | Home, Mobility Category and related Article templates                                 | Campaign, Pricing, approved production content/assets, authoring validation       |
+| 5 — Analytics/A-B  |              10% | Architecture/privacy decisions and MVP fallbacks                                      | Consent adapter, typed events, CTA experiment registry and A/A test               |
+| 6 — Rollout        |               0% | Target domain topology documented                                                     | Environments, domains, redirects, CSP, auth callbacks, crawl and gradual cutover  |
+| 7 — Operations     |               0% | Requirements documented                                                               | Scheduled audits, alerts, SLOs and operating cadence                              |
+
+**Overall rough completion: about 47%.** The Landing foundation alone is further
+ahead (roughly 78%); the overall number is lower because CMS
+integration, campaign/pricing, analytics, production rollout and operations are
+part of the approved plan rather than optional polish.
 
 ## 10. Acceptance criteria
 

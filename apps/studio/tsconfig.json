@@ -1,0 +1,5 @@
+{
+  "extends": "@mini-workout/typescript-config/vitejs-library.json",
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["dist", "node_modules"]
+}

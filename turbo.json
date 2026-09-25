@@ -66,6 +66,14 @@
       "dependsOn": ["^build", "transit"],
       "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"]
     },
+    "check-budget": {
+      "dependsOn": ["build"],
+      "inputs": ["$TURBO_DEFAULT$"]
+    },
+    "check-content-parity": {
+      "env": ["SANITY_DATASET", "SANITY_PROJECT_ID"],
+      "cache": false
+    },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,

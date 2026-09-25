@@ -1,5 +1,6 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
+import { getContentRepository } from '../content/published-content-repository.js';
 import type { JsonLd } from '../lib/seo/index.js';
 
 const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
@@ -9,19 +10,167 @@ const jsonLd: JsonLd = {
   name: 'Mini Workout',
   url: siteUrl,
 };
+
+const { categories } = await getContentRepository(Astro.request).load();
+const categoryPaths = new Map(
+  categories.map((category) => [category.name, category.seo.canonicalPath]),
+);
+
+const movementGroups = [
+  {
+    title: 'Strength & stamina',
+    movements: ['Strength', 'Cardio', 'HIIT'],
+  },
+  {
+    title: 'Mobility & flexibility',
+    movements: ['Mobility', 'Flexibility', 'Stretching'],
+  },
+  {
+    title: 'Flow & focus',
+    movements: ['Yoga', 'Pilates', 'Meditation'],
+  },
+];
+
+const steps = [
+  {
+    title: 'Choose a focus',
+    description: 'Pick the kinds of movement you want in your routine.',
+  },
+  {
+    title: 'Set your level',
+    description: 'Tell us where you are starting, from beginner to advanced.',
+  },
+  {
+    title: 'Pick your rhythm',
+    description: 'Choose a weekly schedule that works with your life.',
+  },
+];
 ---
 
 <SiteLayout
-  title="Mini Workout | Public site foundation"
-  description="The public Mini Workout website is being prepared for campaign and editorial content."
+  title="Mini Workout | A movement habit that fits real life"
+  description="Explore strength, cardio, mobility and more. Choose your experience level and a weekly rhythm that fits your life."
   canonicalPath="/"
   jsonLd={jsonLd}
 >
-  <section class="page-content" aria-labelledby="page-title">
-    <h1 id="page-title">A home for Mini Workout stories and campaigns.</h1>
-    <p>
-      The static site foundation is in place. Reviewed home, campaign, pricing,
-      and editorial content will be added in the next implementation phase.
-    </p>
-  </section>
+  <div class="home-page">
+    <section class="hero section-shell" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Movement for real life</p>
+        <h1 id="page-title">Build a movement habit that fits real life.</h1>
+        <p class="hero-description">
+          Choose from strength, mobility, cardio, yoga and more. Set a weekly
+          rhythm that works for you.
+        </p>
+        <div class="hero-actions">
+          <a
+            class="button button-primary"
+            href="https://app.example.com/register"
+          >
+            Build my routine
+          </a>
+          <a class="text-link" href="#how-it-works">
+            See how it works <span aria-hidden="true">↘</span>
+          </a>
+        </div>
+        <p class="hero-note">Start with what feels good. Make it your own.</p>
+      </div>
+      <figure class="hero-image">
+        <img
+          src="/images/home/movement-hero.webp"
+          alt="Woman holding a low lunge on an exercise mat in a living room."
+          width="1536"
+          height="1024"
+          fetchpriority="high"
+          decoding="async"
+        />
+        <figcaption>Find a way to move that feels like yours.</figcaption>
+      </figure>
+      <span class="hero-index" aria-hidden="true">
+        01 / BEGIN ANYWHERE
+      </span>
+    </section>
+
+    <section
+      class="movement-section section-shell"
+      id="ways-to-move"
+      aria-labelledby="movement-title"
+    >
+      <div class="section-heading">
+        <p class="eyebrow">A little of this, a little of that</p>
+        <h2 id="movement-title">Find your kind of movement</h2>
+        <p>
+          Explore a few starting points, then shape a routine around what you
+          enjoy.
+        </p>
+      </div>
+      <div class="movement-layout">
+        <figure class="movement-image">
+          <img
+            src="/images/home/mobility-stretch.webp"
+            alt="Man stretching his side on a mat at home."
+            width="1122"
+            height="1402"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>Take a breath. Make a little room to move.</figcaption>
+        </figure>
+        <div class="movement-groups">
+          {movementGroups.map((group, index) => (
+            <article class="movement-group">
+              <span class="group-index" aria-hidden="true">
+                0{index + 1}
+              </span>
+              <div>
+                <h3>{group.title}</h3>
+                <ul aria-label={group.title}>
+                  {group.movements.map((movement) => {
+                    const path = categoryPaths.get(movement);
+
+                    return (
+                      <li>{path ? <a href={path}>{movement}</a> : movement}</li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="how-section section-shell"
+      id="how-it-works"
+      aria-labelledby="how-title"
+    >
+      <div class="how-intro">
+        <p class="eyebrow">Your starting point</p>
+        <h2 id="how-title">How it works</h2>
+        <p>A few choices help make your routine feel more like you.</p>
+      </div>
+      <ol class="steps-list">
+        {steps.map((step) => (
+          <li>
+            <h3>{step.title}</h3>
+            <p>{step.description}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section
+      class="closing-section section-shell"
+      aria-labelledby="closing-title"
+    >
+      <div>
+        <p class="eyebrow">Your next small step</p>
+        <h2 id="closing-title">Make room for movement.</h2>
+      </div>
+      <a class="button button-primary" href="https://app.example.com/register">
+        Build my routine
+      </a>
+    </section>
+  </div>
 </SiteLayout>

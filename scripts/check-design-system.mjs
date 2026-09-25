@@ -200,7 +200,7 @@ const requiredUtilities = unique(
     .flatMap(({ path, source }) =>
       [
         ...source.matchAll(
-          /(?:[\w-]+:)*((?:bg|border|decoration|divide|from|ring-offset|ring|text|to|via)-([\w-]+))/g,
+          /(?:^|[\s'"`])(?:[\w-]+:)*((?:bg|border|decoration|divide|from|ring-offset|ring|text|to|via)-([\w-]+))(?=$|[\s'"`])/gm,
         ),
       ].flatMap(([, utility, colorName]) => {
         if (

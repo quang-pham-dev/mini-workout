@@ -1,0 +1,35 @@
+---
+import CategoryPage from '../../features/categories/CategoryPage.astro';
+import {
+  getContentRepository,
+  publishedContentRepository,
+} from '../../content/published-content-repository.js';
+import { summarizeArticlesForCategory } from '../../features/articles/catalog.js';
+import type { CategoryViewModel } from '../../features/categories/catalog.js';
+import type { GetStaticPaths } from 'astro';
+
+interface Props {
+  category: CategoryViewModel;
+}
+
+export const getStaticPaths = (async () => {
+  const { categories } = await publishedContentRepository.load();
+  return categories.map((category) => ({
+    params: { slug: category.slug },
+    props: { category },
+  }));
+}) satisfies GetStaticPaths;
+export const prerender = !import.meta.env.LANDING_PREVIEW;
+
+let { category } = Astro.props;
+if (!category && Astro.params.slug) {
+  const snapshot = await getContentRepository(Astro.request).load();
+  category = snapshot.categories.find(
+    ({ slug }) => slug === Astro.params.slug,
+  )!;
+}
+const { articles } = await getContentRepository(Astro.request).load();
+const relatedArticles = summarizeArticlesForCategory(articles, category.slug);
+---
+
+<CategoryPage category={category} relatedArticles={relatedArticles} />

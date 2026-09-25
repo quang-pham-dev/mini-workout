@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import SeoHead from '../components/SeoHead.astro';
+import { getContentRepository } from '../content/published-content-repository.js';
 import type { JsonLd } from '../lib/seo/index.js';
 
 interface Props {
@@ -18,6 +19,11 @@ const {
   noindex = !import.meta.env.LANDING_INDEXABLE,
   jsonLd,
 } = Astro.props;
+const { siteShell } = await getContentRepository(Astro.request).load();
+const productDestination = {
+  signIn: 'https://app.example.com/login',
+  register: 'https://app.example.com/register',
+} as const;
 ---
 
 <!doctype html>
@@ -25,7 +31,17 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content="oklch(1 0 0)"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="oklch(0.14 0.008 250)"
+      media="(prefers-color-scheme: dark)"
+    />
     <link rel="manifest" href="/manifest.webmanifest" />
     <SeoHead
       title={title}
@@ -34,25 +50,57 @@ const {
       noindex={noindex}
       jsonLd={jsonLd}
     />
+    <script is:inline>
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">
       Skip to content
     </a>
-    <header class="site-header">
-      <a href="/" aria-label="Mini Workout home">
-        <strong>Mini Workout</strong>
+    <header class="site-header section-shell">
+      <a href="/" aria-label={`${siteShell.brandName} home`}>
+        <strong class="wordmark" translate="no">
+          {siteShell.brandName}
+          <span aria-hidden="true">.</span>
+        </strong>
       </a>
-      <nav aria-label="Primary navigation">
-        <a href="/">Home</a>
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        {siteShell.primaryLinks.map((link) => (
+          <a href={link.href}>{link.label}</a>
+        ))}
+        <a href={productDestination.signIn}>{siteShell.signInLabel}</a>
+        <a
+          class="button button-small button-primary"
+          href={productDestination.register}
+        >
+          {siteShell.primaryCtaLabel}
+        </a>
       </nav>
+      <details class="mobile-nav">
+        <summary aria-label="Menu">Menu</summary>
+        <nav aria-label="Mobile navigation">
+          {siteShell.primaryLinks.map((link) => (
+            <a href={link.href}>{link.label}</a>
+          ))}
+          <a href={productDestination.signIn}>{siteShell.signInLabel}</a>
+          <a href={productDestination.register}>{siteShell.primaryCtaLabel}</a>
+        </nav>
+      </details>
     </header>
     <main id="main-content" tabindex="-1">
       <slot />
     </main>
-    <footer class="site-footer">
-      <span>Mini Workout</span>
-      <span>Small steps, built to last.</span>
+    <footer class="site-footer section-shell">
+      <a href="/" aria-label={`${siteShell.brandName} home`}>
+        <strong class="wordmark" translate="no">
+          {siteShell.brandName}
+          <span aria-hidden="true">.</span>
+        </strong>
+      </a>
+      <span>{siteShell.footerTagline}</span>
     </footer>
   </body>
 </html>

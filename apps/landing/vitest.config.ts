@@ -7,7 +7,11 @@ export default mergeConfig(
     test: {
       include: ['tests/**/*.{test,spec}.{ts,tsx}'],
       coverage: {
-        include: ['src/lib/env.ts', 'src/lib/seo/**/*.ts'],
+        include: [
+          'src/content/**/*.ts',
+          'src/lib/env.ts',
+          'src/lib/seo/**/*.ts',
+        ],
       },
     },
   }),
