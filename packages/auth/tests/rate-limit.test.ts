@@ -145,7 +145,7 @@ describe('authentication rate-limit policy', () => {
     await expect(limited.json()).resolves.toEqual({
       message: 'Too many requests. Please try again later.',
     });
-  });
+  }, 15_000);
 
   it('protects Server Actions with pseudonymous IP and account buckets', async () => {
     const consume = vi

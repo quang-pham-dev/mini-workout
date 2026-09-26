@@ -17,6 +17,15 @@ describe('parseLandingEnv', () => {
     expect(
       parseLandingEnv({ LANDING_SITE_URL: 'https://site.example/' }).siteUrl,
     ).toBe('https://site.example/');
+    expect(parseLandingEnv({ LANDING_SITE_URL: 'site.example' }).siteUrl).toBe(
+      'https://site.example/',
+    );
+    expect(
+      parseLandingEnv({ VERCEL_URL: 'my-landing.vercel.app' }).siteUrl,
+    ).toBe('https://my-landing.vercel.app/');
+    expect(
+      parseLandingEnv({ VERCEL_PROJECT_PRODUCTION_URL: 'my-site.com' }).siteUrl,
+    ).toBe('https://my-site.com/');
   });
 
   it('requires complete public Sanity configuration before activation', () => {

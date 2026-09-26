@@ -22,6 +22,8 @@ export function parseLandingEnv(
       | 'SANITY_DATASET'
       | 'SANITY_PROJECT_ID'
       | 'VERCEL_ENV'
+      | 'VERCEL_PROJECT_PRODUCTION_URL'
+      | 'VERCEL_URL'
     >
   >,
 ): LandingEnv {
@@ -41,11 +43,22 @@ export function parseLandingEnv(
       'Sanity content source requires SANITY_PROJECT_ID and SANITY_DATASET.',
     );
   }
-  const configuredSiteUrl = env.LANDING_SITE_URL ?? defaultSiteUrl;
+  let rawSiteUrl =
+    env.LANDING_SITE_URL?.trim() ||
+    (env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL.trim()}`
+      : env.VERCEL_URL
+        ? `https://${env.VERCEL_URL.trim()}`
+        : defaultSiteUrl);
+
+  if (rawSiteUrl && !/^https?:\/\//i.test(rawSiteUrl)) {
+    rawSiteUrl = `https://${rawSiteUrl}`;
+  }
+
   let parsed: URL;
 
   try {
-    parsed = new URL(configuredSiteUrl);
+    parsed = new URL(rawSiteUrl);
   } catch (cause) {
     throw new Error(invalidSiteUrlMessage, { cause });
   }
