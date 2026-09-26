@@ -36,6 +36,7 @@
     "SANITY_STUDIO_URL",
     "VERCEL_URL",
     "VERCEL_PROJECT_PRODUCTION_URL",
+    "MEMBER_APP_URL",
     "VERCEL_ENV"
   ],
   "globalPassThroughEnv": ["CI"],
