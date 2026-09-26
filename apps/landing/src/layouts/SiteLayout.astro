@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import CrossAppLink from '../components/CrossAppLink.astro';
 import SeoHead from '../components/SeoHead.astro';
 import { getContentRepository } from '../content/published-content-repository.js';
 import { productDestination } from '../lib/product-destination.js';
@@ -69,13 +70,23 @@ const productLinks = productDestination(import.meta.env.MEMBER_APP_URL);
         {siteShell.primaryLinks.map((link) => (
           <a href={link.href}>{link.label}</a>
         ))}
-        <a href={productLinks.signIn}>{siteShell.signInLabel}</a>
-        <a
+        <CrossAppLink
+          href={productLinks.signIn}
+          destinationApp="member"
+          action="login"
+          placement="header-desktop"
+        >
+          {siteShell.signInLabel}
+        </CrossAppLink>
+        <CrossAppLink
           class="button button-small button-primary"
           href={productLinks.register}
+          destinationApp="member"
+          action="register"
+          placement="header-desktop"
         >
           {siteShell.primaryCtaLabel}
-        </a>
+        </CrossAppLink>
       </nav>
       <details class="mobile-nav">
         <summary aria-label="Menu">Menu</summary>
@@ -83,8 +94,22 @@ const productLinks = productDestination(import.meta.env.MEMBER_APP_URL);
           {siteShell.primaryLinks.map((link) => (
             <a href={link.href}>{link.label}</a>
           ))}
-          <a href={productLinks.signIn}>{siteShell.signInLabel}</a>
-          <a href={productLinks.register}>{siteShell.primaryCtaLabel}</a>
+          <CrossAppLink
+            href={productLinks.signIn}
+            destinationApp="member"
+            action="login"
+            placement="header-mobile"
+          >
+            {siteShell.signInLabel}
+          </CrossAppLink>
+          <CrossAppLink
+            href={productLinks.register}
+            destinationApp="member"
+            action="register"
+            placement="header-mobile"
+          >
+            {siteShell.primaryCtaLabel}
+          </CrossAppLink>
         </nav>
       </details>
     </header>

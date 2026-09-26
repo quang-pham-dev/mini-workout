@@ -1,0 +1,40 @@
+---
+import {
+  crossAppNavigationMetadata,
+  linkBehavior,
+  type CrossAppNavigationIntent,
+} from '../lib/product-destination.js';
+
+interface Props extends CrossAppNavigationIntent {
+  href: string;
+  class?: string;
+}
+
+const {
+  href,
+  class: className,
+  destinationApp,
+  action,
+  placement,
+} = Astro.props;
+const currentUrl = Astro.site?.toString() ?? Astro.url.origin;
+const behavior = linkBehavior(href, currentUrl);
+const metadata = crossAppNavigationMetadata({
+  destinationApp,
+  action,
+  placement,
+});
+---
+
+<a
+  href={href}
+  class={className}
+  target={behavior.opensNewTab ? behavior.target : undefined}
+  rel={behavior.opensNewTab ? behavior.rel : undefined}
+  {...metadata}
+>
+  <slot />
+  {behavior.opensNewTab && (
+    <span class="visually-hidden"> (opens in a new tab)</span>
+  )}
+</a>

@@ -1,4 +1,5 @@
 ---
+import CrossAppLink from '../../components/CrossAppLink.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { productDestination } from '../../lib/product-destination.js';
 import type { JsonLd } from '../../lib/seo/index.js';
@@ -117,9 +118,15 @@ const jsonLd: JsonLd = {
         <h2 id="category-closing-title">{category.closingHeading}</h2>
         <p>{category.closingCopy}</p>
       </div>
-      <a class="button button-primary" href={registerUrl}>
+      <CrossAppLink
+        class="button button-primary"
+        href={registerUrl}
+        destinationApp="member"
+        action="register"
+        placement="category-closing"
+      >
         Build my routine
-      </a>
+      </CrossAppLink>
     </section>
   </article>
 </SiteLayout>
