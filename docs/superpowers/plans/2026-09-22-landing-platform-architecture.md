@@ -15,7 +15,7 @@ Recommended production topology:
 
 ```text
 example.com                    -> apps/landing
-app.example.com                -> apps/web
+members.example.com            -> apps/web
 admin.example.com              -> apps/admin
 studio.example.com             -> hosted Sanity Studio
 ```
@@ -710,11 +710,13 @@ starting CMS preview/publishing or production rollout:
    mapping against local fixtures. Keep preview endpoints and publish webhooks
    disabled until Spikes A/C pass or their fallbacks are explicitly accepted.
 
-**Progress (2026-09-24):** Items 1 and 3 are implemented with negative fixtures
+**Progress (2026-09-26):** Items 1 and 3 are implemented with negative fixtures
 and CI wiring. Item 2 covers Home and Mobility canonical/meta, JSON-LD, sitemap,
-landmarks, keyboard, no-external-JavaScript and fail-closed crawler behavior;
-the isolated production-indexing build case remains. Item 4 remains an explicit
-Brand/Content input and campaign-retention decision.
+landmarks, keyboard, no-external-JavaScript and fail-closed crawler behavior.
+An isolated CI gate now builds both production fail-closed and explicit
+production-indexing artifacts from the same source, then verifies that robots,
+canonical and sitemap origins agree. Item 4 remains an explicit Brand/Content
+input and campaign-retention decision.
 
 **Phase 1–2 exit gate:** every item above is either implemented with tests or
 recorded as an explicit input/gate with an owner; static output remains
@@ -867,7 +869,7 @@ does not join campaign activity to individual signup identities.
 1. Deploy Landing and editorial preview to approved non-production domains; keep
    all non-production surfaces excluded from indexing.
 2. Crawl the rendered preview and compare URL/status/canonical/sitemap maps.
-3. Configure `example.com`, `app.example.com`, `admin.example.com` and
+3. Configure `example.com`, `members.example.com`, `admin.example.com` and
    `studio.example.com`, plus TLS, security headers, CSP and allowed
    frame/image/connect origins.
 4. Update Better Auth base/trusted origins, OAuth/email callback URLs if present,
@@ -891,25 +893,25 @@ are stable.
 3. Review search queries, content performance and CWV monthly.
 4. Revisit CMS/vendor costs and content model complexity after real usage.
 
-### Rough progress snapshot — 2026-09-24
+### Rough progress snapshot — 2026-09-26
 
 These percentages are planning estimates, not release-readiness claims. They
 measure the full Phase 0–7 plan with each phase weighted equally; external
 Brand, Content, Security and infrastructure gates remain incomplete work.
 
-| Phase              | Rough completion | Evidence now available                                                                | Material remaining                                                                |
-| ------------------ | ---------------: | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 0 — Spikes         |              70% | Local A–F evidence; D/E MVP fallbacks; Astro/design-system and budget checks          | Real Sanity/Vercel preview, deploy/rollback timing, Lighthouse/a11y and field CWV |
-| 1 — Workspace      |              85% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration              | Landing observability/runtime decision and production-owned assets                |
-| 2 — SEO shell      |              80% | Metadata, JSON-LD, robots, sitemap, 404, navigation, budgets and browser contracts    | Isolated production-indexing case, campaign 410/expiry and approved social assets |
-| 3 — CMS foundation |              75% | Published contracts/parity, isolated SSR drafts, stega and Studio Presentation wiring | Protected deployed handshake, Page/Campaign/Pricing, webhook and runbooks         |
-| 4 — MVP pages      |              45% | Home, Mobility Category and related Article templates                                 | Campaign, Pricing, approved production content/assets, authoring validation       |
-| 5 — Analytics/A-B  |              10% | Architecture/privacy decisions and MVP fallbacks                                      | Consent adapter, typed events, CTA experiment registry and A/A test               |
-| 6 — Rollout        |               0% | Target domain topology documented                                                     | Environments, domains, redirects, CSP, auth callbacks, crawl and gradual cutover  |
-| 7 — Operations     |               0% | Requirements documented                                                               | Scheduled audits, alerts, SLOs and operating cadence                              |
+| Phase              | Rough completion | Evidence now available                                                                | Material remaining                                                                 |
+| ------------------ | ---------------: | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| 0 — Spikes         |              70% | Local A–F evidence; D/E MVP fallbacks; Astro/design-system and budget checks          | Protected preview handshake, deploy/rollback timing, Lighthouse/a11y and field CWV |
+| 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration              | Landing observability/runtime decision and production-owned assets                 |
+| 2 — SEO shell      |              90% | Metadata, JSON-LD, robots, sitemap, 404, budgets and isolated indexing build gate     | Campaign 410/expiry policy and approved brand/social assets                        |
+| 3 — CMS foundation |              75% | Published contracts/parity, isolated SSR drafts, stega and Studio Presentation wiring | Protected deployed handshake, Page/Campaign/Pricing, webhook and runbooks          |
+| 4 — MVP pages      |              45% | Home, Mobility Category and related Article templates                                 | Campaign, Pricing, approved production content/assets, authoring validation        |
+| 5 — Analytics/A-B  |              12% | Privacy decisions plus scalable cross-app link attribution metadata                   | Consent adapter, typed events, CTA experiment registry and A/A test                |
+| 6 — Rollout        |              10% | Vercel apps deployed; destinations are environment-controlled and host-aware          | Custom domains, redirects, CSP, auth callbacks, crawl maps and gradual cutover     |
+| 7 — Operations     |               0% | Requirements documented                                                               | Scheduled audits, alerts, SLOs and operating cadence                               |
 
-**Overall rough completion: about 47%.** The Landing foundation alone is further
-ahead (roughly 78%); the overall number is lower because CMS
+**Overall rough completion: about 49%.** The Landing foundation alone is further
+ahead (roughly 82%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
 
@@ -979,7 +981,7 @@ the CI tool; do not hide vendor-specific commands behind root task logic.
 
 Confirmed:
 
-- Domains: `example.com`, `app.example.com`, `admin.example.com` and
+- Domains: `example.com`, `members.example.com`, `admin.example.com` and
   `studio.example.com`.
 - MVP routes: home, campaign, pricing, article and category SEO pages.
 - Landing framework: Astro, subject to the mandatory technical spike gates.

@@ -222,6 +222,9 @@ jobs:
       - name: Check Landing artifact budget
         run: pnpm exec turbo run check-budget --filter=@mini-workout/landing
 
+      - name: Check Landing production indexing isolation
+        run: pnpm check:landing-indexing
+
       - name: Check documentation
         run: pnpm docs:check
 

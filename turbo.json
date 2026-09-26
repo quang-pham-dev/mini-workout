@@ -82,6 +82,10 @@
       "dependsOn": ["build"],
       "inputs": ["$TURBO_DEFAULT$"]
     },
+    "check-indexing-build": {
+      "inputs": ["$TURBO_DEFAULT$"],
+      "cache": false
+    },
     "check-content-parity": {
       "env": ["SANITY_DATASET", "SANITY_PROJECT_ID"],
       "cache": false

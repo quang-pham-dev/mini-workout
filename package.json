@@ -16,6 +16,7 @@
     "format:fix": "turbo run format:fix",
     "check-types": "turbo run check-types",
     "check-budget": "turbo run check-budget",
+    "check:landing-indexing": "turbo run check-indexing-build --filter=@mini-workout/landing",
     "check:landing-content-parity": "turbo run check-content-parity --filter=@mini-workout/landing",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e --filter=@mini-workout/e2e",

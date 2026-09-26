@@ -1,3 +1,4 @@
+import { assertIndexingArtifact } from '../scripts/indexing-artifact.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -77,5 +78,73 @@ describe('static artifact budget gate', () => {
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('compressed JavaScript');
+  });
+});
+
+describe('production indexing artifact gate', () => {
+  it('accepts a fail-closed artifact with noindex and a site-wide robots disallow', () => {
+    const root = makeFixture('landing-indexing-closed');
+    writeFileSync(
+      join(root, 'index.html'),
+      '<link rel="canonical" href="https://landing.example.test/"><meta name="robots" content="noindex, nofollow">',
+    );
+    writeFileSync(join(root, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
+    writeFileSync(
+      join(root, 'sitemap.xml'),
+      '<urlset><url><loc>https://landing.example.test/</loc></url></urlset>',
+    );
+
+    expect(() =>
+      assertIndexingArtifact({
+        indexable: false,
+        root,
+        siteUrl: 'https://landing.example.test/',
+      }),
+    ).not.toThrow();
+  });
+
+  it('accepts an opted-in production artifact with matching canonical, robots and sitemap origins', () => {
+    const root = makeFixture('landing-indexing-open');
+    writeFileSync(
+      join(root, 'index.html'),
+      '<link rel="canonical" href="https://landing.example.test/"><meta name="robots" content="index, follow">',
+    );
+    writeFileSync(
+      join(root, 'robots.txt'),
+      'User-agent: *\nAllow: /\nSitemap: https://landing.example.test/sitemap.xml\n',
+    );
+    writeFileSync(
+      join(root, 'sitemap.xml'),
+      '<urlset><url><loc>https://landing.example.test/</loc></url></urlset>',
+    );
+
+    expect(() =>
+      assertIndexingArtifact({
+        indexable: true,
+        root,
+        siteUrl: 'https://landing.example.test/',
+      }),
+    ).not.toThrow();
+  });
+
+  it('rejects an artifact whose crawler mode or canonical origin does not match the build contract', () => {
+    const root = makeFixture('landing-indexing-mismatch');
+    writeFileSync(
+      join(root, 'index.html'),
+      '<link rel="canonical" href="https://wrong.example/"><meta name="robots" content="index, follow">',
+    );
+    writeFileSync(join(root, 'robots.txt'), 'User-agent: *\nAllow: /\n');
+    writeFileSync(
+      join(root, 'sitemap.xml'),
+      '<urlset><url><loc>https://wrong.example/</loc></url></urlset>',
+    );
+
+    expect(() =>
+      assertIndexingArtifact({
+        indexable: false,
+        root,
+        siteUrl: 'https://landing.example.test/',
+      }),
+    ).toThrow(/indexing artifact/i);
   });
 });

@@ -10,6 +10,7 @@
     "start": "astro preview --host 0.0.0.0",
     "check-boundaries": "node scripts/check-boundaries.mjs",
     "check-budget": "node scripts/check-budget.mjs",
+    "check-indexing-build": "node scripts/check-indexing-build.mjs",
     "check-content-parity": "node --env-file-if-exists=.env --import tsx scripts/check-sanity-parity.ts",
     "check-types": "astro check",
     "prelint": "pnpm check-boundaries",
