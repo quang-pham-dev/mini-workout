@@ -1,10 +1,13 @@
 import { presentationLocations } from './presentation.js';
+import { parsePreviewUrl } from './preview-url.js';
 import { schemaTypes } from './schemaTypes/index.js';
 import { singletonDocumentTypes, studioStructure } from './structure.js';
 import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { presentationTool } from 'sanity/presentation';
 import { structureTool } from 'sanity/structure';
+
+const previewUrl = parsePreviewUrl(process.env.SANITY_STUDIO_PREVIEW_URL);
 
 export default defineConfig({
   name: 'default',
@@ -21,18 +24,13 @@ export default defineConfig({
     structureTool({ structure: studioStructure }),
     presentationTool({
       previewUrl: {
-        initial:
-          process.env.SANITY_STUDIO_PREVIEW_URL ?? 'http://localhost:4321',
+        initial: previewUrl.href,
         previewMode: {
           enable: '/api/draft-mode/enable/',
           shareAccess: false,
         },
       },
-      allowOrigins: [
-        new URL(
-          process.env.SANITY_STUDIO_PREVIEW_URL ?? 'http://localhost:4321',
-        ).origin,
-      ],
+      allowOrigins: [previewUrl.origin],
       resolve: { locations: presentationLocations },
     }),
     visionTool(),

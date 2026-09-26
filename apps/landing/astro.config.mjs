@@ -1,5 +1,5 @@
-import { parseLandingEnv } from './src/lib/env.ts';
 import { previewIntegration } from './preview-integration.mjs';
+import { parseLandingEnv } from './src/lib/env.ts';
 import vercel from '@astrojs/vercel';
 import tailwind from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
@@ -10,7 +10,9 @@ import { URL, fileURLToPath } from 'node:url';
 const dotenvPath = fileURLToPath(new URL('./.env', import.meta.url));
 if (existsSync(dotenvPath)) process.loadEnvFile(dotenvPath);
 
-const { siteUrl, indexable, output } = parseLandingEnv(process.env);
+const { siteUrl, productAppUrl, indexable, output } = parseLandingEnv(
+  process.env,
+);
 const preview = output === 'preview';
 
 export default defineConfig({
@@ -24,6 +26,7 @@ export default defineConfig({
     define: {
       'import.meta.env.LANDING_INDEXABLE': JSON.stringify(indexable),
       'import.meta.env.LANDING_PREVIEW': JSON.stringify(preview),
+      'import.meta.env.MEMBER_APP_URL': JSON.stringify(productAppUrl),
     },
   },
 });

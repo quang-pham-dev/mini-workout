@@ -19,9 +19,10 @@ shared names to Sanity's required `SANITY_STUDIO_*` build-time prefix inside the
 child process. Run Studio through the package scripts below rather than invoking
 the Sanity binary directly.
 
-Set `LANDING_PREVIEW_URL` to the protected preview origin. Local Presentation
-defaults to `http://localhost:4321`. The preview host must not be the public
-static origin and must remain behind Deployment Protection.
+Set `LANDING_PREVIEW_URL` to the complete protected preview origin, including
+the `https://` scheme. Local Presentation defaults to `http://localhost:4321`.
+The preview host must not be the public static origin and must remain behind
+Deployment Protection.
 
 The optional baseline seed command requires a short-lived Editor token in the
 local `SANITY_AUTH_TOKEN` variable. This secret is used only by the Node seed

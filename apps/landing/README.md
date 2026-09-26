@@ -32,6 +32,11 @@ and Vercel sets `VERCEL_ENV=production`; leave it off until approved launch
 content is deployed. Vercel build environments should set values directly
 rather than store credentials in the repository.
 
+Set `MEMBER_APP_URL` to the member app origin for each
+environment. Landing derives the stable `/login` and `/register` routes from
+this origin. Use `http://localhost:3000` locally, the web app's staging origin
+for staging, and its production domain for production.
+
 Public production uses `LANDING_OUTPUT=static`. The editor preview is a
 separate Vercel SSR deployment built with `LANDING_OUTPUT=preview`, protected
 by Deployment Protection and configured with a server-only

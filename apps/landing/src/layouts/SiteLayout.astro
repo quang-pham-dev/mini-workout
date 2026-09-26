@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import SeoHead from '../components/SeoHead.astro';
 import { getContentRepository } from '../content/published-content-repository.js';
+import { productDestination } from '../lib/product-destination.js';
 import type { JsonLd } from '../lib/seo/index.js';
 
 interface Props {
@@ -20,10 +21,7 @@ const {
   jsonLd,
 } = Astro.props;
 const { siteShell } = await getContentRepository(Astro.request).load();
-const productDestination = {
-  signIn: 'https://app.example.com/login',
-  register: 'https://app.example.com/register',
-} as const;
+const productLinks = productDestination(import.meta.env.MEMBER_APP_URL);
 ---
 
 <!doctype html>
@@ -71,10 +69,10 @@ const productDestination = {
         {siteShell.primaryLinks.map((link) => (
           <a href={link.href}>{link.label}</a>
         ))}
-        <a href={productDestination.signIn}>{siteShell.signInLabel}</a>
+        <a href={productLinks.signIn}>{siteShell.signInLabel}</a>
         <a
           class="button button-small button-primary"
-          href={productDestination.register}
+          href={productLinks.register}
         >
           {siteShell.primaryCtaLabel}
         </a>
@@ -85,8 +83,8 @@ const productDestination = {
           {siteShell.primaryLinks.map((link) => (
             <a href={link.href}>{link.label}</a>
           ))}
-          <a href={productDestination.signIn}>{siteShell.signInLabel}</a>
-          <a href={productDestination.register}>{siteShell.primaryCtaLabel}</a>
+          <a href={productLinks.signIn}>{siteShell.signInLabel}</a>
+          <a href={productLinks.register}>{siteShell.primaryCtaLabel}</a>
         </nav>
       </details>
     </header>

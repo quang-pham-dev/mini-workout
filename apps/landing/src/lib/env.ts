@@ -1,9 +1,36 @@
 const defaultSiteUrl = 'https://example.com/';
-const invalidSiteUrlMessage =
-  'LANDING_SITE_URL must be an HTTP(S) origin without credentials or a path.';
+const defaultProductAppUrl = 'http://localhost:3000/';
+
+function parseOrigin(value: string, variableName: string): string {
+  const message = `${variableName} must be an HTTP(S) origin without credentials or a path.`;
+  const candidate = /^[a-z][a-z\d+.-]*:/i.test(value)
+    ? value
+    : `https://${value}`;
+  let parsed: URL;
+
+  try {
+    parsed = new URL(candidate);
+  } catch (cause) {
+    throw new Error(message, { cause });
+  }
+
+  if (
+    !['http:', 'https:'].includes(parsed.protocol) ||
+    parsed.username.length > 0 ||
+    parsed.password.length > 0 ||
+    parsed.pathname !== '/' ||
+    parsed.search.length > 0 ||
+    parsed.hash.length > 0
+  ) {
+    throw new Error(message);
+  }
+
+  return parsed.toString();
+}
 
 export interface LandingEnv {
   siteUrl: string;
+  productAppUrl: string;
   indexable: boolean;
   contentSource: 'fixtures' | 'sanity';
   sanityProjectId?: string;
@@ -18,6 +45,7 @@ export function parseLandingEnv(
       | 'LANDING_CONTENT_SOURCE'
       | 'LANDING_INDEXING_ENABLED'
       | 'LANDING_OUTPUT'
+      | 'MEMBER_APP_URL'
       | 'LANDING_SITE_URL'
       | 'SANITY_DATASET'
       | 'SANITY_PROJECT_ID'
@@ -43,7 +71,7 @@ export function parseLandingEnv(
       'Sanity content source requires SANITY_PROJECT_ID and SANITY_DATASET.',
     );
   }
-  let rawSiteUrl =
+  const rawSiteUrl =
     env.LANDING_SITE_URL?.trim() ||
     (env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL.trim()}`
@@ -51,31 +79,15 @@ export function parseLandingEnv(
         ? `https://${env.VERCEL_URL.trim()}`
         : defaultSiteUrl);
 
-  if (rawSiteUrl && !/^https?:\/\//i.test(rawSiteUrl)) {
-    rawSiteUrl = `https://${rawSiteUrl}`;
-  }
-
-  let parsed: URL;
-
-  try {
-    parsed = new URL(rawSiteUrl);
-  } catch (cause) {
-    throw new Error(invalidSiteUrlMessage, { cause });
-  }
-
-  if (
-    !['http:', 'https:'].includes(parsed.protocol) ||
-    parsed.username.length > 0 ||
-    parsed.password.length > 0 ||
-    parsed.pathname !== '/' ||
-    parsed.search.length > 0 ||
-    parsed.hash.length > 0
-  ) {
-    throw new Error(invalidSiteUrlMessage);
-  }
+  const siteUrl = parseOrigin(rawSiteUrl, 'LANDING_SITE_URL');
+  const productAppUrl = parseOrigin(
+    env.MEMBER_APP_URL?.trim() || defaultProductAppUrl,
+    'MEMBER_APP_URL',
+  );
 
   return {
-    siteUrl: parsed.toString(),
+    siteUrl,
+    productAppUrl,
     indexable:
       output === 'static' &&
       env.VERCEL_ENV === 'production' &&

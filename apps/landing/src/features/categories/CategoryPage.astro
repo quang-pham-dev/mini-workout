@@ -1,5 +1,6 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import { productDestination } from '../../lib/product-destination.js';
 import type { JsonLd } from '../../lib/seo/index.js';
 import type { ArticleSummary } from '../articles/catalog.js';
 import type { CategoryViewModel } from './catalog.js';
@@ -11,6 +12,9 @@ interface Props {
 
 const { category, relatedArticles } = Astro.props;
 const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const { register: registerUrl } = productDestination(
+  import.meta.env.MEMBER_APP_URL,
+);
 const categoryUrl = new URL(category.seo.canonicalPath, siteUrl).toString();
 const jsonLd: JsonLd = {
   '@context': 'https://schema.org',
@@ -113,7 +117,7 @@ const jsonLd: JsonLd = {
         <h2 id="category-closing-title">{category.closingHeading}</h2>
         <p>{category.closingCopy}</p>
       </div>
-      <a class="button button-primary" href="https://app.example.com/register">
+      <a class="button button-primary" href={registerUrl}>
         Build my routine
       </a>
     </section>

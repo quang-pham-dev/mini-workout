@@ -10,6 +10,7 @@ describe('parseLandingEnv', () => {
   it('provides a safe local-independent default and normalizes a configured origin', () => {
     expect(parseLandingEnv({})).toEqual({
       siteUrl: 'https://example.com/',
+      productAppUrl: 'http://localhost:3000/',
       indexable: false,
       contentSource: 'fixtures',
       output: 'static',
@@ -26,6 +27,9 @@ describe('parseLandingEnv', () => {
     expect(
       parseLandingEnv({ VERCEL_PROJECT_PRODUCTION_URL: 'my-site.com' }).siteUrl,
     ).toBe('https://my-site.com/');
+    expect(
+      parseLandingEnv({ MEMBER_APP_URL: 'members.example.com' }).productAppUrl,
+    ).toBe('https://members.example.com/');
   });
 
   it('requires complete public Sanity configuration before activation', () => {
@@ -88,6 +92,21 @@ describe('parseLandingEnv', () => {
       parseLandingEnv({ LANDING_SITE_URL: 'https://site.example/preview' }),
     ).toThrow(
       'LANDING_SITE_URL must be an HTTP(S) origin without credentials or a path.',
+    );
+  });
+
+  it('rejects an unsafe product app origin', () => {
+    expect(() =>
+      parseLandingEnv({ MEMBER_APP_URL: 'javascript:alert(1)' }),
+    ).toThrow(
+      'MEMBER_APP_URL must be an HTTP(S) origin without credentials or a path.',
+    );
+    expect(() =>
+      parseLandingEnv({
+        MEMBER_APP_URL: 'https://members.example.com/app',
+      }),
+    ).toThrow(
+      'MEMBER_APP_URL must be an HTTP(S) origin without credentials or a path.',
     );
   });
 });

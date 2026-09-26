@@ -1,9 +1,13 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { getContentRepository } from '../content/published-content-repository.js';
+import { productDestination } from '../lib/product-destination.js';
 import type { JsonLd } from '../lib/seo/index.js';
 
 const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const { register: registerUrl } = productDestination(
+  import.meta.env.MEMBER_APP_URL,
+);
 const jsonLd: JsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -63,10 +67,7 @@ const steps = [
           rhythm that works for you.
         </p>
         <div class="hero-actions">
-          <a
-            class="button button-primary"
-            href="https://app.example.com/register"
-          >
+          <a class="button button-primary" href={registerUrl}>
             Build my routine
           </a>
           <a class="text-link" href="#how-it-works">
@@ -168,7 +169,7 @@ const steps = [
         <p class="eyebrow">Your next small step</p>
         <h2 id="closing-title">Make room for movement.</h2>
       </div>
-      <a class="button button-primary" href="https://app.example.com/register">
+      <a class="button button-primary" href={registerUrl}>
         Build my routine
       </a>
     </section>
