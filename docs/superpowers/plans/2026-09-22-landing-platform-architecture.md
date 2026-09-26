@@ -447,13 +447,12 @@ fails, update this ADR before starting the phase that consumes that capability;
 an unresolved preview gate does not block the independent static foundation.
 
 Initial local evidence and unresolved gates are recorded in
-<!-- [`2026-09-23-landing-spike-a-results.md`](2026-09-23-landing-spike-a-results.md),
+[`2026-09-23-landing-spike-a-results.md`](2026-09-23-landing-spike-a-results.md),
 [`2026-09-23-landing-spike-b-results.md`](2026-09-23-landing-spike-b-results.md),
 [`2026-09-23-landing-spike-c-results.md`](2026-09-23-landing-spike-c-results.md),
 [`2026-09-23-landing-spike-d-results.md`](2026-09-23-landing-spike-d-results.md),
 [`2026-09-23-landing-spike-e-results.md`](2026-09-23-landing-spike-e-results.md)
-and [`2026-09-23-landing-spike-f-results.md`](2026-09-23-landing-spike-f-results.md). -->
-
+and [`2026-09-23-landing-spike-f-results.md`](2026-09-23-landing-spike-f-results.md).
 These reports are checkpoints, not approvals to start production implementation.
 
 | Spike                      | Current evidence                                                            | Gate still needed                                                                               |
