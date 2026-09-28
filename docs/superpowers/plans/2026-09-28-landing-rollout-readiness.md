@@ -1,6 +1,6 @@
 # Landing Rollout Readiness
 
-**Status:** In progress
+**Status:** Complete (offline foundation; live rollout still gated)
 **Date:** 2026-09-28
 **Owner:** `apps/landing`
 
@@ -65,3 +65,30 @@ require coordinated verification across every app.
    sitemap drift or missing security headers without printing response bodies.
 5. Default static output remains four pages, zero JavaScript and unchanged SEO
    content.
+
+## Result
+
+The shared public/preview header policy, Vercel route integration, preview
+middleware integration, deployed-candidate checker and rollout/rollback runbook
+are implemented. No domain, DNS, indexing, auth callback, analytics or traffic
+setting was changed.
+
+The remaining Phase 6 evidence requires deployed HTTPS origins: run the checker
+against the protected candidate, verify the Sanity iframe handshake, update
+Better Auth and Google callbacks only after final domains are approved, and
+execute the documented gradual cutover.
+
+Verification evidence:
+
+- 166 Landing tests pass across 25 files at 87.73% statement and 82.02% branch
+  coverage; rollout code is 87.5% statement covered.
+- Landing format, lint, Astro type checking and both static and preview builds
+  pass.
+- The static artifact remains four pages and 0 B gzip JavaScript; CSS is 8,331
+  B gzip and total output is 409,515 B.
+- Artifact budget and isolated indexing gates pass; generated Build Output
+  config places the security policy before all five delivery routes.
+- All 14 Landing Playwright checks pass across desktop and mobile.
+- Turbo boundaries pass across 1,100 files and documentation checks pass.
+- Live `check-rollout` execution is intentionally pending an HTTPS candidate;
+  no DNS or deployment state was mutated in this offline slice.

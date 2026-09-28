@@ -65,6 +65,7 @@ pnpm --filter @mini-workout/landing check-boundaries
 pnpm --filter @mini-workout/landing test
 pnpm --filter @mini-workout/landing build
 pnpm --filter @mini-workout/landing check-budget
+pnpm --filter @mini-workout/landing check-rollout
 pnpm test:e2e:landing
 ```
 
@@ -146,3 +147,16 @@ protection and the real Presentation handshake remain Phase 3 external gates;
 publish automation remains disabled until its Vercel/Sanity secrets, protection
 bypass and activation checklist in the [Landing publishing
 runbook](../../docs/observability/LANDING_PUBLISHING_RUNBOOK.md) are completed.
+
+Domain rollout, security-header verification and rollback steps are maintained
+in the [Landing rollout runbook](../../docs/observability/LANDING_ROLLOUT_RUNBOOK.md).
+After building the exact candidate locally, compare it with an HTTPS deployment:
+
+```sh
+LANDING_ROLLOUT_URL=https://candidate.example \
+LANDING_ROLLOUT_INDEXABLE=false pnpm --filter @mini-workout/landing check-rollout
+```
+
+The checker emits only issue codes and paths. Keep non-production candidates
+non-indexable; run once with `false` before cutover and with `true` only after
+the production indexing gate is intentionally enabled.

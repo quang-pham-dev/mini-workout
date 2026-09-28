@@ -5,6 +5,8 @@ import {
 } from '../src/rollout/security-headers';
 import {
   type RolloutObservation,
+  parseRolloutHtml,
+  parseRolloutSitemap,
   validateRolloutObservations,
 } from '../src/rollout/verify-rollout';
 import { describe, expect, it } from 'vitest';
@@ -99,6 +101,30 @@ describe('Landing rollout observations', () => {
         observations: [observation],
       }),
     ).toEqual([]);
+  });
+
+  it('parses controlled sitemap and HTML metadata without accepting origin drift', () => {
+    expect(
+      parseRolloutSitemap(
+        '<urlset><url><loc>https://landing.example/</loc></url><url><loc>https://landing.example/movement/mobility/</loc></url></urlset>',
+      ),
+    ).toEqual({
+      origin: 'https://landing.example/',
+      paths: ['/', '/movement/mobility/'],
+    });
+    expect(
+      parseRolloutHtml(
+        '<meta content="noindex, nofollow" name="robots"><link href="https://landing.example/" rel="canonical">',
+      ),
+    ).toEqual({
+      canonical: 'https://landing.example/',
+      robots: 'noindex, nofollow',
+    });
+    expect(() =>
+      parseRolloutSitemap(
+        '<urlset><url><loc>https://landing.example/</loc></url><url><loc>https://other.example/path/</loc></url></urlset>',
+      ),
+    ).toThrow('ROLLOUT_SITEMAP_ORIGIN');
   });
 
   it('reports stable issue codes for status, canonical and header drift', () => {

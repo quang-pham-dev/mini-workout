@@ -936,6 +936,18 @@ does not join campaign activity to individual signup identities.
 
 ### Phase 6 — Domain migration and rollout
 
+**Offline rollout-readiness progress (2026-09-28):** The public Build Output
+artifact now emits a continuing, tested security-header route before Campaign
+and filesystem routing. CSP is derived from validated feature origins, denies
+public framing and adds PostHog only when analytics is enabled. Preview applies
+the same baseline while allowing only the configured Studio origin to frame it
+and preserving private/no-store/noindex behavior. A bounded rollout checker
+compares deployed status, canonical, robots, sitemap and headers with the exact
+local candidate without logging bodies or raw headers. The parameterized domain
+matrix, activation sequence and rollback runbook are documented. DNS/TLS,
+custom-domain aliases, Better Auth/OAuth origin changes, live crawl evidence and
+traffic cutover remain external gates.
+
 1. Deploy Landing and editorial preview to approved non-production domains; keep
    all non-production surfaces excluded from indexing.
 2. Crawl the rendered preview and compare URL/status/canonical/sitemap maps.
@@ -963,7 +975,7 @@ are stable.
 3. Review search queries, content performance and CWV monthly.
 4. Revisit CMS/vendor costs and content model complexity after real usage.
 
-### Rough progress snapshot — 2026-09-27
+### Rough progress snapshot — 2026-09-28
 
 These percentages are planning estimates, not release-readiness claims. They
 measure the full Phase 0–7 plan with each phase weighted equally; external
@@ -977,11 +989,11 @@ Brand, Content, Security and infrastructure gates remain incomplete work.
 | 3 — CMS foundation |              92% | Article/Category/Campaign/Pricing contracts, parity, drafts, Visual Editing and webhooks      | Protected handshake, webhook evidence and generic Page contract                   |
 | 4 — MVP pages      |              68% | Home, Category, Article, Campaign and fixture-free Pricing template                           | Approved campaign/pricing content, production assets and authoring validation     |
 | 5 — Analytics/A-B  |              66% | Typed events, consent-gated adapter, deterministic registry, kill switch and visible exposure | Consent UI/legal approval, approved brief/reporting and live A/A result           |
-| 6 — Rollout        |              15% | Vercel apps deployed; env destinations and static Campaign routing artifact implemented       | Live route evidence, custom domains, CSP, auth callbacks, crawl maps and cutover  |
+| 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
 | 7 — Operations     |               0% | Requirements documented                                                                       | Scheduled audits, alerts, SLOs and operating cadence                              |
 
-**Overall rough completion: about 62%.** The Landing foundation alone is further
-ahead (roughly 85%); the overall number is lower because CMS
+**Overall rough completion: about 65%.** The Landing foundation alone is further
+ahead (roughly 87%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
 

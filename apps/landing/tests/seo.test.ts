@@ -11,6 +11,7 @@ describe('parseLandingEnv', () => {
     expect(parseLandingEnv({})).toEqual({
       siteUrl: 'https://example.com/',
       productAppUrl: 'http://localhost:3000/',
+      studioUrl: 'http://localhost:3333/',
       indexable: false,
       contentSource: 'fixtures',
       output: 'static',

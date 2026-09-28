@@ -14,6 +14,7 @@ if (existsSync(dotenvPath)) process.loadEnvFile(dotenvPath);
 const {
   siteUrl,
   productAppUrl,
+  studioUrl,
   indexable,
   output,
   analytics,
@@ -36,6 +37,10 @@ export default defineConfig({
       'import.meta.env.LANDING_INDEXABLE': JSON.stringify(indexable),
       'import.meta.env.LANDING_PREVIEW': JSON.stringify(preview),
       'import.meta.env.MEMBER_APP_URL': JSON.stringify(productAppUrl),
+      'import.meta.env.SANITY_PROJECT_ID': JSON.stringify(
+        process.env.SANITY_PROJECT_ID,
+      ),
+      'import.meta.env.SANITY_STUDIO_URL': JSON.stringify(studioUrl),
       'import.meta.env.LANDING_ANALYTICS_ENABLED': JSON.stringify(
         analytics.enabled,
       ),

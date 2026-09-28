@@ -168,7 +168,11 @@ describe('Campaign static delivery planning', () => {
     });
 
     expect(config.version).toBe(3);
-    expect(config.routes[0]).toEqual({
+    expect(config.routes[0]).toMatchObject({
+      src: '^/.*$',
+      continue: true,
+    });
+    expect(config.routes[1]).toEqual({
       src: '^/campaigns/finished/?$',
       status: 410,
     });

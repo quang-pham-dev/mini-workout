@@ -8,6 +8,7 @@ import { resolve } from 'node:path';
 
 const env = parseLandingEnv({
   LANDING_ANALYTICS_ENABLED: process.env.LANDING_ANALYTICS_ENABLED,
+  LANDING_EXPERIMENTS_ENABLED: process.env.LANDING_EXPERIMENTS_ENABLED,
   LANDING_CONTENT_SOURCE: process.env.LANDING_CONTENT_SOURCE,
   LANDING_INDEXING_ENABLED: process.env.LANDING_INDEXING_ENABLED,
   LANDING_OUTPUT: process.env.LANDING_OUTPUT,
@@ -32,7 +33,10 @@ const staticPath = resolve(outputPath, 'static');
 const manifest = parseCampaignRoutingManifest(
   JSON.parse(await readFile(manifestPath, 'utf8')),
 );
-const config = createVercelBuildOutputConfig(manifest);
+const config = createVercelBuildOutputConfig(manifest, {
+  mode: 'public',
+  analytics: env.analytics,
+});
 
 await rm(outputPath, { recursive: true, force: true });
 await mkdir(outputPath, { recursive: true });

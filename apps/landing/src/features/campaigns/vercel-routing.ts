@@ -1,4 +1,8 @@
 import { isSafeInternalPath } from '../../content/validation-primitives.js';
+import {
+  type LandingSecurityPolicyInput,
+  createLandingSecurityHeaders,
+} from '../../rollout/security-headers.js';
 import type { CampaignDeliveryPlan } from './delivery.js';
 
 export interface CampaignRoutingManifest {
@@ -116,10 +120,19 @@ export function createVercelCampaignRoutes(
 
 export function createVercelBuildOutputConfig(
   value: unknown,
+  securityPolicy: LandingSecurityPolicyInput = {
+    mode: 'public',
+    analytics: { enabled: false, host: 'https://us.i.posthog.com/' },
+  },
 ): VercelBuildOutputConfig {
   return {
     version: 3,
     routes: [
+      {
+        src: '^/.*$',
+        headers: createLandingSecurityHeaders(securityPolicy),
+        continue: true,
+      },
       ...createVercelCampaignRoutes(value),
       { src: '^/\\.well-known(?:/.*)?$' },
       {

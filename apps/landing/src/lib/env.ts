@@ -31,6 +31,7 @@ function parseOrigin(value: string, variableName: string): string {
 export interface LandingEnv {
   siteUrl: string;
   productAppUrl: string;
+  studioUrl: string;
   indexable: boolean;
   contentSource: 'fixtures' | 'sanity';
   sanityProjectId?: string;
@@ -59,6 +60,7 @@ export function parseLandingEnv(
       | 'LANDING_SITE_URL'
       | 'SANITY_DATASET'
       | 'SANITY_PROJECT_ID'
+      | 'SANITY_STUDIO_URL'
       | 'VERCEL_ENV'
       | 'VERCEL_PROJECT_PRODUCTION_URL'
       | 'VERCEL_URL'
@@ -117,10 +119,15 @@ export function parseLandingEnv(
     env.MEMBER_APP_URL?.trim() || defaultProductAppUrl,
     'MEMBER_APP_URL',
   );
+  const studioUrl = parseOrigin(
+    env.SANITY_STUDIO_URL?.trim() || 'http://localhost:3333',
+    'SANITY_STUDIO_URL',
+  );
 
   return {
     siteUrl,
     productAppUrl,
+    studioUrl,
     indexable:
       output === 'static' &&
       env.VERCEL_ENV === 'production' &&

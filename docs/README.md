@@ -17,6 +17,9 @@ guidance, testing strategy, and product roadmap.
 - [`observability/LANDING_PUBLISHING_RUNBOOK.md`](observability/LANDING_PUBLISHING_RUNBOOK.md)
   — signed Sanity publishing, Vercel deployment, rollback and emergency
   unpublish procedures for Landing.
+- [`observability/LANDING_ROLLOUT_RUNBOOK.md`](observability/LANDING_ROLLOUT_RUNBOOK.md)
+  — Landing domain matrix, security-header checks, cutover and rollback
+  procedure.
 - [`NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) —
   product scope and learning roadmap, with implementation status.
 

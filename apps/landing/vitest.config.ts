@@ -14,6 +14,7 @@ export default mergeConfig(
           'src/analytics/**/*.ts',
           'src/experimentation/**/*.ts',
           'src/publish/**/*.ts',
+          'src/rollout/**/*.ts',
         ],
       },
     },
