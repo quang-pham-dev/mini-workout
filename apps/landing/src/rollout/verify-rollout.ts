@@ -31,6 +31,16 @@ export type RolloutSitemap = Readonly<{
   paths: readonly string[];
 }>;
 
+export function rolloutRequestHeaders(
+  bypassSecret: string | undefined,
+): Readonly<Record<string, string>> {
+  if (bypassSecret === undefined || bypassSecret.length === 0) return {};
+  if (!/^[A-Za-z0-9_-]{16,512}$/.test(bypassSecret)) {
+    throw new Error('ROLLOUT_BYPASS_SECRET_INVALID');
+  }
+  return { 'x-vercel-protection-bypass': bypassSecret };
+}
+
 export function parseRolloutSitemap(xml: string): RolloutSitemap {
   const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
     (match) => new URL(match[1]!),

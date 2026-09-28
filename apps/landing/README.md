@@ -159,4 +159,7 @@ LANDING_ROLLOUT_INDEXABLE=false pnpm --filter @mini-workout/landing check-rollou
 
 The checker emits only issue codes and paths. Keep non-production candidates
 non-indexable; run once with `false` before cutover and with `true` only after
-the production indexing gate is intentionally enabled.
+the production indexing gate is intentionally enabled. For a protected Vercel
+candidate, provide `VERCEL_AUTOMATION_BYPASS_SECRET` through the local/CI
+environment; the checker sends it only as the recommended protection-bypass
+request header and never includes it in a URL or output.

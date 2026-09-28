@@ -48,6 +48,11 @@ secret or Deploy Hook URL through a public Vite variable.
    pnpm --filter @mini-workout/landing check-rollout
    ```
 
+   When Deployment Protection is enabled, inject
+   `VERCEL_AUTOMATION_BYPASS_SECRET` from the local/CI secret store. The checker
+   sends it only in `x-vercel-protection-bypass`; never append it to the URL or
+   commit it to an env file.
+
 5. Verify preview can be framed by the configured Studio origin but cannot be
    framed by another origin. Confirm `cache-control: private, no-store` and
    `x-robots-tag: noindex, nofollow`.

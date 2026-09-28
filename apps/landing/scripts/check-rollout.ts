@@ -2,6 +2,7 @@ import {
   type RolloutObservation,
   parseRolloutHtml,
   parseRolloutSitemap,
+  rolloutRequestHeaders,
   validateRolloutObservations,
 } from '../src/rollout/verify-rollout.js';
 import { readFile } from 'node:fs/promises';
@@ -43,8 +44,13 @@ function selectedHeaders(response: Response): Readonly<Record<string, string>> {
   );
 }
 
-async function observe(origin: URL, path: string): Promise<RolloutObservation> {
+async function observe(
+  origin: URL,
+  path: string,
+  headers: Readonly<Record<string, string>>,
+): Promise<RolloutObservation> {
   const response = await fetch(new URL(path, origin), {
+    headers,
     redirect: 'manual',
     signal: AbortSignal.timeout(10_000),
   });
@@ -65,9 +71,13 @@ const indexable = parseBoolean(
   process.env.LANDING_ROLLOUT_INDEXABLE,
   'LANDING_ROLLOUT_INDEXABLE',
 );
+const requestHeaders = rolloutRequestHeaders(
+  process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+);
 const localSitemap = await readFile(resolve('dist/sitemap.xml'), 'utf8');
 const expectedSitemap = parseRolloutSitemap(localSitemap);
 const deployedSitemapResponse = await fetch(new URL('/sitemap.xml', origin), {
+  headers: requestHeaders,
   signal: AbortSignal.timeout(10_000),
 });
 if (!deployedSitemapResponse.ok) {
@@ -80,7 +90,7 @@ if (deployedSitemap.origin !== expectedSitemap.origin) {
   throw new Error('ROLLOUT_SITEMAP_ORIGIN');
 }
 const observations = await Promise.all(
-  expectedSitemap.paths.map((path) => observe(origin, path)),
+  expectedSitemap.paths.map((path) => observe(origin, path, requestHeaders)),
 );
 const issues = validateRolloutObservations({
   origin: expectedSitemap.origin,
