@@ -7,6 +7,7 @@ import {
   type RolloutObservation,
   parseRolloutHtml,
   parseRolloutSitemap,
+  rolloutRequestHeaders,
   validateRolloutObservations,
 } from '../src/rollout/verify-rollout';
 import { describe, expect, it } from 'vitest';
@@ -101,6 +102,16 @@ describe('Landing rollout observations', () => {
         observations: [observation],
       }),
     ).toEqual([]);
+  });
+
+  it('keeps an optional deployment-protection secret in request headers only', () => {
+    expect(rolloutRequestHeaders(undefined)).toEqual({});
+    expect(rolloutRequestHeaders('automation-secret')).toEqual({
+      'x-vercel-protection-bypass': 'automation-secret',
+    });
+    expect(() => rolloutRequestHeaders('unsafe\nheader')).toThrow(
+      'ROLLOUT_BYPASS_SECRET_INVALID',
+    );
   });
 
   it('parses controlled sitemap and HTML metadata without accepting origin drift', () => {
