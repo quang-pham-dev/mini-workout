@@ -794,8 +794,9 @@ mapping and fixed-ID Studio singleton editors. Brand/footer copy and ordered
 internal navigation are CMS-driven. Product sign-in/register destinations stay
 architecture-owned so editorial changes cannot alter the product trust
 boundary. Two public singleton documents were seeded idempotently; parity and a
-Sanity-sourced static build pass. Generic Page, Campaign and Pricing remain
-deferred until their app-owned consumers are designed.
+Sanity-sourced static build pass. At this checkpoint Generic Page, Campaign and
+Pricing were deferred; the later Campaign and Pricing sections below supersede
+that status.
 
 **Secure preview progress (2026-09-24):** One source tree now emits a static
 public artifact or a separate Vercel SSR preview artifact. Preview-only routes
@@ -812,6 +813,34 @@ and load the Visual Editing client without browser console errors; the public
 static artifact remains free of preview JavaScript. Studio-generated handshake,
 iframe overlay interaction and Vercel protection/bypass remain deployment
 evidence rather than local implementation work.
+
+**Publishing workflow progress (2026-09-26):** A preview-only Astro route now
+verifies Sanity's timestamped HMAC signature over the bounded raw body, requires
+the provider idempotency key and triggers only an allowlisted Vercel Deploy Hook
+origin. Expected authentication/input failures do not alert; configuration,
+dependency and unexpected failures use the shared error contract, safe
+request-ID responses and one best-effort report. Duplicate deliveries are
+coalesced within a warm runtime and Vercel remains the documented MVP
+cross-instance deploy-deduplication boundary. The publish, failed-build
+rollback, broken-link and emergency-unpublish runbook is implemented. Real
+Sanity delivery, Deployment Protection bypass, deploy timing and rollback
+evidence remain activation gates; automation stays disabled until then.
+
+**Campaign contract progress (2026-09-27):** Landing now owns a fail-closed
+schema-v1 Campaign mapper with stable campaign IDs, UTC start/end validation,
+derived scheduled/active/expired lifecycle, mandatory `gone` / `redirect` /
+`archive` expiry policy and a constrained versioned hero/benefits/FAQ/CTA
+section registry. Sanity schema and published/draft GROQ projections mirror the
+same contract, and Campaigns participate in the shared repository/parity
+inventory. The fixture collection remains intentionally empty, so this work
+creates no placeholder/indexable URL. The reusable Astro route/template and
+deterministic delivery planner are now implemented: scheduled campaigns are
+omitted, active campaigns render their conversion CTA, and archived campaigns
+remain readable while suppressing conversion. Redirect and `410` policies now
+emit validated Vercel Build Output API v3 routes from the same versioned
+manifest used by the prerender pass. Live protected-preview status/header
+evidence remains open. A real campaign and approved offer/legal copy remain
+required before a public URL or Home promotion is emitted.
 
 **Tests:** query mapper fixtures, invalid/unknown sections, webhook signature,
 replay/coalescing behavior, preview authorization, preview `noindex`, no token or
@@ -833,6 +862,26 @@ categories and articles remain unpublished. This validates page composition,
 cross-linking and SEO contracts but does not close the CMS, approved-content,
 asset or remaining Phase 1–2 engineering gates.
 
+**Campaign delivery status (2026-09-27):** A shared Astro campaign template now
+renders the constrained hero, benefits, FAQ and conversion sections without
+client JavaScript. Its injected-clock planner separates scheduled, active,
+archived, redirect and gone outcomes; static paths and sitemap include only
+renderable active/archive pages. Archive behavior is complete. Static builds
+now produce a Build Output API artifact with Campaign `308`/`410` routes before
+filesystem routing, while malformed manifests fail the build. A controlled
+protected-preview deployment still needs to prove the live status/header
+behavior. The fixture inventory remains empty pending approved campaign
+content.
+
+**Pricing foundation status (2026-09-27):** Landing now owns a schema-v1
+Pricing singleton contract with exact minor-unit money, verified currency
+exponent/locale, recurring or one-time cadence, stable plan IDs, ordered
+entitlements, constrained Member CTA actions, at most one recommendation and
+mandatory cancellation/refund copy. Sanity published/draft queries, repository
+mapping, Studio validation and an Astro-only editorial comparison template are
+implemented. The fixture remains `null`; `/pricing/`, sitemap and navigation
+activation remain gated by approved commercial/legal content.
+
 1. Implement approved page templates and section components from design specs.
 2. Add new shared primitives to `packages/ui` only when both Landing and another
    app have a real reusable contract; add Storybook stories and a11y checks.
@@ -844,6 +893,27 @@ asset or remaining Phase 1–2 engineering gates.
 agreed breakpoints, CMS empty states, long-copy stress and reduced motion.
 
 ### Phase 5 — Analytics and experimentation
+
+**Consent/contract progress (2026-09-27):** The shared analytics package now
+owns a runtime-validated product vocabulary for Landing page views, CTA clicks,
+campaign views, experiment exposures and bounded content engagement. Landing
+has an explicit build-time PostHog configuration boundary, lazy provider load,
+the same conservative consent key as Product, delegated cross-app CTA capture,
+bounded route templates, aggregate referrer classification and sanitized UTM
+properties. Invalid or unknown properties fail closed and provider failures do
+not affect navigation. Disabled builds retain the zero-JavaScript baseline.
+Consent UI/legal copy and activation, an approved experiment brief/reporting
+setup and a live A/A validation remain open; analytics must stay disabled until
+the consent surface is approved.
+
+**Experiment-foundation progress (2026-09-27):** Landing now owns a compiled,
+versioned experiment registry with strict allocation/lifecycle/route policy,
+deterministic consent-created assignment, a default-off global kill switch,
+preview-only allowlisted overrides, one-time visibility exposure and bounded
+CTA attribution. A/A definitions are required to map both buckets to the same
+experience and are covered by a deterministic allocation sanity contract. The
+registry remains empty: consent UI/legal approval, a real experiment brief,
+PostHog reporting setup and a live A/A result are still activation gates.
 
 1. Define typed event and property schemas; extend the PostHog adapter without
    letting features call the SDK directly.
@@ -893,25 +963,25 @@ are stable.
 3. Review search queries, content performance and CWV monthly.
 4. Revisit CMS/vendor costs and content model complexity after real usage.
 
-### Rough progress snapshot — 2026-09-26
+### Rough progress snapshot — 2026-09-27
 
 These percentages are planning estimates, not release-readiness claims. They
 measure the full Phase 0–7 plan with each phase weighted equally; external
 Brand, Content, Security and infrastructure gates remain incomplete work.
 
-| Phase              | Rough completion | Evidence now available                                                                | Material remaining                                                                 |
-| ------------------ | ---------------: | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| 0 — Spikes         |              70% | Local A–F evidence; D/E MVP fallbacks; Astro/design-system and budget checks          | Protected preview handshake, deploy/rollback timing, Lighthouse/a11y and field CWV |
-| 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration              | Landing observability/runtime decision and production-owned assets                 |
-| 2 — SEO shell      |              90% | Metadata, JSON-LD, robots, sitemap, 404, budgets and isolated indexing build gate     | Campaign 410/expiry policy and approved brand/social assets                        |
-| 3 — CMS foundation |              75% | Published contracts/parity, isolated SSR drafts, stega and Studio Presentation wiring | Protected deployed handshake, Page/Campaign/Pricing, webhook and runbooks          |
-| 4 — MVP pages      |              45% | Home, Mobility Category and related Article templates                                 | Campaign, Pricing, approved production content/assets, authoring validation        |
-| 5 — Analytics/A-B  |              12% | Privacy decisions plus scalable cross-app link attribution metadata                   | Consent adapter, typed events, CTA experiment registry and A/A test                |
-| 6 — Rollout        |              10% | Vercel apps deployed; destinations are environment-controlled and host-aware          | Custom domains, redirects, CSP, auth callbacks, crawl maps and gradual cutover     |
-| 7 — Operations     |               0% | Requirements documented                                                               | Scheduled audits, alerts, SLOs and operating cadence                               |
+| Phase              | Rough completion | Evidence now available                                                                        | Material remaining                                                                |
+| ------------------ | ---------------: | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 0 — Spikes         |              75% | Local A–F evidence; campaign Build Output routing; Astro/design-system and budget checks      | Protected preview handshake, live 308/410, deploy timing, Lighthouse/a11y and CWV |
+| 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration                      | Landing observability/runtime decision and production-owned assets                |
+| 2 — SEO shell      |              94% | Metadata, JSON-LD, robots, sitemap, 404/410 routing, budgets and indexing build gate          | Live 308/410 evidence and approved brand/social assets                            |
+| 3 — CMS foundation |              92% | Article/Category/Campaign/Pricing contracts, parity, drafts, Visual Editing and webhooks      | Protected handshake, webhook evidence and generic Page contract                   |
+| 4 — MVP pages      |              68% | Home, Category, Article, Campaign and fixture-free Pricing template                           | Approved campaign/pricing content, production assets and authoring validation     |
+| 5 — Analytics/A-B  |              66% | Typed events, consent-gated adapter, deterministic registry, kill switch and visible exposure | Consent UI/legal approval, approved brief/reporting and live A/A result           |
+| 6 — Rollout        |              15% | Vercel apps deployed; env destinations and static Campaign routing artifact implemented       | Live route evidence, custom domains, CSP, auth callbacks, crawl maps and cutover  |
+| 7 — Operations     |               0% | Requirements documented                                                                       | Scheduled audits, alerts, SLOs and operating cadence                              |
 
-**Overall rough completion: about 49%.** The Landing foundation alone is further
-ahead (roughly 82%); the overall number is lower because CMS
+**Overall rough completion: about 62%.** The Landing foundation alone is further
+ahead (roughly 85%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
 

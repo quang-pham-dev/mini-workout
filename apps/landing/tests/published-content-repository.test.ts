@@ -6,7 +6,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 const sanitySnapshot: PublishedContentSnapshot = {
   articles: [],
+  campaigns: [],
   categories: [],
+  pricing: null,
   siteShell: {
     brandName: 'Mini Workout',
     footerTagline: 'Small steps, built to last.',
@@ -31,6 +33,8 @@ describe('published content repository activation', () => {
     expect(snapshot.articles.map((article) => article.slug)).toEqual([
       'a-gentler-way-to-explore-mobility',
     ]);
+    expect(snapshot.campaigns).toEqual([]);
+    expect(snapshot.pricing).toBeNull();
     expect(snapshot.siteShell.brandName).toBe('Mini Workout');
     expect(createSanitySource).not.toHaveBeenCalled();
   });

@@ -14,6 +14,9 @@ guidance, testing strategy, and product roadmap.
 - [`TESTING.md`](TESTING.md) — unit, component, Storybook, and E2E testing.
 - [`OBSERVABILITY.md`](OBSERVABILITY.md) — logging, errors, tracing, Web
   Vitals, health, and alerting contracts.
+- [`observability/LANDING_PUBLISHING_RUNBOOK.md`](observability/LANDING_PUBLISHING_RUNBOOK.md)
+  — signed Sanity publishing, Vercel deployment, rollback and emergency
+  unpublish procedures for Landing.
 - [`NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) —
   product scope and learning roadmap, with implementation status.
 

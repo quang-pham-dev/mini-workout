@@ -20,7 +20,7 @@
     "check:landing-content-parity": "turbo run check-content-parity --filter=@mini-workout/landing",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e --filter=@mini-workout/e2e",
-    "test:e2e:landing": "turbo run test:e2e:landing --filter=@mini-workout/e2e",
+    "test:e2e:landing": "LANDING_OUTPUT=static LANDING_CONTENT_SOURCE=fixtures LANDING_ANALYTICS_ENABLED=false LANDING_SITE_URL=https://example.com MEMBER_APP_URL=https://app.example.com turbo run test:e2e:landing --filter=@mini-workout/e2e",
     "test:e2e:admin": "turbo run test:e2e:admin --filter=@mini-workout/e2e",
     "test:e2e:db": "turbo run test:e2e:db --filter=@mini-workout/e2e",
     "test:e2e:ci-local": "pnpm --filter @mini-workout/e2e test:e2e:ci-local",

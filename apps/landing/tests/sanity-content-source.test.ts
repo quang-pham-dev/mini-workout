@@ -5,11 +5,15 @@ import {
 } from '../src/content/sanity/content-source.js';
 import {
   previewArticlesQuery,
+  previewCampaignsQuery,
   previewCategoriesQuery,
+  previewPricingQuery,
   previewPrimaryNavigationQuery,
   previewSiteSettingsQuery,
   publishedArticlesQuery,
+  publishedCampaignsQuery,
   publishedCategoriesQuery,
+  publishedPricingQuery,
   publishedPrimaryNavigationQuery,
   publishedSiteSettingsQuery,
 } from '../src/content/sanity/queries.js';
@@ -27,9 +31,11 @@ describe('Sanity published-content source', () => {
   it('keeps queries published-only and projects contract-version fields', () => {
     for (const query of [
       publishedArticlesQuery,
+      publishedCampaignsQuery,
       publishedCategoriesQuery,
       publishedSiteSettingsQuery,
       publishedPrimaryNavigationQuery,
+      publishedPricingQuery,
     ]) {
       expect(query).toContain('status == "published"');
       expect(query).toContain('schemaVersion');
@@ -40,9 +46,11 @@ describe('Sanity published-content source', () => {
   it('uses draft-aware queries that preserve the validated mapper contract', () => {
     for (const query of [
       previewArticlesQuery,
+      previewCampaignsQuery,
       previewCategoriesQuery,
       previewSiteSettingsQuery,
       previewPrimaryNavigationQuery,
+      previewPricingQuery,
     ]) {
       expect(query).not.toContain('status == "published"');
       expect(query).toContain('"status": "published"');
@@ -83,13 +91,22 @@ describe('Sanity published-content source', () => {
   });
 
   it('fetches and maps Article and Category documents through existing contracts', async () => {
-    const fetch = vi.fn().mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
     const source = createPublishedContentSource({ fetch });
 
     await expect(source.getArticles()).resolves.toEqual([]);
     await expect(source.getCategories()).resolves.toEqual([]);
+    await expect(source.getCampaigns()).resolves.toEqual([]);
+    await expect(source.getPricing()).resolves.toBeNull();
     expect(fetch).toHaveBeenNthCalledWith(1, publishedArticlesQuery);
     expect(fetch).toHaveBeenNthCalledWith(2, publishedCategoriesQuery);
+    expect(fetch).toHaveBeenNthCalledWith(3, publishedCampaignsQuery);
+    expect(fetch).toHaveBeenNthCalledWith(4, publishedPricingQuery);
   });
 
   it('normalizes provider failures without leaking provider messages', async () => {

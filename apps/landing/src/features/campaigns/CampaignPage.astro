@@ -1,0 +1,41 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import type { JsonLd } from '../../lib/seo/index.js';
+import CampaignSection from './CampaignSection.astro';
+import type { CampaignViewModel } from './catalog.js';
+
+interface Props {
+  campaign: CampaignViewModel;
+  lifecycle: 'active' | 'archived';
+}
+
+const { campaign, lifecycle } = Astro.props;
+const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const campaignUrl = new URL(campaign.seo.canonicalPath, siteUrl).toString();
+const jsonLd: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: campaign.title,
+  description: campaign.seo.description,
+  url: campaignUrl,
+};
+---
+
+<SiteLayout
+  title={campaign.seo.title}
+  description={campaign.seo.description}
+  canonicalPath={campaign.seo.canonicalPath}
+  jsonLd={jsonLd}
+>
+  <article class="campaign-page" data-campaign-lifecycle={lifecycle}>
+    {campaign.sections.map((section) => (
+      <CampaignSection section={section} lifecycle={lifecycle} />
+    ))}
+  </article>
+</SiteLayout>
+
+<style>
+  .campaign-page {
+    overflow: clip;
+  }
+</style>

@@ -1,12 +1,16 @@
 import { comparePublishedContentSnapshots } from '../src/content/content-parity.js';
 import { getPublishedArticles } from '../src/features/articles/catalog.js';
+import { getPublishedCampaigns } from '../src/features/campaigns/catalog.js';
 import { getPublishedCategories } from '../src/features/categories/catalog.js';
+import { getPublishedPricing } from '../src/features/pricing/catalog.js';
 import { getPublishedSiteShell } from '../src/features/site-shell/catalog.js';
 import { describe, expect, it } from 'vitest';
 
 const fixtureSnapshot = () => ({
   articles: structuredClone(getPublishedArticles()),
+  campaigns: structuredClone(getPublishedCampaigns()),
   categories: structuredClone(getPublishedCategories()),
+  pricing: structuredClone(getPublishedPricing()),
   siteShell: structuredClone(getPublishedSiteShell()),
 });
 
@@ -58,6 +62,33 @@ describe('published content parity', () => {
           path: 'categories.unexpected.unexpected',
         },
       ],
+    });
+  });
+
+  it('reports Pricing activation without exposing commercial values', () => {
+    const expected = fixtureSnapshot();
+    const actual = fixtureSnapshot();
+    actual.pricing = {
+      status: 'published',
+      title: 'Changed',
+      introduction: 'Changed',
+      currencyCode: 'USD',
+      currencyMinorUnit: 2,
+      locale: 'en-US',
+      plans: [],
+      faq: [],
+      cancellationTerms: 'Changed',
+      refundTerms: 'Changed',
+      seo: {
+        title: 'Changed',
+        description: 'Changed',
+        canonicalPath: '/pricing/',
+      },
+    };
+
+    expect(comparePublishedContentSnapshots(expected, actual)).toEqual({
+      ok: false,
+      issues: [{ code: 'PRICING_INVENTORY', path: 'pricing.unexpected' }],
     });
   });
 

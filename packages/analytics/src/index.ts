@@ -1,3 +1,5 @@
+import { isProductEventName, sanitizeProductEvent } from './product-events';
+
 export type AnalyticsProperties = Readonly<Record<string, unknown>>;
 
 export type AnalyticsClient = Readonly<{
@@ -102,7 +104,11 @@ export function createPostHogBrowserAdapter(
     capture: (event, properties) => {
       if (!ensureInitialized()) return;
       try {
-        client.capture?.(event, sanitizeProperties(properties));
+        const sanitized = isProductEventName(event)
+          ? sanitizeProductEvent(event, properties ?? {})
+          : sanitizeProperties(properties);
+        if (!sanitized) return;
+        client.capture?.(event, sanitized);
       } catch {
         // Analytics must never change the application response.
       }

@@ -9,9 +9,20 @@ describe('Studio schema contract', () => {
       'internalLink',
       'articleProseV1',
       'articlePullQuoteV1',
+      'campaignConversionCta',
+      'campaignHeroV1',
+      'campaignBenefitsV1',
+      'campaignFaqV1',
+      'campaignCtaV1',
+      'pricingConversionCta',
+      'pricingBilling',
+      'pricingPlan',
+      'pricingFaqItem',
       'category',
       'author',
       'article',
+      'campaignPage',
+      'pricingPage',
       'siteSettings',
       'primaryNavigation',
     ]);
@@ -21,6 +32,8 @@ describe('Studio schema contract', () => {
     for (const documentName of [
       'category',
       'article',
+      'campaignPage',
+      'pricingPage',
       'siteSettings',
       'primaryNavigation',
     ]) {
@@ -32,6 +45,49 @@ describe('Studio schema contract', () => {
         expect.arrayContaining(['schemaVersion', 'status']),
       );
     }
+  });
+
+  it('models Pricing as one structured commercial document', () => {
+    const pricing = schemaTypes.find((schema) => schema.name === 'pricingPage');
+    expect(pricing?.fields?.map((field) => field.name)).toEqual(
+      expect.arrayContaining([
+        'currencyCode',
+        'currencyMinorUnit',
+        'locale',
+        'plans',
+        'faq',
+        'cancellationTerms',
+        'refundTerms',
+      ]),
+    );
+    expect(
+      pricing?.fields
+        ?.find((field) => field.name === 'plans')
+        ?.of?.map((member) => member.type),
+    ).toEqual(['pricingPlan']);
+  });
+
+  it('allows Campaign sections only through the versioned registry', () => {
+    const campaign = schemaTypes.find(
+      (schema) => schema.name === 'campaignPage',
+    );
+    const sections = campaign?.fields?.find(
+      (field) => field.name === 'sections',
+    );
+    expect(sections?.of?.map((member) => member.type)).toEqual([
+      'campaignHeroV1',
+      'campaignBenefitsV1',
+      'campaignFaqV1',
+      'campaignCtaV1',
+    ]);
+    expect(campaign?.fields?.map((field) => field.name)).toEqual(
+      expect.arrayContaining([
+        'campaignId',
+        'startsAt',
+        'endsAt',
+        'expiryPolicy',
+      ]),
+    );
   });
 
   it('allows primary navigation to use only validated internal links', () => {

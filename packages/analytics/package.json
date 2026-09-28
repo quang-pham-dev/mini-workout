@@ -16,6 +16,10 @@
     "./posthog-browser": {
       "types": "./dist/posthog-browser.d.ts",
       "import": "./dist/posthog-browser.js"
+    },
+    "./product-events": {
+      "types": "./dist/product-events.d.ts",
+      "import": "./dist/product-events.js"
     }
   },
   "files": [

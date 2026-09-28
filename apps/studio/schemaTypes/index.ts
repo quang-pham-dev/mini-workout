@@ -1,4 +1,10 @@
-import { validateInternalHref, validateSlug } from './validation.js';
+import {
+  validateCampaignExpiryPolicy,
+  validateCampaignSchedule,
+  validateInternalHref,
+  validatePricingDocument,
+  validateSlug,
+} from './validation.js';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 const requiredText = <RuleType extends { required: () => RuleType }>(
@@ -78,6 +84,249 @@ export const articlePullQuoteV1 = defineType({
   type: 'object',
   fields: [
     defineField({ name: 'quote', type: 'text', validation: requiredText }),
+  ],
+});
+
+export const campaignHeroV1 = defineType({
+  name: 'campaignHeroV1',
+  title: 'Campaign hero v1',
+  type: 'object',
+  fields: [
+    defineField({ name: 'eyebrow', type: 'string', validation: requiredText }),
+    defineField({ name: 'headline', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'introduction',
+      type: 'text',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'image',
+      type: 'localMedia',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'cta',
+      type: 'campaignConversionCta',
+      validation: requiredText,
+    }),
+  ],
+});
+
+export const campaignConversionCta = defineType({
+  name: 'campaignConversionCta',
+  title: 'Campaign conversion CTA',
+  type: 'object',
+  fields: [
+    defineField({ name: 'label', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'action',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Register', value: 'register' },
+          { title: 'Sign in', value: 'login' },
+        ],
+        layout: 'radio',
+      },
+      validation: requiredText,
+    }),
+  ],
+});
+
+export const campaignBenefitsV1 = defineType({
+  name: 'campaignBenefitsV1',
+  title: 'Campaign benefits v1',
+  type: 'object',
+  fields: [
+    defineField({ name: 'heading', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'items',
+      type: 'array',
+      validation: (rule) => rule.required().min(1),
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'title',
+              type: 'string',
+              validation: requiredText,
+            }),
+            defineField({
+              name: 'description',
+              type: 'text',
+              validation: requiredText,
+            }),
+          ],
+        }),
+      ],
+    }),
+  ],
+});
+
+export const campaignFaqV1 = defineType({
+  name: 'campaignFaqV1',
+  title: 'Campaign FAQ v1',
+  type: 'object',
+  fields: [
+    defineField({ name: 'heading', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'items',
+      type: 'array',
+      validation: (rule) => rule.required().min(1),
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'question',
+              type: 'string',
+              validation: requiredText,
+            }),
+            defineField({
+              name: 'answer',
+              type: 'text',
+              validation: requiredText,
+            }),
+          ],
+        }),
+      ],
+    }),
+  ],
+});
+
+export const campaignCtaV1 = defineType({
+  name: 'campaignCtaV1',
+  title: 'Campaign CTA v1',
+  type: 'object',
+  fields: [
+    defineField({ name: 'heading', type: 'string', validation: requiredText }),
+    defineField({ name: 'copy', type: 'text', validation: requiredText }),
+    defineField({
+      name: 'cta',
+      type: 'campaignConversionCta',
+      validation: requiredText,
+    }),
+  ],
+});
+
+export const pricingConversionCta = defineType({
+  name: 'pricingConversionCta',
+  title: 'Pricing conversion CTA',
+  type: 'object',
+  fields: [
+    defineField({ name: 'label', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'action',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Register', value: 'register' },
+          { title: 'Sign in', value: 'login' },
+        ],
+        layout: 'radio',
+      },
+      validation: requiredText,
+    }),
+  ],
+});
+
+export const pricingBilling = defineType({
+  name: 'pricingBilling',
+  title: 'Billing cadence',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'cadence',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Monthly', value: 'month' },
+          { title: 'Annual', value: 'year' },
+          { title: 'One time', value: 'one_time' },
+        ],
+        layout: 'radio',
+      },
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'interval',
+      type: 'number',
+      description: 'Required for recurring billing; omit for one-time access.',
+      validation: (rule) => rule.integer().positive(),
+    }),
+  ],
+});
+
+export const pricingPlan = defineType({
+  name: 'pricingPlan',
+  title: 'Pricing plan',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'planId',
+      type: 'string',
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validateSlug(value)
+              ? true
+              : 'Use a stable lowercase ID with single hyphens.',
+          ),
+    }),
+    defineField({ name: 'name', type: 'string', validation: requiredText }),
+    defineField({ name: 'summary', type: 'text', validation: requiredText }),
+    defineField({
+      name: 'amountMinor',
+      title: 'Amount in minor currency units',
+      type: 'number',
+      validation: (rule) => rule.required().integer().min(0),
+    }),
+    defineField({
+      name: 'billing',
+      type: 'pricingBilling',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'entitlements',
+      type: 'array',
+      validation: (rule) => rule.required().min(1),
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'label',
+              type: 'string',
+              validation: requiredText,
+            }),
+          ],
+        }),
+      ],
+    }),
+    defineField({
+      name: 'cta',
+      type: 'pricingConversionCta',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'recommended',
+      type: 'boolean',
+      initialValue: false,
+      validation: (rule) => rule.required(),
+    }),
+  ],
+  preview: { select: { title: 'name', subtitle: 'planId' } },
+});
+
+export const pricingFaqItem = defineType({
+  name: 'pricingFaqItem',
+  title: 'Pricing FAQ item',
+  type: 'object',
+  fields: [
+    defineField({ name: 'question', type: 'string', validation: requiredText }),
+    defineField({ name: 'answer', type: 'text', validation: requiredText }),
   ],
 });
 
@@ -279,6 +528,168 @@ export const article = defineType({
   },
 });
 
+export const campaignPage = defineType({
+  name: 'campaignPage',
+  title: 'Campaign',
+  type: 'document',
+  fields: [
+    ...lifecycleFields,
+    defineField({
+      name: 'campaignId',
+      type: 'string',
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validateSlug(value)
+              ? true
+              : 'Use a stable lowercase ID with single hyphens.',
+          ),
+    }),
+    defineField({ name: 'title', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'slug',
+      type: 'slug',
+      options: { source: 'title' },
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validateSlug(value)
+              ? true
+              : 'Use lowercase words separated by single hyphens.',
+          ),
+    }),
+    defineField({
+      name: 'audienceDescription',
+      type: 'text',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'startsAt',
+      type: 'datetime',
+      validation: requiredText,
+    }),
+    defineField({ name: 'endsAt', type: 'datetime', validation: requiredText }),
+    defineField({
+      name: 'expiryPolicy',
+      type: 'object',
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validateCampaignExpiryPolicy(value)
+              ? true
+              : 'Choose gone/archive without a successor, or redirect with a safe successor.',
+          ),
+      fields: [
+        defineField({
+          name: 'mode',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Return gone', value: 'gone' },
+              { title: 'Redirect', value: 'redirect' },
+              { title: 'Keep archived', value: 'archive' },
+            ],
+            layout: 'radio',
+          },
+          validation: requiredText,
+        }),
+        defineField({ name: 'successor', type: 'internalLink' }),
+      ],
+    }),
+    defineField({
+      name: 'sections',
+      type: 'array',
+      validation: (rule) => rule.required().min(1),
+      of: [
+        defineArrayMember({ type: 'campaignHeroV1' }),
+        defineArrayMember({ type: 'campaignBenefitsV1' }),
+        defineArrayMember({ type: 'campaignFaqV1' }),
+        defineArrayMember({ type: 'campaignCtaV1' }),
+      ],
+    }),
+    defineField({ name: 'seo', type: 'seoFields', validation: requiredText }),
+  ],
+  validation: (rule) =>
+    rule.custom((document) =>
+      validateCampaignSchedule(document)
+        ? true
+        : 'Campaign start must be before end and both dates must be UTC ISO values.',
+    ),
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'status',
+      media: 'sections.0.image.image',
+    },
+  },
+});
+
+export const pricingPage = defineType({
+  name: 'pricingPage',
+  title: 'Pricing',
+  type: 'document',
+  fields: [
+    ...lifecycleFields,
+    defineField({ name: 'title', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'introduction',
+      type: 'text',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'currencyCode',
+      description: 'Three-letter uppercase currency code, for example USD.',
+      type: 'string',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'currencyMinorUnit',
+      description: 'Number of decimal places used by the selected currency.',
+      type: 'number',
+      validation: (rule) => rule.required().integer().min(0).max(3),
+    }),
+    defineField({
+      name: 'locale',
+      description: 'Formatting locale, for example en-US.',
+      type: 'string',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'plans',
+      type: 'array',
+      validation: (rule) => rule.required().min(1),
+      of: [defineArrayMember({ type: 'pricingPlan' })],
+    }),
+    defineField({
+      name: 'faq',
+      type: 'array',
+      validation: (rule) => rule.required().min(1),
+      of: [defineArrayMember({ type: 'pricingFaqItem' })],
+    }),
+    defineField({
+      name: 'cancellationTerms',
+      type: 'text',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'refundTerms',
+      type: 'text',
+      validation: requiredText,
+    }),
+    defineField({ name: 'seo', type: 'seoFields', validation: requiredText }),
+  ],
+  validation: (rule) =>
+    rule.custom((document) =>
+      validatePricingDocument(document)
+        ? true
+        : 'Check currency, minor units, plan IDs, amounts, cadence and recommendation.',
+    ),
+  preview: { select: { title: 'title', subtitle: 'status' } },
+});
+
 export const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Site settings',
@@ -335,9 +746,20 @@ export const schemaTypes = [
   internalLink,
   articleProseV1,
   articlePullQuoteV1,
+  campaignConversionCta,
+  campaignHeroV1,
+  campaignBenefitsV1,
+  campaignFaqV1,
+  campaignCtaV1,
+  pricingConversionCta,
+  pricingBilling,
+  pricingPlan,
+  pricingFaqItem,
   category,
   author,
   article,
+  campaignPage,
+  pricingPage,
   siteSettings,
   primaryNavigation,
 ];

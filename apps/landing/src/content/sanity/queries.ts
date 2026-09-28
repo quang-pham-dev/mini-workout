@@ -47,6 +47,73 @@ export const publishedCategoriesQuery = `
   }
 `;
 
+export const publishedCampaignsQuery = `
+  *[_type == "campaignPage" && status == "published"] | order(slug.current asc) {
+    _type,
+    schemaVersion,
+    status,
+    campaignId,
+    "slug": slug.current,
+    title,
+    audienceDescription,
+    startsAt,
+    endsAt,
+    expiryPolicy,
+    "sections": sections[]{
+      "_key": _key,
+      "_type": select(
+        _type == "campaignHeroV1" => "campaignHero.v1",
+        _type == "campaignBenefitsV1" => "campaignBenefits.v1",
+        _type == "campaignFaqV1" => "campaignFaq.v1",
+        _type == "campaignCtaV1" => "campaignCta.v1"
+      ),
+      eyebrow,
+      headline,
+      introduction,
+      "image": {
+        "src": image.image.asset->url,
+        "alt": image.alt,
+        "width": image.image.asset->metadata.dimensions.width,
+        "height": image.image.asset->metadata.dimensions.height,
+        "caption": image.caption
+      },
+      cta,
+      heading,
+      "items": items[]{"_key": _key, title, description, question, answer},
+      copy
+    },
+    seo
+  }
+`;
+
+export const publishedPricingQuery = `
+  *[_type == "pricingPage" && status == "published"] {
+    _type,
+    schemaVersion,
+    status,
+    title,
+    introduction,
+    currencyCode,
+    currencyMinorUnit,
+    locale,
+    "plans": plans[]{
+      "_key": _key,
+      planId,
+      name,
+      summary,
+      amountMinor,
+      billing,
+      "entitlements": entitlements[]{"_key": _key, label},
+      cta,
+      recommended
+    },
+    "faq": faq[]{"_key": _key, question, answer},
+    cancellationTerms,
+    refundTerms,
+    seo
+  }
+`;
+
 export const publishedSiteSettingsQuery = `
   *[_type == "siteSettings" && status == "published"] {
     _type,
@@ -76,6 +143,8 @@ function asPreviewQuery(query: string): string {
 
 export const previewArticlesQuery = asPreviewQuery(publishedArticlesQuery);
 export const previewCategoriesQuery = asPreviewQuery(publishedCategoriesQuery);
+export const previewCampaignsQuery = asPreviewQuery(publishedCampaignsQuery);
+export const previewPricingQuery = asPreviewQuery(publishedPricingQuery);
 export const previewSiteSettingsQuery = asPreviewQuery(
   publishedSiteSettingsQuery,
 );

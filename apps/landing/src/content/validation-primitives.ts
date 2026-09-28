@@ -101,7 +101,7 @@ export function mapSlug(
   return slug;
 }
 
-function isSafeInternalPath(href: string): boolean {
+export function isSafeInternalPath(href: string): boolean {
   if (!href.startsWith('/') || href.startsWith('//')) return false;
   if (href.includes('?') || href.includes('\\')) return false;
 

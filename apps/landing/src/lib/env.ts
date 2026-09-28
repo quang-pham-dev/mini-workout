@@ -36,6 +36,12 @@ export interface LandingEnv {
   sanityProjectId?: string;
   sanityDataset?: string;
   output: 'static' | 'preview';
+  analytics: Readonly<{
+    enabled: boolean;
+    host: string;
+    key?: string;
+  }>;
+  experimentsEnabled: boolean;
 }
 
 export function parseLandingEnv(
@@ -44,6 +50,10 @@ export function parseLandingEnv(
       NodeJS.ProcessEnv,
       | 'LANDING_CONTENT_SOURCE'
       | 'LANDING_INDEXING_ENABLED'
+      | 'LANDING_ANALYTICS_ENABLED'
+      | 'LANDING_EXPERIMENTS_ENABLED'
+      | 'LANDING_POSTHOG_HOST'
+      | 'LANDING_POSTHOG_KEY'
       | 'LANDING_OUTPUT'
       | 'MEMBER_APP_URL'
       | 'LANDING_SITE_URL'
@@ -55,6 +65,29 @@ export function parseLandingEnv(
     >
   >,
 ): LandingEnv {
+  const analyticsFlag = env.LANDING_ANALYTICS_ENABLED ?? 'false';
+  if (analyticsFlag !== 'true' && analyticsFlag !== 'false') {
+    throw new Error('LANDING_ANALYTICS_ENABLED must be true or false.');
+  }
+  const analyticsEnabled = analyticsFlag === 'true';
+  const experimentsFlag = env.LANDING_EXPERIMENTS_ENABLED ?? 'false';
+  if (experimentsFlag !== 'true' && experimentsFlag !== 'false') {
+    throw new Error('LANDING_EXPERIMENTS_ENABLED must be true or false.');
+  }
+  const experimentsEnabled = experimentsFlag === 'true';
+  if (experimentsEnabled && !analyticsEnabled) {
+    throw new Error('Landing experiments require analytics to be enabled.');
+  }
+  const analyticsKey = env.LANDING_POSTHOG_KEY?.trim();
+  if (analyticsEnabled && !analyticsKey) {
+    throw new Error(
+      'LANDING_POSTHOG_KEY is required when analytics is enabled.',
+    );
+  }
+  const analyticsHost = parseOrigin(
+    env.LANDING_POSTHOG_HOST?.trim() || 'https://us.i.posthog.com',
+    'LANDING_POSTHOG_HOST',
+  );
   const output = env.LANDING_OUTPUT ?? 'static';
   if (output !== 'static' && output !== 'preview') {
     throw new Error('LANDING_OUTPUT must be static or preview.');
@@ -94,6 +127,12 @@ export function parseLandingEnv(
       env.LANDING_INDEXING_ENABLED === 'true',
     contentSource,
     output,
+    analytics: {
+      enabled: analyticsEnabled,
+      host: analyticsHost,
+      ...(analyticsKey ? { key: analyticsKey } : {}),
+    },
+    experimentsEnabled,
     ...(contentSource === 'sanity'
       ? {
           sanityProjectId: env.SANITY_PROJECT_ID,

@@ -30,6 +30,13 @@ export type JsonLd =
     }
   | {
       '@context': 'https://schema.org';
+      '@type': 'WebPage';
+      name: string;
+      description: string;
+      url: string;
+    }
+  | {
+      '@context': 'https://schema.org';
       '@type': 'BreadcrumbList';
       itemListElement: Array<{
         '@type': 'ListItem';

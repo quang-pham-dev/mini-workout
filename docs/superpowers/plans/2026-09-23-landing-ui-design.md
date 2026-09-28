@@ -245,18 +245,22 @@ of design review, not optional styling preferences.
 2. Capture and approve Home at the agreed responsive/theme states. Replace the
    provisional photography and copy only when Brand/Product supplies approved
    assets; these inputs do not block engineering guardrails.
-3. Build Phase 3 published-content contracts against local fixtures: category,
-   article and campaign view models plus an exhaustive section registry. Keep
-   Sanity preview and publish automation disabled until Spikes A/C close.
+3. Phase 3 published-content contracts now cover Category, Article and Campaign
+   view models plus exhaustive versioned section registries. Campaign remains
+   deliberately fixture-free until an approved offer exists.
 4. The Mobility Category-to-Article vertical slice is implemented. Keep
    additional category and article routes unpublished until they have unique
-   approved copy and media. Add Campaign next when a real campaign fixture and
-   retention/expiry policy are approved; otherwise continue the offline Phase 3
-   section registry and published-content mapper without exposing preview or
-   webhooks.
-5. Implement Pricing only after currency, billing cadence, entitlements and
-   legal/refund copy are approved. Do not ship guessed tiers or placeholder
-   amounts.
+   approved copy and media. The Campaign mapper/schema, reusable Astro template
+   and lifecycle planner are complete. Its route remains output-free while the
+   fixture collection is empty; add a real URL and Home promotion only with an
+   approved campaign, offer/legal copy and an explicit retention/expiry choice.
+   Archive and the Vercel Build Output contract for redirect/`410` are
+   implemented; live protected-preview status/header evidence remains required.
+5. The fixture-free Pricing contract, Studio singleton and reusable Astro
+   template are implemented without a public route. Activate `/pricing/` only
+   after currency, exact amounts/minor units, billing cadence, entitlements and
+   cancellation/refund copy are approved. Do not ship guessed tiers or
+   placeholder amounts.
 
 ### Open review inputs
 

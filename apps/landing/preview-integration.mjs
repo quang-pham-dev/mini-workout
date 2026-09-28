@@ -17,6 +17,14 @@ export function previewIntegration(enabled) {
           ),
           prerender: false,
         });
+        injectRoute({
+          pattern: '/api/webhooks/sanity/publish',
+          entrypoint: new URL(
+            './src/publish/publish-route.ts',
+            import.meta.url,
+          ),
+          prerender: false,
+        });
         addMiddleware({
           order: 'pre',
           entrypoint: new URL('./src/preview/middleware.ts', import.meta.url),

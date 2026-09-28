@@ -35,5 +35,6 @@ export function crossAppNavigationMetadata(intent: CrossAppNavigationIntent) {
     'data-destination-app': intent.destinationApp,
     'data-navigation-action': intent.action,
     'data-navigation-placement': intent.placement,
+    'data-analytics-cta-id': `${intent.placement}-${intent.action}`,
   } as const;
 }

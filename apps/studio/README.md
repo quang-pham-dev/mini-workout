@@ -3,10 +3,12 @@
 Sanity Studio owns Landing editorial authoring and is intentionally isolated
 from the Product/Admin React runtimes. It pins its own compatible React version.
 
-The current offline schema slice covers Category, Article, Author, SEO, internal
-links, Sanity image assets and the versioned Article prose/pull-quote sections.
-Campaign, Pricing and publish webhooks remain gated by the Landing architecture
-plan. Presentation targets a separately built, protected SSR Landing origin.
+The current schema covers Category, Article, Campaign, Pricing, Author, SEO,
+internal links, Sanity image assets and their versioned content boundaries.
+Pricing is a singleton and remains fixture-free until approved commercial and
+legal copy exists. Presentation targets a separately built, protected SSR
+Landing origin; Pricing receives no Presentation location until its public
+route is approved.
 
 Copy `.env.example` to `apps/studio/.env` when a real Sanity project is
 available. Studio and Landing use the same non-secret `SANITY_PROJECT_ID` and
@@ -54,11 +56,12 @@ pnpm --filter @mini-workout/studio check-types
 pnpm --filter @mini-workout/studio build
 ```
 
-The Studio desk groups Articles and Categories under Editorial, with Authors
-under People. Slug and internal-link authoring validation mirrors the Landing
-published-content boundary, and document previews expose the identifying text
-and editorial image. Configuration singletons and additional page types are
-added only after their Landing contracts exist.
+The Studio desk groups Articles, Categories and Campaigns under Editorial, with
+Authors under People. Site shell and Pricing are explicit Configuration
+singletons. Slug, internal-link and commercial authoring validation mirrors the
+Landing published-content boundary, and document previews expose identifying
+content. Additional page types are added only after their Landing contracts
+exist.
 
 Landing still defaults to local fixtures, but its activation gate is now
 verified against this published dataset. Select `LANDING_CONTENT_SOURCE=sanity`

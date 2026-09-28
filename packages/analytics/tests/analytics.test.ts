@@ -79,4 +79,37 @@ describe('analytics contracts', () => {
     }).not.toThrow();
     Object.assign(globalThis, { window: previousWindow });
   });
+
+  it('forwards typed product properties and rejects invalid product payloads', () => {
+    const sdk = {
+      init: vi.fn(),
+      capture: vi.fn(),
+      captureException: vi.fn(),
+      identify: vi.fn(),
+      reset: vi.fn(),
+    };
+    const client = createPostHogBrowserAdapter(sdk, 'public-key');
+    const previousWindow = globalThis.window;
+    Object.assign(globalThis, { window: {} });
+
+    client.capture('cta_clicked', {
+      route_template: '/',
+      cta_id: 'header-login',
+      destination_app: 'member',
+      action: 'login',
+      placement: 'header',
+      email: 'private@example.test',
+    });
+    client.capture('cta_clicked', { route_template: '/' });
+
+    expect(sdk.capture).toHaveBeenCalledTimes(1);
+    expect(sdk.capture).toHaveBeenCalledWith('cta_clicked', {
+      route_template: '/',
+      cta_id: 'header-login',
+      destination_app: 'member',
+      action: 'login',
+      placement: 'header',
+    });
+    Object.assign(globalThis, { window: previousWindow });
+  });
 });

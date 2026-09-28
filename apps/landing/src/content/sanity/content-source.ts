@@ -1,16 +1,24 @@
 import type { ArticleViewModel } from '../../features/articles/catalog.js';
+import type { CampaignViewModel } from '../../features/campaigns/catalog.js';
 import type { CategoryViewModel } from '../../features/categories/catalog.js';
+import type { PricingViewModel } from '../../features/pricing/catalog.js';
 import type { SiteShellViewModel } from '../../features/site-shell/catalog.js';
 import { mapPublishedArticleDocuments } from '../published-article.js';
+import { mapPublishedCampaignDocuments } from '../published-campaign.js';
 import { mapPublishedCategoryDocuments } from '../published-category.js';
+import { mapPublishedPricingDocuments } from '../published-pricing.js';
 import { mapPublishedSiteShellDocuments } from '../published-site-shell.js';
 import {
   previewArticlesQuery,
+  previewCampaignsQuery,
   previewCategoriesQuery,
+  previewPricingQuery,
   previewPrimaryNavigationQuery,
   previewSiteSettingsQuery,
   publishedArticlesQuery,
+  publishedCampaignsQuery,
   publishedCategoriesQuery,
+  publishedPricingQuery,
   publishedPrimaryNavigationQuery,
   publishedSiteSettingsQuery,
 } from './queries.js';
@@ -46,6 +54,8 @@ interface ContentSourceOptions {
 export interface PublishedContentSource {
   getArticles: () => Promise<ArticleViewModel[]>;
   getCategories: () => Promise<CategoryViewModel[]>;
+  getCampaigns: () => Promise<CampaignViewModel[]>;
+  getPricing: () => Promise<PricingViewModel | null>;
   getSiteShell: () => Promise<SiteShellViewModel>;
 }
 
@@ -113,6 +123,18 @@ export function createPublishedContentSource(
       mapPublishedCategoryDocuments(
         await fetchDocuments(
           options.preview ? previewCategoriesQuery : publishedCategoriesQuery,
+        ),
+      ),
+    getCampaigns: async () =>
+      mapPublishedCampaignDocuments(
+        await fetchDocuments(
+          options.preview ? previewCampaignsQuery : publishedCampaignsQuery,
+        ),
+      ),
+    getPricing: async () =>
+      mapPublishedPricingDocuments(
+        await fetchDocuments(
+          options.preview ? previewPricingQuery : publishedPricingQuery,
         ),
       ),
     getSiteShell: async () => {

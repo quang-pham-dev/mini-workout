@@ -1,0 +1,341 @@
+---
+import CrossAppLink from '../../components/CrossAppLink.astro';
+import { productDestination } from '../../lib/product-destination.js';
+import type { CampaignSection } from '../../content/campaign-section-registry.js';
+
+interface Props {
+  section: CampaignSection;
+  lifecycle: 'active' | 'archived';
+}
+
+const { section, lifecycle } = Astro.props;
+const destinations = productDestination(import.meta.env.MEMBER_APP_URL);
+const conversionUrl =
+  section.type === 'campaignHero.v1' || section.type === 'campaignCta.v1'
+    ? destinations[section.cta.action === 'register' ? 'register' : 'signIn']
+    : undefined;
+---
+
+{section.type === 'campaignHero.v1' && (
+  <header class="campaign-hero section-shell">
+    <div class="campaign-hero-copy">
+      {lifecycle === 'archived' && (
+        <p class="campaign-status">Archived campaign</p>
+      )}
+      <p class="eyebrow">{section.eyebrow}</p>
+      <h1>{section.headline}</h1>
+      <p class="campaign-introduction">{section.introduction}</p>
+      {lifecycle === 'active' && conversionUrl && (
+        <CrossAppLink
+          class="button button-primary"
+          href={conversionUrl}
+          destinationApp="member"
+          action={section.cta.action}
+          placement="campaign-hero"
+        >
+          {section.cta.label}
+        </CrossAppLink>
+      )}
+    </div>
+    <figure>
+      <img
+        src={section.image.src}
+        alt={section.image.alt}
+        width={section.image.width}
+        height={section.image.height}
+        fetchpriority="high"
+        decoding="async"
+      />
+      <figcaption>{section.image.caption}</figcaption>
+    </figure>
+    <p class="campaign-index" aria-hidden="true">
+      01 / Move with intention
+    </p>
+  </header>
+)}
+
+{section.type === 'campaignBenefits.v1' && (
+  <section
+    class="campaign-benefits section-shell"
+    aria-labelledby={`${section.key}-title`}
+  >
+    <div>
+      <p class="eyebrow">The practice</p>
+      <h2 id={`${section.key}-title`}>{section.heading}</h2>
+    </div>
+    <ol>
+      {section.items.map((item, index) => (
+        <li>
+          <span aria-hidden="true">0{index + 1}</span>
+          <div>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+
+{section.type === 'campaignFaq.v1' && (
+  <section
+    class="campaign-faq section-shell"
+    aria-labelledby={`${section.key}-title`}
+  >
+    <div>
+      <p class="eyebrow">Good to know</p>
+      <h2 id={`${section.key}-title`}>{section.heading}</h2>
+    </div>
+    <div class="campaign-faq-list">
+      {section.items.map((item) => (
+        <details>
+          <summary>{item.question}</summary>
+          <p>{item.answer}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+)}
+
+{section.type === 'campaignCta.v1' && (
+  <section
+    class="campaign-closing section-shell"
+    aria-labelledby={`${section.key}-title`}
+  >
+    <div>
+      <p class="eyebrow">
+        {lifecycle === 'active' ? 'Begin from here' : 'Campaign archive'}
+      </p>
+      <h2 id={`${section.key}-title`}>{section.heading}</h2>
+      <p>{section.copy}</p>
+    </div>
+    {lifecycle === 'active' && conversionUrl && (
+      <CrossAppLink
+        class="button button-primary"
+        href={conversionUrl}
+        destinationApp="member"
+        action={section.cta.action}
+        placement="campaign-closing"
+      >
+        {section.cta.label}
+      </CrossAppLink>
+    )}
+  </section>
+)}
+
+<style>
+  .campaign-hero {
+    position: relative;
+    display: grid;
+    min-height: 48rem;
+    grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
+    align-items: center;
+    gap: clamp(3rem, 8vw, 8rem);
+    padding-block: 5rem 8rem;
+  }
+
+  .campaign-hero-copy {
+    position: relative;
+    z-index: 1;
+  }
+
+  .campaign-status {
+    display: inline-block;
+    margin-bottom: 2rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid var(--color-primary);
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .campaign-hero h1,
+  .campaign-benefits h2,
+  .campaign-faq h2,
+  .campaign-closing h2 {
+    color: var(--color-text-primary);
+    font-weight: 650;
+    letter-spacing: -0.055em;
+    text-wrap: balance;
+  }
+
+  .campaign-hero h1 {
+    max-width: 10ch;
+    margin-top: 1.5rem;
+    font-size: clamp(4rem, 7vw, 7.2rem);
+    line-height: 0.94;
+  }
+
+  .campaign-introduction {
+    max-width: 38ch;
+    margin-block: 2rem 2.25rem;
+    color: var(--color-text-secondary);
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    line-height: 1.7;
+  }
+
+  .campaign-hero figure {
+    margin: 0;
+  }
+
+  .campaign-hero img {
+    display: block;
+    width: min(100%, 34rem);
+    aspect-ratio: 0.78;
+    margin-left: auto;
+    border-radius: 50% 50% 1.25rem 1.25rem;
+    object-fit: cover;
+  }
+
+  .campaign-hero figcaption {
+    width: min(100%, 34rem);
+    margin: 0.8rem 0 0 auto;
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+  }
+
+  .campaign-index {
+    position: absolute;
+    right: 0;
+    bottom: 4rem;
+    color: var(--color-primary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .campaign-benefits,
+  .campaign-faq {
+    display: grid;
+    grid-template-columns: minmax(15rem, 0.72fr) minmax(0, 1.28fr);
+    gap: clamp(3rem, 10vw, 10rem);
+    padding-block: 7rem 8rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .campaign-benefits h2,
+  .campaign-faq h2,
+  .campaign-closing h2 {
+    max-width: 11ch;
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    line-height: 1.02;
+  }
+
+  .campaign-benefits ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .campaign-benefits li {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    padding-block: 1.5rem 1.8rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .campaign-benefits li:first-child {
+    padding-top: 0.2rem;
+  }
+
+  .campaign-benefits li > span {
+    padding-top: 0.25rem;
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .campaign-benefits h3 {
+    color: var(--color-text-primary);
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+
+  .campaign-benefits li p,
+  .campaign-faq details p,
+  .campaign-closing div > p:last-child {
+    max-width: 42ch;
+    margin-top: 0.6rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .campaign-faq-list {
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .campaign-faq details {
+    padding-block: 1.4rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .campaign-faq summary {
+    cursor: pointer;
+    color: var(--color-text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .campaign-faq summary::marker {
+    color: var(--color-primary);
+  }
+
+  .campaign-closing {
+    display: grid;
+    min-height: 24rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 3rem;
+    margin-bottom: 6rem;
+    padding: clamp(2rem, 6vw, 5rem);
+    border-radius: 1.25rem;
+    background: var(--color-surface-sunken);
+  }
+
+  @media (max-width: 48rem) {
+    .campaign-hero,
+    .campaign-benefits,
+    .campaign-faq,
+    .campaign-closing {
+      grid-template-columns: 1fr;
+    }
+
+    .campaign-hero {
+      min-height: 0;
+      gap: 3.5rem;
+      padding-block: 3.5rem 5rem;
+    }
+
+    .campaign-hero h1 {
+      font-size: clamp(3.6rem, 15vw, 5.2rem);
+    }
+
+    .campaign-hero img {
+      width: 100%;
+      margin: 0;
+    }
+
+    .campaign-index {
+      display: none;
+    }
+
+    .campaign-benefits,
+    .campaign-faq {
+      gap: 3rem;
+      padding-block: 5rem;
+    }
+
+    .campaign-closing {
+      min-height: 0;
+      align-items: start;
+      gap: 2rem;
+      margin-bottom: 4rem;
+      padding: 2.25rem 1.5rem;
+    }
+  }
+</style>

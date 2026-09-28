@@ -11,7 +11,9 @@ export type ContentParityIssueCode =
   | 'CATEGORY_INVENTORY'
   | 'CATEGORY_MEDIA_DIMENSIONS'
   | 'CATEGORY_SEO'
+  | 'CAMPAIGN_INVENTORY'
   | 'PRIMARY_NAVIGATION'
+  | 'PRICING_INVENTORY'
   | 'SITE_SETTINGS';
 
 export interface ContentParityIssue {
@@ -45,12 +47,17 @@ function equalDimensions(
 }
 
 function compareInventory<T extends { slug: string }>(
-  kind: 'articles' | 'categories',
+  kind: 'articles' | 'categories' | 'campaigns',
   expected: readonly T[],
   actual: readonly T[],
   issues: ContentParityIssue[],
 ): void {
-  const code = kind === 'articles' ? 'ARTICLE_INVENTORY' : 'CATEGORY_INVENTORY';
+  const code =
+    kind === 'articles'
+      ? 'ARTICLE_INVENTORY'
+      : kind === 'categories'
+        ? 'CATEGORY_INVENTORY'
+        : 'CAMPAIGN_INVENTORY';
   const expectedSlugs = new Set(expected.map(({ slug }) => slug));
   const actualSlugs = new Set(actual.map(({ slug }) => slug));
 
@@ -147,7 +154,13 @@ export function comparePublishedContentSnapshots(
       path: 'siteShell.primaryCtaLabel',
     });
   }
+  if (expected.pricing === null && actual.pricing !== null) {
+    issues.push({ code: 'PRICING_INVENTORY', path: 'pricing.unexpected' });
+  } else if (expected.pricing !== null && actual.pricing === null) {
+    issues.push({ code: 'PRICING_INVENTORY', path: 'pricing.missing' });
+  }
   compareInventory('articles', expected.articles, actual.articles, issues);
+  compareInventory('campaigns', expected.campaigns, actual.campaigns, issues);
   compareInventory(
     'categories',
     expected.categories,

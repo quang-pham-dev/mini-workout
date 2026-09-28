@@ -14,6 +14,11 @@ describe('parseLandingEnv', () => {
       indexable: false,
       contentSource: 'fixtures',
       output: 'static',
+      analytics: {
+        enabled: false,
+        host: 'https://us.i.posthog.com/',
+      },
+      experimentsEnabled: false,
     });
     expect(
       parseLandingEnv({ LANDING_SITE_URL: 'https://site.example/' }).siteUrl,
@@ -30,6 +35,42 @@ describe('parseLandingEnv', () => {
     expect(
       parseLandingEnv({ MEMBER_APP_URL: 'members.example.com' }).productAppUrl,
     ).toBe('https://members.example.com/');
+  });
+
+  it('requires an explicit key and opt-in before enabling analytics', () => {
+    expect(
+      parseLandingEnv({
+        LANDING_ANALYTICS_ENABLED: 'true',
+        LANDING_POSTHOG_KEY: 'phc_public',
+        LANDING_POSTHOG_HOST: 'https://eu.i.posthog.com',
+      }).analytics,
+    ).toEqual({
+      enabled: true,
+      key: 'phc_public',
+      host: 'https://eu.i.posthog.com/',
+    });
+    expect(() =>
+      parseLandingEnv({ LANDING_ANALYTICS_ENABLED: 'true' }),
+    ).toThrow('LANDING_POSTHOG_KEY is required when analytics is enabled.');
+    expect(() => parseLandingEnv({ LANDING_ANALYTICS_ENABLED: 'yes' })).toThrow(
+      'LANDING_ANALYTICS_ENABLED must be true or false.',
+    );
+  });
+
+  it('keeps experiments behind both the global kill switch and analytics', () => {
+    expect(
+      parseLandingEnv({
+        LANDING_ANALYTICS_ENABLED: 'true',
+        LANDING_POSTHOG_KEY: 'phc_public',
+        LANDING_EXPERIMENTS_ENABLED: 'true',
+      }).experimentsEnabled,
+    ).toBe(true);
+    expect(() =>
+      parseLandingEnv({ LANDING_EXPERIMENTS_ENABLED: 'true' }),
+    ).toThrow('Landing experiments require analytics to be enabled.');
+    expect(() =>
+      parseLandingEnv({ LANDING_EXPERIMENTS_ENABLED: 'yes' }),
+    ).toThrow('LANDING_EXPERIMENTS_ENABLED must be true or false.');
   });
 
   it('requires complete public Sanity configuration before activation', () => {
@@ -171,6 +212,23 @@ describe('serializeJsonLd', () => {
     ).toMatchObject({
       '@type': 'CollectionPage',
       name: 'Mobility',
+    });
+  });
+
+  it('serializes the schema-owned Campaign WebPage shape', () => {
+    expect(
+      JSON.parse(
+        serializeJsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'WebPage',
+          name: 'Autumn mobility',
+          description: 'A seasonal movement collection.',
+          url: 'https://example.com/campaigns/autumn-mobility/',
+        }),
+      ),
+    ).toMatchObject({
+      '@type': 'WebPage',
+      name: 'Autumn mobility',
     });
   });
 });

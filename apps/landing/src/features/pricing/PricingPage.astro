@@ -1,0 +1,380 @@
+---
+import CrossAppLink from '../../components/CrossAppLink.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { productDestination } from '../../lib/product-destination.js';
+import type { JsonLd } from '../../lib/seo/index.js';
+import type { PricingViewModel } from './catalog.js';
+import { formatBillingCadence, formatPricingAmount } from './presentation.js';
+
+interface Props {
+  pricing: PricingViewModel;
+}
+
+const { pricing } = Astro.props;
+const productLinks = productDestination(import.meta.env.MEMBER_APP_URL);
+const siteUrl = Astro.site?.toString() ?? 'https://example.com/';
+const pricingUrl = new URL(pricing.seo.canonicalPath, siteUrl).toString();
+const jsonLd: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: pricing.title,
+  description: pricing.seo.description,
+  url: pricingUrl,
+};
+---
+
+<SiteLayout
+  title={pricing.seo.title}
+  description={pricing.seo.description}
+  canonicalPath={pricing.seo.canonicalPath}
+  jsonLd={jsonLd}
+>
+  <article class="pricing-page">
+    <header class="pricing-hero section-shell">
+      <p class="pricing-kicker">Plans and terms</p>
+      <div class="pricing-heading">
+        <h1>{pricing.title}</h1>
+        <p>{pricing.introduction}</p>
+      </div>
+      <p class="pricing-context">
+        {pricing.currencyCode}
+        <span aria-hidden="true"> / </span>
+        {pricing.locale}
+      </p>
+    </header>
+
+    <section
+      class="plan-comparison section-shell"
+      aria-labelledby="plans-title"
+    >
+      <h2 id="plans-title" class="visually-hidden">
+        Available plans
+      </h2>
+      {pricing.plans.map((plan, index) => {
+        const amount = formatPricingAmount({
+          amountMinor: plan.amountMinor,
+          currencyCode: pricing.currencyCode,
+          currencyMinorUnit: pricing.currencyMinorUnit,
+          locale: pricing.locale,
+        });
+        const destination =
+          plan.cta.action === 'login'
+            ? productLinks.signIn
+            : productLinks.register;
+        return (
+          <article
+            class:list={[
+              'pricing-plan',
+              { 'is-recommended': plan.recommended },
+            ]}
+            aria-labelledby={`plan-${plan.planId}`}
+          >
+            <div class="plan-index" aria-hidden="true">
+              {String(index + 1).padStart(2, '0')}
+            </div>
+            <div class="plan-summary">
+              <div class="plan-heading">
+                <h3 id={`plan-${plan.planId}`}>{plan.name}</h3>
+                {plan.recommended && <span>Recommended</span>}
+              </div>
+              <p>{plan.summary}</p>
+            </div>
+            <div class="plan-price">
+              <strong>{amount}</strong>
+              <span>{formatBillingCadence(plan.billing)}</span>
+            </div>
+            <ul class="plan-entitlements">
+              {plan.entitlements.map((entitlement) => (
+                <li>{entitlement.label}</li>
+              ))}
+            </ul>
+            <CrossAppLink
+              class="button button-primary plan-cta"
+              href={destination}
+              destinationApp="member"
+              action={plan.cta.action}
+              placement={`pricing-${plan.planId}`}
+            >
+              {plan.cta.label}
+            </CrossAppLink>
+          </article>
+        );
+      })}
+    </section>
+
+    <section
+      class="pricing-faq section-shell"
+      aria-labelledby="pricing-faq-title"
+    >
+      <header>
+        <p class="pricing-kicker">Before choosing</p>
+        <h2 id="pricing-faq-title">Questions, answered plainly.</h2>
+      </header>
+      <div>
+        {pricing.faq.map((item) => (
+          <details>
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <aside class="pricing-terms section-shell" aria-labelledby="terms-title">
+      <div>
+        <p class="pricing-kicker">Approved terms</p>
+        <h2 id="terms-title">Know what happens next.</h2>
+      </div>
+      <dl>
+        <div>
+          <dt>Cancellation</dt>
+          <dd>{pricing.cancellationTerms}</dd>
+        </div>
+        <div>
+          <dt>Refunds</dt>
+          <dd>{pricing.refundTerms}</dd>
+        </div>
+      </dl>
+    </aside>
+  </article>
+</SiteLayout>
+
+<style>
+  .pricing-page {
+    overflow: clip;
+  }
+
+  .pricing-hero {
+    display: grid;
+    grid-template-columns: 0.35fr 1fr 0.3fr;
+    gap: clamp(1.5rem, 5vw, 5rem);
+    align-items: end;
+    padding-block: clamp(5rem, 10vw, 9rem) clamp(4rem, 8vw, 7rem);
+  }
+
+  .pricing-kicker {
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .pricing-heading h1,
+  .pricing-faq h2,
+  .pricing-terms h2 {
+    color: var(--color-text-primary);
+    font-weight: 650;
+    letter-spacing: -0.055em;
+    text-wrap: balance;
+  }
+
+  .pricing-heading h1 {
+    max-width: 11ch;
+    font-size: clamp(3.4rem, 7vw, 7rem);
+    line-height: 0.96;
+  }
+
+  .pricing-heading > p {
+    max-width: 42rem;
+    margin-top: 1.5rem;
+    color: var(--color-text-secondary);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.7;
+  }
+
+  .pricing-context {
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .plan-comparison {
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .pricing-plan {
+    display: grid;
+    grid-template-columns: 0.22fr 0.85fr 0.55fr 0.85fr auto;
+    gap: clamp(1rem, 3vw, 3rem);
+    align-items: start;
+    padding-block: clamp(2.5rem, 5vw, 4.5rem);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .pricing-plan.is-recommended {
+    box-shadow: inset 0.3rem 0 0 var(--color-primary);
+    padding-left: clamp(1rem, 2vw, 2rem);
+  }
+
+  .plan-index,
+  .plan-price span {
+    color: var(--color-text-secondary);
+    font-size: 0.78rem;
+  }
+
+  .plan-heading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .plan-heading h3 {
+    color: var(--color-text-primary);
+    font-size: clamp(1.5rem, 2.5vw, 2.3rem);
+    letter-spacing: -0.04em;
+  }
+
+  .plan-heading span {
+    color: var(--color-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .plan-summary > p,
+  .plan-entitlements,
+  .pricing-faq details p,
+  .pricing-terms dd {
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+  }
+
+  .plan-summary > p {
+    margin-top: 0.75rem;
+  }
+
+  .plan-price {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .plan-price strong {
+    color: var(--color-text-primary);
+    font-size: clamp(1.8rem, 3vw, 3rem);
+    letter-spacing: -0.05em;
+  }
+
+  .plan-entitlements {
+    display: grid;
+    gap: 0.6rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .plan-entitlements li::before {
+    content: '—';
+    margin-right: 0.6rem;
+    color: var(--color-primary);
+  }
+
+  .plan-cta {
+    white-space: nowrap;
+  }
+
+  .pricing-faq,
+  .pricing-terms {
+    display: grid;
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: clamp(2rem, 8vw, 8rem);
+    padding-block: clamp(5rem, 9vw, 8rem);
+  }
+
+  .pricing-faq h2,
+  .pricing-terms h2 {
+    max-width: 10ch;
+    margin-top: 1rem;
+    font-size: clamp(2.5rem, 5vw, 4.6rem);
+    line-height: 1.02;
+  }
+
+  .pricing-faq details {
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .pricing-faq summary {
+    cursor: pointer;
+    color: var(--color-text-primary);
+    font-weight: 650;
+  }
+
+  .pricing-faq details p {
+    max-width: 58ch;
+    margin-top: 1rem;
+  }
+
+  .pricing-terms {
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .pricing-terms dl {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .pricing-terms dt {
+    margin-bottom: 0.75rem;
+    color: var(--color-text-primary);
+    font-weight: 700;
+  }
+
+  @media (max-width: 70rem) {
+    .pricing-plan {
+      grid-template-columns: 0.15fr 1fr 0.65fr;
+    }
+
+    .plan-entitlements {
+      grid-column: 2;
+    }
+
+    .plan-cta {
+      grid-column: 3;
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .pricing-hero,
+    .pricing-faq,
+    .pricing-terms {
+      grid-template-columns: 1fr;
+    }
+
+    .pricing-hero {
+      align-items: start;
+    }
+
+    .pricing-context {
+      order: 3;
+    }
+
+    .pricing-plan,
+    .pricing-plan.is-recommended {
+      grid-template-columns: 1fr;
+      padding-left: 0;
+    }
+
+    .pricing-plan.is-recommended {
+      box-shadow: inset 0 0.3rem 0 var(--color-primary);
+      padding-top: 3rem;
+    }
+
+    .plan-entitlements,
+    .plan-cta {
+      grid-column: auto;
+    }
+
+    .plan-cta {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plan-cta:hover {
+      transform: none;
+    }
+  }
+</style>

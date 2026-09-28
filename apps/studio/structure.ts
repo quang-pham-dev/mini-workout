@@ -1,13 +1,17 @@
 import type { StructureResolver } from 'sanity/structure';
 
 export const editorialDeskGroups = [
-  { title: 'Editorial', documentTypes: ['article', 'category'] },
+  {
+    title: 'Editorial',
+    documentTypes: ['article', 'category', 'campaignPage'],
+  },
   { title: 'People', documentTypes: ['author'] },
 ] as const;
 
 export const singletonDocumentTypes = [
   'siteSettings',
   'primaryNavigation',
+  'pricingPage',
 ] as const;
 
 const configurationSingletons = [
@@ -20,6 +24,11 @@ const configurationSingletons = [
     title: 'Primary navigation',
     schemaType: 'primaryNavigation',
     documentId: 'mini-workout-primary-navigation',
+  },
+  {
+    title: 'Pricing',
+    schemaType: 'pricingPage',
+    documentId: 'mini-workout-pricing',
   },
 ] as const;
 

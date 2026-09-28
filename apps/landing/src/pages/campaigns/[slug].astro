@@ -1,0 +1,35 @@
+---
+import CampaignPage from '../../features/campaigns/CampaignPage.astro';
+import {
+  getContentRepository,
+  publishedContentRepository,
+} from '../../content/published-content-repository.js';
+import { classifyCampaignLifecycle } from '../../content/published-campaign.js';
+import { planCampaignDelivery } from '../../features/campaigns/delivery.js';
+import type { CampaignPageDelivery } from '../../features/campaigns/delivery.js';
+import { writeCampaignRoutingManifest } from '../../features/campaigns/routing-manifest.js';
+import type { GetStaticPaths } from 'astro';
+
+interface Props extends CampaignPageDelivery {}
+
+export const getStaticPaths = (async () => {
+  const { campaigns } = await publishedContentRepository.load();
+  const plan = planCampaignDelivery(campaigns, new Date());
+  await writeCampaignRoutingManifest(plan);
+  return plan.pages.map(({ campaign, lifecycle }) => ({
+    params: { slug: campaign.slug },
+    props: { campaign, lifecycle },
+  }));
+}) satisfies GetStaticPaths;
+export const prerender = !import.meta.env.LANDING_PREVIEW;
+
+let { campaign, lifecycle } = Astro.props;
+if (!campaign && Astro.params.slug) {
+  const snapshot = await getContentRepository(Astro.request).load();
+  campaign = snapshot.campaigns.find(({ slug }) => slug === Astro.params.slug)!;
+  const current = classifyCampaignLifecycle(campaign, new Date());
+  lifecycle = current === 'expired' ? 'archived' : 'active';
+}
+---
+
+<CampaignPage campaign={campaign} lifecycle={lifecycle} />

@@ -1,7 +1,11 @@
 import { getPublishedArticles } from '../features/articles/catalog.js';
 import type { ArticleViewModel } from '../features/articles/catalog.js';
+import { getPublishedCampaigns } from '../features/campaigns/catalog.js';
+import type { CampaignViewModel } from '../features/campaigns/catalog.js';
 import { getPublishedCategories } from '../features/categories/catalog.js';
 import type { CategoryViewModel } from '../features/categories/catalog.js';
+import { getPublishedPricing } from '../features/pricing/catalog.js';
+import type { PricingViewModel } from '../features/pricing/catalog.js';
 import { getPublishedSiteShell } from '../features/site-shell/catalog.js';
 import type { SiteShellViewModel } from '../features/site-shell/catalog.js';
 import { parseLandingEnv } from '../lib/env.js';
@@ -10,7 +14,9 @@ import { createPublishedContentSource } from './sanity/content-source.js';
 
 export interface PublishedContentSnapshot {
   articles: readonly ArticleViewModel[];
+  campaigns: readonly CampaignViewModel[];
   categories: readonly CategoryViewModel[];
+  pricing: PricingViewModel | null;
   siteShell: SiteShellViewModel;
 }
 
@@ -40,12 +46,15 @@ const defaultDependencies: RepositoryDependencies = {
     const source = createPublishedContentSource({ projectId, dataset });
     return {
       load: async () => {
-        const [articles, categories, siteShell] = await Promise.all([
-          source.getArticles(),
-          source.getCategories(),
-          source.getSiteShell(),
-        ]);
-        return { articles, categories, siteShell };
+        const [articles, campaigns, categories, pricing, siteShell] =
+          await Promise.all([
+            source.getArticles(),
+            source.getCampaigns(),
+            source.getCategories(),
+            source.getPricing(),
+            source.getSiteShell(),
+          ]);
+        return { articles, campaigns, categories, pricing, siteShell };
       },
     };
   },
@@ -63,7 +72,9 @@ export function createPublishedContentRepository(
         config.contentSource === 'fixtures'
           ? Promise.resolve({
               articles: getPublishedArticles(),
+              campaigns: getPublishedCampaigns(),
               categories: getPublishedCategories(),
+              pricing: getPublishedPricing(),
               siteShell: getPublishedSiteShell(),
             })
           : dependencies
@@ -114,11 +125,15 @@ export function getContentRepository(request: Request): ContentRepository {
     load: () =>
       (snapshotPromise ??= Promise.all([
         source.getArticles(),
+        source.getCampaigns(),
         source.getCategories(),
+        source.getPricing(),
         source.getSiteShell(),
-      ]).then(([articles, categories, siteShell]) => ({
+      ]).then(([articles, campaigns, categories, pricing, siteShell]) => ({
         articles,
+        campaigns,
         categories,
+        pricing,
         siteShell,
       }))),
   };

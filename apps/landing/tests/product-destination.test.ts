@@ -48,6 +48,7 @@ describe('Landing product destinations', () => {
       'data-destination-app': 'member',
       'data-navigation-action': 'register',
       'data-navigation-placement': 'home-hero',
+      'data-analytics-cta-id': 'home-hero-register',
     });
   });
 });

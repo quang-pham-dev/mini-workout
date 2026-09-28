@@ -2,9 +2,11 @@
 
 Astro owns the public marketing and editorial surface on the root domain. This
 app is intentionally static-first. The Home, Mobility category and first
-Mobility Article vertical slices exercise the approved architecture; campaign
-and pricing templates remain gated by their content contracts and the delivery
-plan.
+Mobility Article vertical slices exercise the approved architecture. Campaign
+now has an offline content/lifecycle contract and reusable route/template, but
+no public fixture or generated URL. Pricing has a fixture-free contract,
+Sanity/repository boundary and reusable Astro template; its public route remains
+gated by approved commercial inputs.
 
 ## Ownership boundary
 
@@ -16,11 +18,24 @@ plan.
   islands with reserved layout.
 - Product login, admin, and Sanity Studio remain separate origins/apps.
 - Keep Sanity preview isolated to the `LANDING_OUTPUT=preview` SSR artifact.
-  Publish webhooks, PostHog and product auth remain behind their plan gates.
+  The signed publishing route is injected only into that protected artifact;
+  Product auth remains behind its own boundary. PostHog is loaded only by the
+  consent-gated adapter described below.
 - Treat CMS-shaped content as untrusted. Published Article fixtures enter via
   app-owned Article/Category mappers under `src/content/`; shared slug, SEO,
   local-media and internal-link primitives enforce one policy. Unknown schema
   or section versions fail closed, while drafts never enter static generation.
+- Campaign schedule and expiry behavior are mandatory CMS fields. Scheduled
+  campaigns are omitted; active and archived campaigns can prerender, with
+  conversion suppressed for archives. Until a real offer and expiry policy are
+  approved, the collection remains empty and no campaign URL is generated.
+  Redirect and `gone` policies become validated Vercel Build Output API routes
+  with exact `308` and `410` status codes. Campaign routes are evaluated before
+  trailing-slash normalization and filesystem routing.
+- Pricing is a CMS singleton with exact minor-unit amounts, explicit currency
+  exponent/locale, billing cadence, entitlements, conversion action,
+  cancellation/refund copy and at most one approved recommendation. The local
+  fixture is `null`, so no `/pricing/` route or invented price is published.
 
 ## Local development
 
@@ -53,6 +68,18 @@ pnpm --filter @mini-workout/landing check-budget
 pnpm test:e2e:landing
 ```
 
+Static builds also create `.vercel/output` alongside `dist`. The Build Output
+API v3 artifact copies the reviewed static files and adds Campaign expiry
+routing derived from the same build manifest as `getStaticPaths`. Keep the
+Vercel Landing project rooted at `apps/landing`; do not configure `dist` as a
+manual Output Directory because `.vercel/output` is the deployment contract.
+Preview builds continue to use the Astro Vercel adapter and do not run this
+static-output transformation. In Vercel, configure the public static Landing
+project with Framework Preset `Other`, the normal workspace build command, and
+no Output Directory override so the Build Output API artifact is authoritative.
+Keep the separate editor-preview project on the Astro preset with
+`LANDING_OUTPUT=preview`.
+
 Only explicitly published paths are included in `src/pages/sitemap.xml.ts`.
 The sitemap currently contains Home, Mobility and the published Mobility field
 note. Add routes only when their unique content and SEO metadata/canonical
@@ -78,6 +105,31 @@ dimensions. A mismatch or unavailable/invalid CMS exits non-zero. This is an
 activation gate, not a permanent requirement that future editorial content
 remain identical to the initial fixture baseline.
 
+## Analytics baseline
+
+Landing analytics is off by default, so normal local and static builds retain
+the zero-JavaScript baseline. To prepare an environment, set
+`LANDING_ANALYTICS_ENABLED=true`, `LANDING_POSTHOG_KEY` to the public PostHog
+project key and optionally `LANDING_POSTHOG_HOST`. The key is public browser
+configuration, not a server token. Do not put a personal or server API key here.
+
+Even when configured, the provider is not imported and no event is captured
+until `mini-workout:analytics-consent=granted` exists in local storage. No
+consent UI is implied by this adapter; keep analytics disabled until approved
+privacy copy and the consent surface are available. Events use bounded route
+templates, stable CTA IDs, aggregate referrer classes and sanitized UTM values.
+Raw referrer URLs, destination URLs, query strings, auth identity and arbitrary
+properties are not accepted.
+
+Experiments have a second, independent kill switch:
+`LANDING_EXPERIMENTS_ENABLED`. It may be enabled only when analytics is enabled,
+the consent surface and experiment brief are approved, and the compiled Landing
+registry contains a reviewed test. The registry is intentionally empty today.
+Assignment is deterministic from an opaque ID created only after consent;
+exposure is captured once after the registered CTA/island is visible. Sanity
+does not own traffic allocation. Preview builds may force an allowlisted variant
+with `?mw_experiment=<id>&mw_variant=<id>`; production ignores this override.
+
 `check-boundaries` applies the Astro-native ownership rule to `.astro` imports,
 including files ESLint does not parse. `check-budget` inspects the production
 artifact and enforces 120 KB gzip JavaScript, 48 KB gzip CSS, 512 KB per file
@@ -91,4 +143,6 @@ not launch-ready. Marketing/content owners need to provide approved brand assets
 and content. Production domain routing is a Phase 6 rollout gate. Indexing is
 fail-closed until explicitly enabled on production. Preview deployment
 protection and the real Presentation handshake remain Phase 3 external gates;
-publish automation is still disabled.
+publish automation remains disabled until its Vercel/Sanity secrets, protection
+bypass and activation checklist in the [Landing publishing
+runbook](../../docs/observability/LANDING_PUBLISHING_RUNBOOK.md) are completed.
