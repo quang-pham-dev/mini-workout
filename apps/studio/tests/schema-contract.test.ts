@@ -118,6 +118,20 @@ describe('Studio schema contract', () => {
     expect(arrayMemberTypes(links)).toEqual(['internalLink']);
   });
 
+  it('keeps consent copy optional and owned by site settings', () => {
+    const settings = schemaTypes.find(
+      (schema) => schema.name === 'siteSettings',
+    );
+    const consent = settings?.fields?.find(
+      (field) => field.name === 'analyticsConsent',
+    );
+
+    expect(consent?.type).toBe('analyticsConsent');
+    expect(schemaTypes.map((schema) => schema.name)).toContain(
+      'analyticsConsent',
+    );
+  });
+
   it('allows Article sections only through the versioned registry', () => {
     const article = schemaTypes.find((schema) => schema.name === 'article');
     const sections = article?.fields?.find(

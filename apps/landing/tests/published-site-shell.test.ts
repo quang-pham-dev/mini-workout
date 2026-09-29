@@ -23,6 +23,15 @@ const navigation = {
   primaryCtaLabel: 'Build my routine',
 };
 
+const analyticsConsent = {
+  heading: 'Your privacy, your choice',
+  description: 'Allow anonymous usage data to help improve Mini Workout.',
+  allowLabel: 'Allow analytics',
+  declineLabel: 'Decline',
+  manageLabel: 'Privacy choices',
+  privacyLink: { label: 'Read our privacy policy', href: '/privacy/' },
+};
+
 describe('published site shell contract', () => {
   it('maps the two versioned singleton documents', () => {
     expect(mapPublishedSiteShellDocuments([settings], [navigation])).toEqual({
@@ -34,7 +43,26 @@ describe('published site shell contract', () => {
       ],
       signInLabel: 'Sign in',
       primaryCtaLabel: 'Build my routine',
+      analyticsConsent: null,
     });
+  });
+
+  it('maps complete approved consent copy without providing a fallback', () => {
+    expect(
+      mapPublishedSiteShellDocuments(
+        [{ ...settings, analyticsConsent }],
+        [navigation],
+      ).analyticsConsent,
+    ).toEqual(analyticsConsent);
+  });
+
+  it('rejects partial consent copy instead of publishing invented legal text', () => {
+    expect(() =>
+      mapPublishedSiteShellDocuments(
+        [{ ...settings, analyticsConsent: { heading: 'Privacy' } }],
+        [navigation],
+      ),
+    ).toThrow(/analyticsConsent\.description/);
   });
 
   it('rejects malformed published settings', () => {
