@@ -93,6 +93,12 @@ describe('Landing experiment brief and reporting contract', () => {
         joinKeys: ['email', 'experiment_version', 'variant_id'],
       },
     },
+    {
+      reporting: {
+        ...brief.reporting,
+        reportKey: undefined,
+      },
+    },
   ])('rejects an unsafe approved brief: %j', (override) => {
     expect(() =>
       validateExperimentBriefRegistry([

@@ -1,6 +1,6 @@
 # Landing Experiment Brief and Reporting Contract
 
-**Status:** In progress
+**Status:** Complete (offline contract only; no experiment activated)
 **Date:** 2026-09-29
 **Owner:** `apps/landing`
 
@@ -69,3 +69,21 @@ or executing the live A/A validation.
 Keep the compiled brief registry empty and
 `LANDING_EXPERIMENTS_ENABLED=false`. The existing static control and analytics
 consent behavior remain unchanged.
+
+## Completion evidence — 2026-09-29
+
+- RED checkpoint: `1a534ca`; the new contract module was absent and the focused
+  test failed for that intended reason.
+- Focused GREEN: all brief validation, approval, reporting, registry-drift,
+  orphan and empty-registry states pass.
+- Landing suite: 34 files and 247 tests pass with 87.98% statements and 84.28%
+  branches covered; the experimentation boundary remains above 99% statements.
+- Landing lint, Astro type-check and Astro ownership boundaries pass.
+- `pnpm check:landing-experiments` passes against the deliberately empty
+  production registries without provider access.
+- Production-static fixture build emits four pages and `0 B` gzip JavaScript;
+  the artifact budget passes at 413,037 B total output.
+- Documentation checks and Turbo boundaries pass across 1,087 files.
+- No provider request, report mutation, deployment or environment mutation was
+  performed. A real approved brief, verified provider report and live A/A result
+  remain external activation gates.

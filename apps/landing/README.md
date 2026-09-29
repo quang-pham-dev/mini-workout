@@ -150,6 +150,12 @@ published consent copy, a matching published Generic Legal Page, valid enabled
 analytics configuration and experiments still disabled. It does not replace
 Legal approval or live reporting validation.
 
+Experiment activation has a separate compiled brief/reporting gate:
+`pnpm check:landing-experiments`. See the
+[Landing Experiment Brief and Reporting Runbook](../../docs/observability/LANDING_EXPERIMENTS.md)
+for metric, anonymous join, report verification and A/A sequencing rules. Both
+production registries intentionally remain empty.
+
 `check-boundaries` applies the Astro-native ownership rule to `.astro` imports,
 including files ESLint does not parse. `check-budget` inspects the production
 artifact and enforces 120 KB gzip JavaScript, 48 KB gzip CSS, 512 KB per file

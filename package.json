@@ -17,6 +17,7 @@
     "check-types": "turbo run check-types",
     "check-budget": "turbo run check-budget",
     "check:landing-indexing": "turbo run check-indexing-build --filter=@mini-workout/landing",
+    "check:landing-experiments": "pnpm --filter @mini-workout/landing check-experiment-readiness",
     "check:landing-launch-readiness": "pnpm --filter @mini-workout/landing check-launch-readiness",
     "check:landing-operations": "pnpm --filter @mini-workout/landing check-operations",
     "check:landing-content-parity": "turbo run check-content-parity --filter=@mini-workout/landing",

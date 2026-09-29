@@ -11,6 +11,7 @@
     "check-boundaries": "node scripts/check-boundaries.mjs",
     "check-budget": "node scripts/check-budget.mjs",
     "check-indexing-build": "node scripts/check-indexing-build.mjs",
+    "check-experiment-readiness": "node --import tsx scripts/check-experiment-readiness.ts",
     "check-launch-readiness": "node --env-file-if-exists=.env --import tsx scripts/check-content-launch-readiness.ts",
     "check-operations": "node --env-file-if-exists=.env --import tsx scripts/check-operations.ts",
     "check-rollout": "node --env-file-if-exists=.env --import tsx scripts/check-rollout.ts",
