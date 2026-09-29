@@ -114,6 +114,21 @@ export const publishedPricingQuery = `
   }
 `;
 
+export const publishedMarketingPagesQuery = `
+  *[_type == "marketingPage" && status == "published"] | order(slug.current asc) {
+    _type,
+    schemaVersion,
+    status,
+    template,
+    "slug": slug.current,
+    title,
+    introduction,
+    effectiveDate,
+    "sections": sections[]{"_key": _key, "_type": select(_type == "legalSectionV1" => "legalSection.v1"), heading, paragraphs},
+    seo
+  }
+`;
+
 export const publishedSiteSettingsQuery = `
   *[_type == "siteSettings" && status == "published"] {
     _type,
@@ -153,6 +168,9 @@ export const previewArticlesQuery = asPreviewQuery(publishedArticlesQuery);
 export const previewCategoriesQuery = asPreviewQuery(publishedCategoriesQuery);
 export const previewCampaignsQuery = asPreviewQuery(publishedCampaignsQuery);
 export const previewPricingQuery = asPreviewQuery(publishedPricingQuery);
+export const previewMarketingPagesQuery = asPreviewQuery(
+  publishedMarketingPagesQuery,
+);
 export const previewSiteSettingsQuery = asPreviewQuery(
   publishedSiteSettingsQuery,
 );

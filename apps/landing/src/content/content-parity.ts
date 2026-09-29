@@ -12,6 +12,10 @@ export type ContentParityIssueCode =
   | 'CATEGORY_MEDIA_DIMENSIONS'
   | 'CATEGORY_SEO'
   | 'CAMPAIGN_INVENTORY'
+  | 'MARKETING_PAGE_CANONICAL'
+  | 'MARKETING_PAGE_INVENTORY'
+  | 'MARKETING_PAGE_SECTION_ORDER'
+  | 'MARKETING_PAGE_SEO'
   | 'PRIMARY_NAVIGATION'
   | 'PRICING_INVENTORY'
   | 'SITE_SETTINGS';
@@ -28,6 +32,7 @@ export interface ContentParityResult {
 
 type Article = PublishedContentSnapshot['articles'][number];
 type Category = PublishedContentSnapshot['categories'][number];
+type MarketingPage = PublishedContentSnapshot['marketingPages'][number];
 
 function equalSeo(
   expected: { title: string; description: string },
@@ -47,7 +52,7 @@ function equalDimensions(
 }
 
 function compareInventory<T extends { slug: string }>(
-  kind: 'articles' | 'categories' | 'campaigns',
+  kind: 'articles' | 'categories' | 'campaigns' | 'marketingPages',
   expected: readonly T[],
   actual: readonly T[],
   issues: ContentParityIssue[],
@@ -57,7 +62,9 @@ function compareInventory<T extends { slug: string }>(
       ? 'ARTICLE_INVENTORY'
       : kind === 'categories'
         ? 'CATEGORY_INVENTORY'
-        : 'CAMPAIGN_INVENTORY';
+        : kind === 'campaigns'
+          ? 'CAMPAIGN_INVENTORY'
+          : 'MARKETING_PAGE_INVENTORY';
   const expectedSlugs = new Set(expected.map(({ slug }) => slug));
   const actualSlugs = new Set(actual.map(({ slug }) => slug));
 
@@ -70,6 +77,32 @@ function compareInventory<T extends { slug: string }>(
     if (!expectedSlugs.has(slug)) {
       issues.push({ code, path: `${kind}.${slug}.unexpected` });
     }
+  }
+}
+
+function compareMarketingPage(
+  expected: MarketingPage,
+  actual: MarketingPage,
+  issues: ContentParityIssue[],
+): void {
+  const path = `marketingPages.${expected.slug}`;
+  if (expected.seo.canonicalPath !== actual.seo.canonicalPath) {
+    issues.push({
+      code: 'MARKETING_PAGE_CANONICAL',
+      path: `${path}.canonical`,
+    });
+  }
+  if (
+    expected.sections.map(({ key, type }) => `${type}:${key}`).join('|') !==
+    actual.sections.map(({ key, type }) => `${type}:${key}`).join('|')
+  ) {
+    issues.push({
+      code: 'MARKETING_PAGE_SECTION_ORDER',
+      path: `${path}.sections`,
+    });
+  }
+  if (!equalSeo(expected.seo, actual.seo)) {
+    issues.push({ code: 'MARKETING_PAGE_SEO', path: `${path}.seo` });
   }
 }
 
@@ -171,6 +204,12 @@ export function comparePublishedContentSnapshots(
   compareInventory('articles', expected.articles, actual.articles, issues);
   compareInventory('campaigns', expected.campaigns, actual.campaigns, issues);
   compareInventory(
+    'marketingPages',
+    expected.marketingPages,
+    actual.marketingPages,
+    issues,
+  );
+  compareInventory(
     'categories',
     expected.categories,
     actual.categories,
@@ -192,6 +231,14 @@ export function comparePublishedContentSnapshots(
     const actualCategory = actualCategories.get(expectedCategory.slug);
     if (actualCategory)
       compareCategory(expectedCategory, actualCategory, issues);
+  }
+
+  const actualMarketingPages = new Map(
+    actual.marketingPages.map((page) => [page.slug, page]),
+  );
+  for (const expectedPage of expected.marketingPages) {
+    const actualPage = actualMarketingPages.get(expectedPage.slug);
+    if (actualPage) compareMarketingPage(expectedPage, actualPage, issues);
   }
 
   issues.sort((left, right) =>

@@ -1,0 +1,32 @@
+---
+import LegalPage from '../features/pages/LegalPage.astro';
+import {
+  getContentRepository,
+  publishedContentRepository,
+} from '../content/published-content-repository.js';
+import type { MarketingPageViewModel } from '../features/pages/catalog.js';
+import type { GetStaticPaths } from 'astro';
+
+interface Props {
+  page: MarketingPageViewModel;
+}
+
+export const getStaticPaths = (async () => {
+  const { marketingPages } = await publishedContentRepository.load();
+  return marketingPages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}) satisfies GetStaticPaths;
+export const prerender = !import.meta.env.LANDING_PREVIEW;
+
+let { page } = Astro.props;
+if (!page && Astro.params.slug) {
+  const snapshot = await getContentRepository(Astro.request).load();
+  page = snapshot.marketingPages.find(
+    ({ slug }) => slug === Astro.params.slug,
+  )!;
+}
+---
+
+<LegalPage page={page} />

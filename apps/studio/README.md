@@ -3,12 +3,15 @@
 Sanity Studio owns Landing editorial authoring and is intentionally isolated
 from the Product/Admin React runtimes. It pins its own compatible React version.
 
-The current schema covers Category, Article, Campaign, Pricing, Author, SEO,
-internal links, Sanity image assets and their versioned content boundaries.
+The current schema covers Category, Article, Campaign, Pricing, Generic Legal
+Page, Author, SEO, internal links, Sanity image assets and their versioned
+content boundaries.
 Pricing is a singleton and remains fixture-free until approved commercial and
 legal copy exists. Presentation targets a separately built, protected SSR
 Landing origin; Pricing receives no Presentation location until its public
 route is approved.
+Generic Legal Pages receive root-level Presentation locations only after a
+valid non-reserved slug exists; no legal document is seeded automatically.
 
 Copy `.env.example` to `apps/studio/.env` when a real Sanity project is
 available. Studio and Landing use the same non-secret `SANITY_PROJECT_ID` and

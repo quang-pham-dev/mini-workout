@@ -4,6 +4,8 @@ import { getPublishedCampaigns } from '../features/campaigns/catalog.js';
 import type { CampaignViewModel } from '../features/campaigns/catalog.js';
 import { getPublishedCategories } from '../features/categories/catalog.js';
 import type { CategoryViewModel } from '../features/categories/catalog.js';
+import { getPublishedMarketingPages } from '../features/pages/catalog.js';
+import type { MarketingPageViewModel } from '../features/pages/catalog.js';
 import { getPublishedPricing } from '../features/pricing/catalog.js';
 import type { PricingViewModel } from '../features/pricing/catalog.js';
 import { getPublishedSiteShell } from '../features/site-shell/catalog.js';
@@ -17,6 +19,7 @@ export interface PublishedContentSnapshot {
   campaigns: readonly CampaignViewModel[];
   categories: readonly CategoryViewModel[];
   pricing: PricingViewModel | null;
+  marketingPages: readonly MarketingPageViewModel[];
   siteShell: SiteShellViewModel;
 }
 
@@ -46,15 +49,29 @@ const defaultDependencies: RepositoryDependencies = {
     const source = createPublishedContentSource({ projectId, dataset });
     return {
       load: async () => {
-        const [articles, campaigns, categories, pricing, siteShell] =
-          await Promise.all([
-            source.getArticles(),
-            source.getCampaigns(),
-            source.getCategories(),
-            source.getPricing(),
-            source.getSiteShell(),
-          ]);
-        return { articles, campaigns, categories, pricing, siteShell };
+        const [
+          articles,
+          campaigns,
+          categories,
+          marketingPages,
+          pricing,
+          siteShell,
+        ] = await Promise.all([
+          source.getArticles(),
+          source.getCampaigns(),
+          source.getCategories(),
+          source.getMarketingPages(),
+          source.getPricing(),
+          source.getSiteShell(),
+        ]);
+        return {
+          articles,
+          campaigns,
+          categories,
+          marketingPages,
+          pricing,
+          siteShell,
+        };
       },
     };
   },
@@ -74,6 +91,7 @@ export function createPublishedContentRepository(
               articles: getPublishedArticles(),
               campaigns: getPublishedCampaigns(),
               categories: getPublishedCategories(),
+              marketingPages: getPublishedMarketingPages(),
               pricing: getPublishedPricing(),
               siteShell: getPublishedSiteShell(),
             })
@@ -127,15 +145,26 @@ export function getContentRepository(request: Request): ContentRepository {
         source.getArticles(),
         source.getCampaigns(),
         source.getCategories(),
+        source.getMarketingPages(),
         source.getPricing(),
         source.getSiteShell(),
-      ]).then(([articles, campaigns, categories, pricing, siteShell]) => ({
-        articles,
-        campaigns,
-        categories,
-        pricing,
-        siteShell,
-      }))),
+      ]).then(
+        ([
+          articles,
+          campaigns,
+          categories,
+          marketingPages,
+          pricing,
+          siteShell,
+        ]) => ({
+          articles,
+          campaigns,
+          categories,
+          marketingPages,
+          pricing,
+          siteShell,
+        }),
+      )),
   };
   requestRepositories.set(request, repository);
   return repository;

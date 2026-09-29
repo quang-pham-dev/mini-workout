@@ -1,0 +1,176 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import type { JsonLd } from '../../lib/seo/index.js';
+import type { MarketingPageViewModel } from './catalog.js';
+
+interface Props {
+  page: MarketingPageViewModel;
+}
+
+const { page } = Astro.props;
+const pageUrl = new URL(
+  page.seo.canonicalPath,
+  Astro.site?.toString() ?? 'https://example.com/',
+).toString();
+const jsonLd: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: page.title,
+  description: page.seo.description,
+  url: pageUrl,
+};
+---
+
+<SiteLayout
+  title={page.seo.title}
+  description={page.seo.description}
+  canonicalPath={page.seo.canonicalPath}
+  jsonLd={jsonLd}
+>
+  <article class="legal-page">
+    <header class="legal-header section-shell">
+      <h1>{page.title}</h1>
+      <p>{page.introduction}</p>
+      <p class="legal-effective-date">
+        Effective{' '}
+        <time datetime={page.effectiveDate}>{page.effectiveDate}</time>
+      </p>
+    </header>
+
+    <div class="legal-layout section-shell">
+      <nav aria-label={`${page.title} sections`}>
+        <p>On this page</p>
+        <ol>
+          {page.sections.map((section) => (
+            <li>
+              <a href={`#${section.key}`}>{section.heading}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <div class="legal-sections">
+        {page.sections.map((section) => (
+          <section id={section.key} aria-labelledby={`${section.key}-heading`}>
+            <h2 id={`${section.key}-heading`}>{section.heading}</h2>
+            {section.paragraphs.map((paragraph) => (
+              <p>{paragraph}</p>
+            ))}
+          </section>
+        ))}
+      </div>
+    </div>
+  </article>
+</SiteLayout>
+
+<style>
+  .legal-page {
+    padding-bottom: clamp(5rem, 9vw, 8rem);
+  }
+
+  .legal-header {
+    padding-block: clamp(4rem, 9vw, 8rem) clamp(3rem, 6vw, 5rem);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .legal-header h1 {
+    max-width: 12ch;
+    color: var(--color-text-primary);
+    font-size: clamp(3.2rem, 7vw, 6.5rem);
+    font-weight: 650;
+    letter-spacing: -0.06em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .legal-header > p:not(.legal-effective-date) {
+    max-width: 48rem;
+    margin-top: 2rem;
+    color: var(--color-text-secondary);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.65;
+  }
+
+  .legal-effective-date {
+    margin-top: 1.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+  }
+
+  .legal-layout {
+    display: grid;
+    grid-template-columns: minmax(11rem, 0.34fr) minmax(0, 1fr);
+    gap: clamp(3rem, 10vw, 10rem);
+    padding-top: clamp(3.5rem, 7vw, 6rem);
+  }
+
+  .legal-layout nav {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+  }
+
+  .legal-layout nav > p {
+    color: var(--color-text-primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .legal-layout ol {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    padding-left: 1.1rem;
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .legal-layout a {
+    text-decoration: underline;
+  }
+
+  .legal-sections {
+    max-width: 46rem;
+  }
+
+  .legal-sections section {
+    scroll-margin-top: 3rem;
+  }
+
+  .legal-sections section + section {
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: clamp(3rem, 6vw, 5rem);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .legal-sections h2 {
+    color: var(--color-text-primary);
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+
+  .legal-sections p {
+    margin-top: 1.25rem;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 48rem) {
+    .legal-header h1 {
+      font-size: clamp(3rem, 15vw, 4.6rem);
+    }
+
+    .legal-layout {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .legal-layout nav {
+      position: static;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+  }
+</style>

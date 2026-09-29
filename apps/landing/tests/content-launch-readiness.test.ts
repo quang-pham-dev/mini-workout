@@ -68,6 +68,7 @@ function snapshot(
 ): PublishedContentSnapshot {
   return {
     articles: [],
+    marketingPages: [],
     campaigns: [],
     categories: [],
     pricing: null,

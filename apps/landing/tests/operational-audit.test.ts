@@ -11,6 +11,7 @@ function snapshot(
 ): PublishedContentSnapshot {
   return {
     articles: [],
+    marketingPages: [],
     campaigns: [],
     categories: [],
     pricing: null,
@@ -91,6 +92,45 @@ describe('Landing operational audit', () => {
         path: 'siteShell.primaryLinks.missing',
       },
     ]);
+  });
+
+  it('requires the consent privacy link to resolve to a published page', () => {
+    const content = snapshot({
+      siteShell: {
+        ...snapshot().siteShell,
+        analyticsConsent: {
+          heading: 'Privacy',
+          description: 'Approved.',
+          allowLabel: 'Allow',
+          declineLabel: 'Decline',
+          manageLabel: 'Privacy choices',
+          privacyLink: { label: 'Privacy policy', href: '/privacy/' },
+        },
+      },
+    });
+    expect(audit(content)).toContainEqual({
+      severity: 'error',
+      code: 'broken_internal_link',
+      path: 'siteShell.analyticsConsent.privacyLink',
+    });
+
+    content.marketingPages = [
+      {
+        status: 'published',
+        template: 'legal.v1',
+        slug: 'privacy',
+        title: 'Privacy policy',
+        introduction: 'Approved.',
+        effectiveDate: '2026-09-29',
+        sections: [],
+        seo: {
+          title: 'Privacy policy',
+          description: 'Approved.',
+          canonicalPath: '/privacy/',
+        },
+      },
+    ];
+    expect(audit(content)).toEqual([]);
   });
 
   it('reports Campaign expiry windows and stale archives deterministically', () => {

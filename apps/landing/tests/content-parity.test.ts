@@ -2,6 +2,7 @@ import { comparePublishedContentSnapshots } from '../src/content/content-parity.
 import { getPublishedArticles } from '../src/features/articles/catalog.js';
 import { getPublishedCampaigns } from '../src/features/campaigns/catalog.js';
 import { getPublishedCategories } from '../src/features/categories/catalog.js';
+import { getPublishedMarketingPages } from '../src/features/pages/catalog.js';
 import { getPublishedPricing } from '../src/features/pricing/catalog.js';
 import { getPublishedSiteShell } from '../src/features/site-shell/catalog.js';
 import { describe, expect, it } from 'vitest';
@@ -10,6 +11,7 @@ const fixtureSnapshot = () => ({
   articles: structuredClone(getPublishedArticles()),
   campaigns: structuredClone(getPublishedCampaigns()),
   categories: structuredClone(getPublishedCategories()),
+  marketingPages: structuredClone(getPublishedMarketingPages()),
   pricing: structuredClone(getPublishedPricing()),
   siteShell: structuredClone(getPublishedSiteShell()),
 });
@@ -78,6 +80,37 @@ describe('published content parity', () => {
         {
           code: 'CATEGORY_INVENTORY',
           path: 'categories.unexpected.unexpected',
+        },
+      ],
+    });
+  });
+
+  it('reports unexpected generic page inventory without exposing legal copy', () => {
+    const expected = fixtureSnapshot();
+    const actual = fixtureSnapshot();
+    actual.marketingPages = [
+      {
+        status: 'published',
+        template: 'legal.v1',
+        slug: 'privacy',
+        title: 'Privacy',
+        introduction: 'Approved.',
+        effectiveDate: '2026-09-29',
+        sections: [],
+        seo: {
+          title: 'Privacy',
+          description: 'Approved.',
+          canonicalPath: '/privacy/',
+        },
+      },
+    ];
+
+    expect(comparePublishedContentSnapshots(expected, actual)).toEqual({
+      ok: false,
+      issues: [
+        {
+          code: 'MARKETING_PAGE_INVENTORY',
+          path: 'marketingPages.privacy.unexpected',
         },
       ],
     });

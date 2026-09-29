@@ -25,6 +25,7 @@ describe('Studio schema contract', () => {
       'internalLink',
       'articleProseV1',
       'articlePullQuoteV1',
+      'legalSectionV1',
       'campaignConversionCta',
       'campaignHeroV1',
       'campaignBenefitsV1',
@@ -35,7 +36,6 @@ describe('Studio schema contract', () => {
       'pricingPlan',
       'pricingFaqItem',
       'analyticsConsent',
-      'legalSectionV1',
       'category',
       'author',
       'article',
@@ -71,6 +71,7 @@ describe('Studio schema contract', () => {
       'article',
       'campaignPage',
       'pricingPage',
+      'marketingPage',
       'siteSettings',
       'primaryNavigation',
     ]) {

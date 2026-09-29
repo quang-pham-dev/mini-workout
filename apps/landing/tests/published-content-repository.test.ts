@@ -8,6 +8,7 @@ const sanitySnapshot: PublishedContentSnapshot = {
   articles: [],
   campaigns: [],
   categories: [],
+  marketingPages: [],
   pricing: null,
   siteShell: {
     analyticsConsent: null,
@@ -35,6 +36,7 @@ describe('published content repository activation', () => {
       'a-gentler-way-to-explore-mobility',
     ]);
     expect(snapshot.campaigns).toEqual([]);
+    expect(snapshot.marketingPages).toEqual([]);
     expect(snapshot.pricing).toBeNull();
     expect(snapshot.siteShell.brandName).toBe('Mini Workout');
     expect(createSanitySource).not.toHaveBeenCalled();

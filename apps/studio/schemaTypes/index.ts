@@ -4,6 +4,9 @@ import {
   validateCampaignSchedule,
   validateCampaignSections,
   validateInternalHref,
+  validateIsoDate,
+  validateLegalPageSections,
+  validateMarketingPageSlug,
   validatePricingBilling,
   validatePricingCurrencyCode,
   validatePricingDocument,
@@ -89,6 +92,21 @@ export const articlePullQuoteV1 = defineType({
   type: 'object',
   fields: [
     defineField({ name: 'quote', type: 'text', validation: requiredText }),
+  ],
+});
+
+export const legalSectionV1 = defineType({
+  name: 'legalSectionV1',
+  title: 'Legal section v1',
+  type: 'object',
+  fields: [
+    defineField({ name: 'heading', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'paragraphs',
+      type: 'array',
+      of: [defineArrayMember({ type: 'text', rows: 4 })],
+      validation: (rule) => rule.required().min(1),
+    }),
   ],
 });
 
@@ -737,6 +755,77 @@ export const pricingPage = defineType({
   },
 });
 
+export const marketingPage = defineType({
+  name: 'marketingPage',
+  title: 'Page',
+  type: 'document',
+  fields: [
+    ...lifecycleFields,
+    defineField({
+      name: 'template',
+      type: 'string',
+      initialValue: 'legal.v1',
+      readOnly: true,
+      options: { list: [{ title: 'Legal v1', value: 'legal.v1' }] },
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            value === 'legal.v1' ? true : 'Only legal.v1 is supported.',
+          ),
+    }),
+    defineField({ name: 'title', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'slug',
+      type: 'slug',
+      options: { source: 'title' },
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validateMarketingPageSlug(value)
+              ? true
+              : 'Use a normalized slug outside reserved application routes.',
+          ),
+    }),
+    defineField({
+      name: 'introduction',
+      type: 'text',
+      rows: 3,
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'effectiveDate',
+      title: 'Effective date',
+      type: 'date',
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validateIsoDate(value) ? true : 'Use a valid ISO calendar date.',
+          ),
+    }),
+    defineField({
+      name: 'sections',
+      type: 'array',
+      validation: (rule) =>
+        rule
+          .required()
+          .min(1)
+          .custom((value) =>
+            validateLegalPageSections(value)
+              ? true
+              : 'Use unique legal section keys and supported section versions.',
+          ),
+      of: [defineArrayMember({ type: 'legalSectionV1' })],
+    }),
+    defineField({ name: 'seo', type: 'seoFields', validation: requiredText }),
+  ],
+  preview: {
+    select: { title: 'title', subtitle: 'effectiveDate' },
+  },
+});
+
 export const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Site settings',
@@ -835,6 +924,7 @@ export const schemaTypes = [
   internalLink,
   articleProseV1,
   articlePullQuoteV1,
+  legalSectionV1,
   campaignConversionCta,
   campaignHeroV1,
   campaignBenefitsV1,
@@ -850,6 +940,7 @@ export const schemaTypes = [
   article,
   campaignPage,
   pricingPage,
+  marketingPage,
   siteSettings,
   primaryNavigation,
 ];

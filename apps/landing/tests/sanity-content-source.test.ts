@@ -7,12 +7,14 @@ import {
   previewArticlesQuery,
   previewCampaignsQuery,
   previewCategoriesQuery,
+  previewMarketingPagesQuery,
   previewPricingQuery,
   previewPrimaryNavigationQuery,
   previewSiteSettingsQuery,
   publishedArticlesQuery,
   publishedCampaignsQuery,
   publishedCategoriesQuery,
+  publishedMarketingPagesQuery,
   publishedPricingQuery,
   publishedPrimaryNavigationQuery,
   publishedSiteSettingsQuery,
@@ -36,6 +38,7 @@ describe('Sanity published-content source', () => {
       publishedSiteSettingsQuery,
       publishedPrimaryNavigationQuery,
       publishedPricingQuery,
+      publishedMarketingPagesQuery,
     ]) {
       expect(query).toContain('status == "published"');
       expect(query).toContain('schemaVersion');
@@ -56,6 +59,7 @@ describe('Sanity published-content source', () => {
       previewSiteSettingsQuery,
       previewPrimaryNavigationQuery,
       previewPricingQuery,
+      previewMarketingPagesQuery,
     ]) {
       expect(query).not.toContain('status == "published"');
       expect(query).toContain('"status": "published"');
@@ -95,9 +99,10 @@ describe('Sanity published-content source', () => {
     expect(fetch).toHaveBeenNthCalledWith(2, publishedPrimaryNavigationQuery);
   });
 
-  it('fetches and maps Article and Category documents through existing contracts', async () => {
+  it('fetches and maps route documents through existing contracts', async () => {
     const fetch = vi
       .fn()
+      .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
@@ -107,11 +112,13 @@ describe('Sanity published-content source', () => {
     await expect(source.getArticles()).resolves.toEqual([]);
     await expect(source.getCategories()).resolves.toEqual([]);
     await expect(source.getCampaigns()).resolves.toEqual([]);
+    await expect(source.getMarketingPages()).resolves.toEqual([]);
     await expect(source.getPricing()).resolves.toBeNull();
     expect(fetch).toHaveBeenNthCalledWith(1, publishedArticlesQuery);
     expect(fetch).toHaveBeenNthCalledWith(2, publishedCategoriesQuery);
     expect(fetch).toHaveBeenNthCalledWith(3, publishedCampaignsQuery);
-    expect(fetch).toHaveBeenNthCalledWith(4, publishedPricingQuery);
+    expect(fetch).toHaveBeenNthCalledWith(4, publishedMarketingPagesQuery);
+    expect(fetch).toHaveBeenNthCalledWith(5, publishedPricingQuery);
   });
 
   it('normalizes provider failures without leaking provider messages', async () => {

@@ -1,23 +1,27 @@
 import type { ArticleViewModel } from '../../features/articles/catalog.js';
 import type { CampaignViewModel } from '../../features/campaigns/catalog.js';
 import type { CategoryViewModel } from '../../features/categories/catalog.js';
+import type { MarketingPageViewModel } from '../../features/pages/catalog.js';
 import type { PricingViewModel } from '../../features/pricing/catalog.js';
 import type { SiteShellViewModel } from '../../features/site-shell/catalog.js';
 import { mapPublishedArticleDocuments } from '../published-article.js';
 import { mapPublishedCampaignDocuments } from '../published-campaign.js';
 import { mapPublishedCategoryDocuments } from '../published-category.js';
+import { mapPublishedMarketingPageDocuments } from '../published-marketing-page.js';
 import { mapPublishedPricingDocuments } from '../published-pricing.js';
 import { mapPublishedSiteShellDocuments } from '../published-site-shell.js';
 import {
   previewArticlesQuery,
   previewCampaignsQuery,
   previewCategoriesQuery,
+  previewMarketingPagesQuery,
   previewPricingQuery,
   previewPrimaryNavigationQuery,
   previewSiteSettingsQuery,
   publishedArticlesQuery,
   publishedCampaignsQuery,
   publishedCategoriesQuery,
+  publishedMarketingPagesQuery,
   publishedPricingQuery,
   publishedPrimaryNavigationQuery,
   publishedSiteSettingsQuery,
@@ -56,6 +60,7 @@ export interface PublishedContentSource {
   getCategories: () => Promise<CategoryViewModel[]>;
   getCampaigns: () => Promise<CampaignViewModel[]>;
   getPricing: () => Promise<PricingViewModel | null>;
+  getMarketingPages: () => Promise<MarketingPageViewModel[]>;
   getSiteShell: () => Promise<SiteShellViewModel>;
 }
 
@@ -135,6 +140,14 @@ export function createPublishedContentSource(
       mapPublishedPricingDocuments(
         await fetchDocuments(
           options.preview ? previewPricingQuery : publishedPricingQuery,
+        ),
+      ),
+    getMarketingPages: async () =>
+      mapPublishedMarketingPageDocuments(
+        await fetchDocuments(
+          options.preview
+            ? previewMarketingPagesQuery
+            : publishedMarketingPagesQuery,
         ),
       ),
     getSiteShell: async () => {

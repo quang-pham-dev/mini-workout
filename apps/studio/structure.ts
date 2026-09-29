@@ -3,7 +3,7 @@ import type { StructureResolver } from 'sanity/structure';
 export const editorialDeskGroups = [
   {
     title: 'Editorial',
-    documentTypes: ['article', 'category', 'campaignPage'],
+    documentTypes: ['article', 'category', 'campaignPage', 'marketingPage'],
   },
   { title: 'People', documentTypes: ['author'] },
 ] as const;

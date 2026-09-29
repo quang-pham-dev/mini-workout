@@ -7,6 +7,9 @@ import {
   validateCampaignSchedule,
   validateCampaignSections,
   validateInternalHref,
+  validateIsoDate,
+  validateLegalPageSections,
+  validateMarketingPageSlug,
   validatePricingBilling,
   validatePricingCurrencyCode,
   validatePricingDocument,
@@ -21,7 +24,7 @@ describe('Studio authoring contract', () => {
     expect(editorialDeskGroups).toEqual([
       {
         title: 'Editorial',
-        documentTypes: ['article', 'category', 'campaignPage'],
+        documentTypes: ['article', 'category', 'campaignPage', 'marketingPage'],
       },
       { title: 'People', documentTypes: ['author'] },
     ]);
@@ -30,6 +33,25 @@ describe('Studio authoring contract', () => {
       'primaryNavigation',
       'pricingPage',
     ]);
+  });
+
+  it('reserves app routes and validates legal page structure', () => {
+    expect(validateMarketingPageSlug({ current: 'privacy' })).toBe(true);
+    expect(validateMarketingPageSlug({ current: 'articles' })).toBe(false);
+    expect(validateIsoDate('2026-09-29')).toBe(true);
+    expect(validateIsoDate('2026-02-30')).toBe(false);
+    expect(
+      validateLegalPageSections([
+        { _key: 'collection', _type: 'legalSectionV1' },
+        { _key: 'retention', _type: 'legalSectionV1' },
+      ]),
+    ).toBe(true);
+    expect(
+      validateLegalPageSections([
+        { _key: 'same', _type: 'legalSectionV1' },
+        { _key: 'same', _type: 'futureSectionV2' },
+      ]),
+    ).toBe(false);
   });
 
   it('validates Pricing money, cadence and recommendation invariants', () => {

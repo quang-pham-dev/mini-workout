@@ -11,6 +11,50 @@ export function validateSlug(value: unknown): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
 
+const marketingPageReservedSlugs = new Set([
+  '404',
+  'api',
+  'articles',
+  'campaigns',
+  'movement',
+  'pricing',
+  'robots',
+  'sitemap',
+]);
+
+export function validateMarketingPageSlug(value: unknown): boolean {
+  const slug =
+    typeof value === 'string'
+      ? value
+      : typeof value === 'object' &&
+          value !== null &&
+          'current' in value &&
+          typeof value.current === 'string'
+        ? value.current
+        : '';
+  return validateSlug(value) && !marketingPageReservedSlugs.has(slug);
+}
+
+export function validateIsoDate(value: unknown): boolean {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return (
+    !Number.isNaN(parsed.valueOf()) &&
+    parsed.toISOString().slice(0, 10) === value
+  );
+}
+
+export function validateLegalPageSections(value: unknown): boolean {
+  return (
+    hasUniqueKeys(value) &&
+    (value as Array<Record<string, unknown>>).every(
+      ({ _type }) => _type === 'legalSectionV1',
+    )
+  );
+}
+
 export function validateInternalHref(value: unknown): boolean {
   if (typeof value !== 'string') return false;
   if (!value.startsWith('/') || value.startsWith('//')) return false;

@@ -62,6 +62,7 @@ export function auditLandingOperations(
     '/',
     ...input.content.articles.map(({ seo }) => seo.canonicalPath),
     ...input.content.categories.map(({ seo }) => seo.canonicalPath),
+    ...input.content.marketingPages.map(({ seo }) => seo.canonicalPath),
     ...delivery.pages.map(({ campaign }) => campaign.seo.canonicalPath),
     ...(input.content.pricing ? [input.content.pricing.seo.canonicalPath] : []),
   ]);
@@ -85,6 +86,12 @@ export function auditLandingOperations(
 
   for (const link of input.content.siteShell.primaryLinks) {
     inspectLink(link.href, `siteShell.primaryLinks.${link.key}`);
+  }
+  if (input.content.siteShell.analyticsConsent) {
+    inspectLink(
+      input.content.siteShell.analyticsConsent.privacyLink.href,
+      'siteShell.analyticsConsent.privacyLink',
+    );
   }
   for (const category of input.content.categories) {
     inspectLink(category.backlink.href, `categories.${category.slug}.backlink`);

@@ -53,3 +53,14 @@ consent retention/deletion policy.
   route on the next successful static deployment.
 - A future richer marketing template must add a new versioned template/section
   registry entry; it must not weaken `legal.v1` into arbitrary page-builder data.
+
+## Completion evidence
+
+Implemented offline on 2026-09-29. The RED checkpoint captured the missing
+mapper, fixture catalog, Studio schema and Presentation contract. GREEN
+verification covers 226 Landing tests at 87.24% statements / 83.15% branches,
+57 Studio tests, Landing and Studio lint/type checks and builds, the production
+static artifact budget, documentation checks and Turbo boundaries. The static
+fixture build still contains only four existing pages, proving that this slice
+did not publish `/privacy/` or placeholder legal text. Approved CMS content and
+Legal sign-off remain activation inputs.

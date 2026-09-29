@@ -7,6 +7,9 @@ now has an offline content/lifecycle contract and reusable route/template, but
 no public fixture or generated URL. Pricing has a fixture-free contract,
 Sanity/repository boundary and reusable Astro template; its public route remains
 gated by approved commercial inputs.
+Generic `legal.v1` pages now have a constrained root-route contract and
+server-rendered Astro template. Their fixture inventory is empty, so
+`/privacy/` is not generated until an approved Sanity document is published.
 
 ## Ownership boundary
 
@@ -21,10 +24,11 @@ gated by approved commercial inputs.
   The signed publishing route is injected only into that protected artifact;
   Product auth remains behind its own boundary. PostHog is loaded only by the
   consent-gated adapter described below.
-- Treat CMS-shaped content as untrusted. Published Article fixtures enter via
-  app-owned Article/Category mappers under `src/content/`; shared slug, SEO,
-  local-media and internal-link primitives enforce one policy. Unknown schema
-  or section versions fail closed, while drafts never enter static generation.
+- Treat CMS-shaped content as untrusted. Published content enters through
+  app-owned Article, Category, Campaign, Pricing and Generic Page mappers under
+  `src/content/`; shared slug, SEO, local-media and internal-link primitives
+  enforce one policy. Unknown schema or section versions fail closed, while
+  drafts never enter static generation.
 - Campaign schedule and expiry behavior are mandatory CMS fields. Scheduled
   campaigns are omitted; active and archived campaigns can prerender, with
   conversion suppressed for archives. Until a real offer and expiry policy are
@@ -36,6 +40,10 @@ gated by approved commercial inputs.
   exponent/locale, billing cadence, entitlements, conversion action,
   cancellation/refund copy and at most one approved recommendation. The local
   fixture is `null`, so no `/pricing/` route or invented price is published.
+- Generic pages currently accept only `legal.v1` with structured
+  `legalSection.v1` blocks, an explicit effective date and a non-reserved root
+  slug. The operational audit verifies that the consent privacy link resolves
+  to a published page.
 
 ## Local development
 
