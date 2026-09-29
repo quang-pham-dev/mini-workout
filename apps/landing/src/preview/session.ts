@@ -1,3 +1,15 @@
+import type { LandingServiceOutcome } from '../operations/service-level-policy.js';
+import {
+  type LandingServiceObservationRecorder,
+  recordLandingServiceObservation,
+} from '../operations/service-observation-recorder.js';
+import {
+  AppError,
+  type ErrorReporter,
+  classifyError,
+  createRequestContext,
+} from '@mini-workout/observability';
+
 export const previewCookieName = 'sanity-preview-perspective';
 
 interface PreviewValidationResult {
@@ -19,12 +31,42 @@ interface PreviewHandlerDependencies {
     dataset: string;
     token: string;
   }) => PreviewValidator;
+  now?: () => number;
+  recorder?: LandingServiceObservationRecorder;
+  reporter?: ErrorReporter;
 }
 
 const privateNoStoreHeaders = {
   'cache-control': 'private, no-store',
   'x-robots-tag': 'noindex, nofollow',
 } as const;
+
+function configurationError(): AppError {
+  return new AppError({
+    category: 'configuration',
+    code: 'CONFIG_INVALID',
+    message: 'Preview is unavailable.',
+    reportable: true,
+    retryable: false,
+    status: 503,
+  });
+}
+
+function dependencyError(cause: unknown): AppError {
+  return new AppError({
+    category: 'dependency',
+    code: 'DEPENDENCY_UNAVAILABLE',
+    message: 'Preview is temporarily unavailable.',
+    reportable: true,
+    retryable: true,
+    status: 503,
+    cause,
+  });
+}
+
+function responseHeaders(requestId: string): HeadersInit {
+  return { ...privateNoStoreHeaders, 'x-request-id': requestId };
+}
 
 function safeRedirectPath(value: string | undefined): string {
   if (
@@ -51,42 +93,81 @@ function previewCookie(value: string, maxAge: number): string {
 export function createEnablePreviewHandler(
   dependencies: PreviewHandlerDependencies,
 ): (request: Request) => Promise<Response> {
+  const now = dependencies.now ?? Date.now;
   return async (request) => {
-    const { projectId, dataset, token } = dependencies;
-    if (!projectId || !dataset || !token) {
-      return new Response('Preview is unavailable.', {
-        status: 503,
-        headers: privateNoStoreHeaders,
+    const startedAt = now();
+    const requestContext = createRequestContext(request.headers);
+    const context = {
+      environment: process.env.VERCEL_ENV,
+      operation: 'landing.preview.enable',
+      release: process.env.VERCEL_GIT_COMMIT_SHA,
+      requestId: requestContext.requestId,
+      route: '/api/draft-mode/enable',
+      service: 'landing',
+      traceId: requestContext.traceId,
+    };
+    const record = (outcome: LandingServiceOutcome) =>
+      recordLandingServiceObservation(dependencies.recorder, {
+        at: new Date(startedAt).toISOString(),
+        durationMs: Math.max(0, now() - startedAt),
+        operation: 'preview.enable',
+        outcome,
       });
-    }
+    const { projectId, dataset, token } = dependencies;
 
     try {
-      const validate = dependencies.createValidator({
-        projectId,
-        dataset,
-        token,
-      });
-      const result = await validate(request.url);
+      if (!projectId || !dataset || !token) throw configurationError();
+      let result: PreviewValidationResult;
+      try {
+        const validate = dependencies.createValidator({
+          projectId,
+          dataset,
+          token,
+        });
+        result = await validate(request.url);
+      } catch (cause) {
+        throw dependencyError(cause);
+      }
       if (!result.isValid) {
+        record('auth_rejected');
         return new Response('Preview authorization failed.', {
           status: 401,
-          headers: privateNoStoreHeaders,
+          headers: responseHeaders(requestContext.requestId),
         });
       }
 
       const perspective = result.studioPreviewPerspective || 'drafts';
+      record('success');
       return new Response(null, {
         status: 307,
         headers: {
-          ...privateNoStoreHeaders,
+          ...responseHeaders(requestContext.requestId),
           location: safeRedirectPath(result.redirectTo),
           'set-cookie': previewCookie(perspective, 60 * 60),
         },
       });
-    } catch {
-      return new Response('Preview is temporarily unavailable.', {
-        status: 503,
-        headers: privateNoStoreHeaders,
+    } catch (error) {
+      const classified = classifyError(error, context);
+      if (classified.controlFlow) throw error;
+      if (classified.reportable && dependencies.reporter) {
+        try {
+          dependencies.reporter.report({
+            error: classified.error,
+            context: {
+              ...context,
+              errorCode: classified.code,
+              fingerprint: classified.fingerprint,
+            },
+          });
+        } catch {
+          // Error reporting remains best-effort.
+        }
+      }
+      const isConfiguration = classified.code === 'CONFIG_INVALID';
+      record(isConfiguration ? 'configuration_failed' : 'dependency_failed');
+      return new Response(classified.publicMessage, {
+        status: classified.status,
+        headers: responseHeaders(requestContext.requestId),
       });
     }
   };

@@ -177,4 +177,6 @@ policy. Expected authorization/input failures and duplicate deliveries are
 excluded; low-volume periods report insufficient data, and actionable failures
 must breach consecutive windows before alerting. See the [Landing service-level
 runbook](../../docs/observability/LANDING_SERVICE_LEVELS.md). Telemetry-provider
-and deployment-completion wiring remain separate activation work.
+and deployment-completion wiring remain separate activation work. Preview and
+publish-webhook boundaries already emit sanitized best-effort observations to
+the service logger; they never include content, URLs, headers or credentials.

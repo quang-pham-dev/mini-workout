@@ -4,6 +4,9 @@ This runbook defines the provisional service-level policy for editor preview and
 content publishing. It is policy-as-code in
 `apps/landing/src/operations/service-level-policy.ts`; it does not claim that
 production currently meets an SLO and does not configure a paging provider.
+Preview-enable and publish-webhook boundaries now emit the allowlisted
+observations through the service logger. Publish-to-ready collection remains
+inactive until an authenticated deployment-completion boundary is approved.
 
 ## Indicators and objectives
 
@@ -73,12 +76,14 @@ an individual observation. Configuration failures bypass sampling. Expected
 
 Before connecting a telemetry or paging provider:
 
-1. add best-effort adapters that emit only the observation allowlist;
-2. prove success and failure lifecycle correlation without document identity;
-3. collect a non-paging staging baseline;
-4. validate provider aggregation against the pure policy tests;
-5. assign an on-call destination and review thresholds with Content/Growth;
-6. explicitly enable alerts—do not infer activation from logging alone.
+1. verify the existing preview/webhook log adapter emits only the observation
+   allowlist in the target environment;
+2. add and security-review the missing publish-to-ready completion signal;
+3. prove success and failure lifecycle correlation without document identity;
+4. collect a non-paging staging baseline;
+5. validate provider aggregation against the pure policy tests;
+6. assign an on-call destination and review thresholds with Content/Growth;
+7. explicitly enable alerts—do not infer activation from logging alone.
 
 A Vercel deployment-completion callback or durable observation store is a new
 authenticated boundary and requires its own design/security review.

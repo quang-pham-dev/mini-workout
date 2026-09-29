@@ -1,6 +1,6 @@
 # Landing Service Observation Adapters
 
-**Status:** In progress
+**Status:** Complete
 **Date:** 2026-09-29
 **Owner:** `apps/landing`
 
@@ -47,3 +47,11 @@ remains the single source for actionable exception detail and request IDs.
 4. Reporter or recorder failure cannot alter the original response.
 5. Preview responses preserve private/no-store/noindex and add `x-request-id`.
 6. No new dependency, environment variable or external write is introduced.
+
+## Result
+
+Completed on 2026-09-29. Preview and publish-webhook boundaries now emit the
+allowlisted observations through a best-effort logger adapter. Preview also
+propagates request IDs and reports classified configuration/dependency failures
+once. Publish-to-ready observation remains excluded because it requires a new
+authenticated Vercel completion boundary.

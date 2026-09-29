@@ -1,3 +1,8 @@
+import type { LandingServiceOutcome } from '../operations/service-level-policy.js';
+import {
+  type LandingServiceObservationRecorder,
+  recordLandingServiceObservation,
+} from '../operations/service-observation-recorder.js';
 import {
   AppError,
   type ErrorReporter,
@@ -23,6 +28,7 @@ interface PublishWebhookOptions {
   deliveryStore?: DeliveryStore;
   fetch?: typeof fetch;
   now?: () => number;
+  recorder?: LandingServiceObservationRecorder;
   reporter: ErrorReporter;
 }
 
@@ -198,6 +204,7 @@ export function createPublishWebhookHandler(options: PublishWebhookOptions) {
   const now = options.now ?? Date.now;
 
   return async (request: Request): Promise<Response> => {
+    const startedAt = now();
     const requestContext = createRequestContext(request.headers);
     const context = {
       environment: process.env.VERCEL_ENV,
@@ -209,6 +216,13 @@ export function createPublishWebhookHandler(options: PublishWebhookOptions) {
       traceId: requestContext.traceId,
     };
     let claimedDeliveryKey: string | undefined;
+    const record = (outcome: LandingServiceOutcome) =>
+      recordLandingServiceObservation(options.recorder, {
+        at: new Date(startedAt).toISOString(),
+        durationMs: Math.max(0, now() - startedAt),
+        operation: 'publish.webhook',
+        outcome,
+      });
 
     try {
       const webhookSecret = options.webhookSecret ?? '';
@@ -234,6 +248,7 @@ export function createPublishWebhookHandler(options: PublishWebhookOptions) {
       validateJsonObject(rawBody);
 
       if (!deliveryStore.claim(deliveryKey, now(), deliveryTtlMs)) {
+        record('duplicate');
         return Response.json(
           {
             data: { requestId: requestContext.requestId, status: 'duplicate' },
@@ -255,6 +270,7 @@ export function createPublishWebhookHandler(options: PublishWebhookOptions) {
       }
       if (!deployResponse.ok) throw dependencyError();
 
+      record('accepted');
       return Response.json(
         { data: { requestId: requestContext.requestId, status: 'accepted' } },
         { status: 202, headers: responseHeaders(requestContext.requestId) },
@@ -277,6 +293,17 @@ export function createPublishWebhookHandler(options: PublishWebhookOptions) {
           // Telemetry must never replace the webhook response.
         }
       }
+      const outcome: LandingServiceOutcome =
+        classified.code === 'INPUT_INVALID'
+          ? 'input_rejected'
+          : classified.code === 'AUTH_REQUIRED'
+            ? 'auth_rejected'
+            : classified.code === 'CONFIG_INVALID'
+              ? 'configuration_failed'
+              : classified.code === 'DEPENDENCY_UNAVAILABLE'
+                ? 'dependency_failed'
+                : 'internal_failed';
+      record(outcome);
       return Response.json(
         { error: toPublicError(classified) },
         {
