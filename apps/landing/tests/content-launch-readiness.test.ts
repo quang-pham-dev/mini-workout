@@ -1,5 +1,6 @@
 import type { PublishedContentSnapshot } from '../src/content/published-content-repository.js';
 import type { CampaignViewModel } from '../src/features/campaigns/catalog.js';
+import type { MarketingPageViewModel } from '../src/features/pages/catalog.js';
 import type { PricingViewModel } from '../src/features/pricing/catalog.js';
 import {
   assessLandingContentLaunchReadiness,
@@ -62,6 +63,32 @@ function pricing(): PricingViewModel {
     },
   };
 }
+
+function privacyPage(): MarketingPageViewModel {
+  return {
+    status: 'published',
+    template: 'legal.v1',
+    slug: 'privacy',
+    title: 'Privacy policy',
+    introduction: 'Approved privacy introduction.',
+    effectiveDate: '2026-09-29',
+    sections: [],
+    seo: {
+      title: 'Privacy policy',
+      description: 'Approved privacy policy.',
+      canonicalPath: '/privacy/',
+    },
+  };
+}
+
+const analyticsConsent = {
+  heading: 'Privacy choices',
+  description: 'Approved consent copy.',
+  allowLabel: 'Allow',
+  declineLabel: 'Decline',
+  manageLabel: 'Privacy choices',
+  privacyLink: { label: 'Privacy policy', href: '/privacy/' },
+};
 
 function snapshot(
   overrides: Partial<PublishedContentSnapshot> = {},
@@ -157,10 +184,86 @@ describe('Landing content launch readiness', () => {
     ).toEqual([]);
   });
 
+  it('fails analytics consent readiness for every missing activation gate', () => {
+    expect(
+      assessLandingContentLaunchReadiness({
+        content: snapshot(),
+        now,
+        requiredSurfaces: ['analytics-consent'],
+        analytics: { enabled: false, experimentsEnabled: false },
+      }),
+    ).toEqual([
+      {
+        severity: 'error',
+        code: 'analytics_disabled',
+        path: 'analytics',
+      },
+      {
+        severity: 'error',
+        code: 'consent_copy_missing',
+        path: 'siteShell.analyticsConsent',
+      },
+    ]);
+  });
+
+  it('requires the consent privacy link to resolve to a published legal page', () => {
+    expect(
+      assessLandingContentLaunchReadiness({
+        content: snapshot({
+          siteShell: { ...snapshot().siteShell, analyticsConsent },
+        }),
+        now,
+        requiredSurfaces: ['analytics-consent'],
+        analytics: { enabled: true, experimentsEnabled: false },
+      }),
+    ).toEqual([
+      {
+        severity: 'error',
+        code: 'privacy_page_missing',
+        path: 'siteShell.analyticsConsent.privacyLink',
+      },
+    ]);
+  });
+
+  it('passes analytics consent readiness with matching content and safe config', () => {
+    expect(
+      assessLandingContentLaunchReadiness({
+        content: snapshot({
+          marketingPages: [privacyPage()],
+          siteShell: { ...snapshot().siteShell, analyticsConsent },
+        }),
+        now,
+        requiredSurfaces: ['analytics-consent'],
+        analytics: { enabled: true, experimentsEnabled: false },
+      }),
+    ).toEqual([]);
+  });
+
+  it('keeps experiments disabled until a separate brief is approved', () => {
+    expect(
+      assessLandingContentLaunchReadiness({
+        content: snapshot({
+          marketingPages: [privacyPage()],
+          siteShell: { ...snapshot().siteShell, analyticsConsent },
+        }),
+        now,
+        requiredSurfaces: ['analytics-consent'],
+        analytics: { enabled: true, experimentsEnabled: true },
+      }),
+    ).toEqual([
+      {
+        severity: 'error',
+        code: 'experiments_not_approved',
+        path: 'experiments',
+      },
+    ]);
+  });
+
   it.each([
     [[], ['campaign', 'pricing']],
     [['--require=campaign'], ['campaign']],
     [['--require=pricing,campaign'], ['campaign', 'pricing']],
+    [['--require=analytics-consent'], ['analytics-consent']],
   ])('parses launch surfaces from %j', (args, expected) => {
     expect(parseLaunchSurfaces(args)).toEqual(expected);
   });
