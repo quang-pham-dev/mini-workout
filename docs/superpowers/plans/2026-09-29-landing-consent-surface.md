@@ -72,3 +72,13 @@ cross-domain identity joins.
   off. The surface remains visible so the failure is privacy-safe.
 - Existing stored `granted` consent is honored only when both build-time
   analytics configuration and approved CMS copy are active.
+
+## Completion evidence
+
+Implemented offline on 2026-09-29. The RED checkpoint captured missing mapper,
+browser primitive and Studio contract behavior. GREEN verification covers 214
+Landing tests at 88.72% statements / 83.48% branches, 54 Studio tests, Landing
+and Studio type/lint checks, static Landing and Studio builds, the Landing
+artifact budget, documentation validation and Turbo boundaries. Live Legal
+approval, privacy-page publication, PostHog activation/reporting and A/A
+validation remain rollout gates rather than implementation gaps in this slice.

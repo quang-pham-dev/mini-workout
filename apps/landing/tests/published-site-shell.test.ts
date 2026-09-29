@@ -62,7 +62,7 @@ describe('published site shell contract', () => {
         [{ ...settings, analyticsConsent: { heading: 'Privacy' } }],
         [navigation],
       ),
-    ).toThrow(/analyticsConsent\.description/);
+    ).toThrow(/description, allowLabel, declineLabel, manageLabel/);
   });
 
   it('rejects malformed published settings', () => {

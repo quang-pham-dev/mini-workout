@@ -34,6 +34,7 @@ describe('Studio schema contract', () => {
       'pricingBilling',
       'pricingPlan',
       'pricingFaqItem',
+      'analyticsConsent',
       'category',
       'author',
       'article',

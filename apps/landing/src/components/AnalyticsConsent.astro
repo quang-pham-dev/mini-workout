@@ -1,0 +1,95 @@
+---
+import type { AnalyticsConsentViewModel } from '../features/site-shell/catalog.js';
+
+interface Props {
+  content: AnalyticsConsentViewModel;
+}
+
+const { content } = Astro.props;
+---
+
+<section
+  class="consent-note"
+  data-analytics-consent
+  aria-labelledby="analytics-consent-heading"
+  hidden
+>
+  <div class="consent-note-copy">
+    <h2 id="analytics-consent-heading">{content.heading}</h2>
+    <p>
+      {content.description}
+      <a href={content.privacyLink.href}>{content.privacyLink.label}</a>
+    </p>
+  </div>
+  <div class="consent-note-actions">
+    <button
+      class="button button-secondary"
+      type="button"
+      data-consent-choice="granted"
+    >
+      {content.allowLabel}
+    </button>
+    <button
+      class="button button-secondary"
+      type="button"
+      data-consent-choice="denied"
+    >
+      {content.declineLabel}
+    </button>
+  </div>
+</section>
+<button class="consent-manage" type="button" data-consent-manage hidden>
+  {content.manageLabel}
+</button>
+
+<script>
+  import {
+    readConsentPreference,
+    saveConsentPreference,
+    type AnalyticsConsentPreference,
+  } from '../analytics/consent-preference.js';
+
+  const surface = document.querySelector<HTMLElement>(
+    '[data-analytics-consent]',
+  );
+  const manage = document.querySelector<HTMLButtonElement>(
+    '[data-consent-manage]',
+  );
+  const choices = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-consent-choice]'),
+  );
+
+  const setOpen = (open: boolean) => {
+    if (!surface || !manage) return;
+    surface.hidden = !open;
+    manage.hidden = open;
+  };
+
+  if (surface && manage) {
+    setOpen(readConsentPreference(window.localStorage) === null);
+    for (const choice of choices) {
+      choice.addEventListener('click', () => {
+        const preference = choice.dataset.consentChoice;
+        if (preference !== 'granted' && preference !== 'denied') return;
+        const saved = saveConsentPreference(
+          window.localStorage,
+          preference,
+          (eventName, value) =>
+            window.dispatchEvent(
+              new CustomEvent<{ preference: AnalyticsConsentPreference }>(
+                eventName,
+                { detail: { preference: value } },
+              ),
+            ),
+        );
+        if (!saved) return;
+        setOpen(false);
+        manage.focus();
+      });
+    }
+    manage.addEventListener('click', () => {
+      setOpen(true);
+      choices[0]?.focus();
+    });
+  }
+</script>

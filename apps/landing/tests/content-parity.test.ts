@@ -40,6 +40,24 @@ describe('published content parity', () => {
     });
   });
 
+  it('reports consent contract drift without exposing legal copy', () => {
+    const expected = fixtureSnapshot();
+    const actual = fixtureSnapshot();
+    actual.siteShell.analyticsConsent = {
+      heading: 'Privacy',
+      description: 'Approved description',
+      allowLabel: 'Allow',
+      declineLabel: 'Decline',
+      manageLabel: 'Privacy choices',
+      privacyLink: { label: 'Privacy policy', href: '/privacy/' },
+    };
+
+    expect(comparePublishedContentSnapshots(expected, actual)).toEqual({
+      ok: false,
+      issues: [{ code: 'SITE_SETTINGS', path: 'siteShell.analyticsConsent' }],
+    });
+  });
+
   it('reports route inventory differences without exposing content values', () => {
     const expected = fixtureSnapshot();
     const actual = fixtureSnapshot();

@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 import CrossAppLink from '../components/CrossAppLink.astro';
+import AnalyticsConsent from '../components/AnalyticsConsent.astro';
+import { shouldRenderAnalyticsConsent } from '../analytics/consent-preference.js';
 import SeoHead from '../components/SeoHead.astro';
 import { getContentRepository } from '../content/published-content-repository.js';
 import { productDestination } from '../lib/product-destination.js';
@@ -23,6 +25,10 @@ const {
 } = Astro.props;
 const { siteShell } = await getContentRepository(Astro.request).load();
 const productLinks = productDestination(import.meta.env.MEMBER_APP_URL);
+const showAnalyticsConsent = shouldRenderAnalyticsConsent(
+  import.meta.env.LANDING_ANALYTICS_ENABLED,
+  siteShell.analyticsConsent,
+);
 ---
 
 <!doctype html>
@@ -124,6 +130,9 @@ const productLinks = productDestination(import.meta.env.MEMBER_APP_URL);
         </strong>
       </a>
       <span>{siteShell.footerTagline}</span>
+      {showAnalyticsConsent && siteShell.analyticsConsent ? (
+        <AnalyticsConsent content={siteShell.analyticsConsent} />
+      ) : null}
     </footer>
   </body>
 </html>

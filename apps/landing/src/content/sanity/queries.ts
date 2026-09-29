@@ -120,7 +120,15 @@ export const publishedSiteSettingsQuery = `
     schemaVersion,
     status,
     brandName,
-    footerTagline
+    footerTagline,
+    analyticsConsent {
+      heading,
+      description,
+      allowLabel,
+      declineLabel,
+      manageLabel,
+      privacyLink {label, href}
+    }
   }
 `;
 

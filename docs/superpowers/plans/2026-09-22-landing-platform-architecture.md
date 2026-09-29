@@ -932,6 +932,16 @@ experience and are covered by a deterministic allocation sanity contract. The
 registry remains empty: consent UI/legal approval, a real experiment brief,
 PostHog reporting setup and a live A/A result are still activation gates.
 
+**Consent-surface progress (2026-09-29):** Site Settings now owns an optional,
+fully validated Legal-approved consent contract. Landing renders a calm,
+non-modal Allow/Decline surface only when both that published contract and the
+analytics build flag exist; missing or partial copy fails closed. The host-local
+choice can be reopened from the footer, storage failures do not activate
+tracking, and granting consent starts the lazy analytics/experiment runtime once
+without a reload. No fallback legal copy is embedded in code. Legal approval,
+privacy-route content, production PostHog activation, reporting and live A/A
+evidence remain external gates.
+
 1. Define typed event and property schemas; extend the PostHog adapter without
    letting features call the SDK directly.
 2. Implement the conservative consent baseline and explicit Astro public PostHog
@@ -1021,19 +1031,19 @@ These percentages are planning estimates, not release-readiness claims. They
 measure the full Phase 0–7 plan with each phase weighted equally; external
 Brand, Content, Security and infrastructure gates remain incomplete work.
 
-| Phase              | Rough completion | Evidence now available                                                                        | Material remaining                                                                |
-| ------------------ | ---------------: | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 0 — Spikes         |              75% | Local A–F evidence; campaign Build Output routing; Astro/design-system and budget checks      | Protected preview handshake, live 308/410, deploy timing, Lighthouse/a11y and CWV |
-| 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration                      | Landing observability/runtime decision and production-owned assets                |
-| 2 — SEO shell      |              94% | Metadata, JSON-LD, robots, sitemap, 404/410 routing, budgets and indexing build gate          | Live 308/410 evidence and approved brand/social assets                            |
-| 3 — CMS foundation |              92% | Article/Category/Campaign/Pricing contracts, parity, drafts, Visual Editing and webhooks      | Protected handshake, webhook evidence and generic Page contract                   |
-| 4 — MVP pages      |              80% | MVP templates, hardened authoring, Campaign Presentation and content launch gate              | Approved content/assets, route activation and Content usability validation        |
-| 5 — Analytics/A-B  |              66% | Typed events, consent-gated adapter, deterministic registry, kill switch and visible exposure | Consent UI/legal approval, approved brief/reporting and live A/A result           |
-| 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
-| 7 — Operations     |              55% | Scheduled audit, SLO policy and sanitized preview/webhook observation adapters                | Publish-ready signal, aggregation, baselines, paging and monthly cadence          |
+| Phase              | Rough completion | Evidence now available                                                                       | Material remaining                                                                |
+| ------------------ | ---------------: | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 0 — Spikes         |              75% | Local A–F evidence; campaign Build Output routing; Astro/design-system and budget checks     | Protected preview handshake, live 308/410, deploy timing, Lighthouse/a11y and CWV |
+| 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration                     | Landing observability/runtime decision and production-owned assets                |
+| 2 — SEO shell      |              94% | Metadata, JSON-LD, robots, sitemap, 404/410 routing, budgets and indexing build gate         | Live 308/410 evidence and approved brand/social assets                            |
+| 3 — CMS foundation |              92% | Article/Category/Campaign/Pricing contracts, parity, drafts, Visual Editing and webhooks     | Protected handshake, webhook evidence and generic Page contract                   |
+| 4 — MVP pages      |              80% | MVP templates, hardened authoring, Campaign Presentation and content launch gate             | Approved content/assets, route activation and Content usability validation        |
+| 5 — Analytics/A-B  |              78% | Typed events, CMS-gated consent UI, lazy adapter, registry, kill switch and visible exposure | Legal copy approval, privacy page, approved brief/reporting and live A/A result   |
+| 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook               | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
+| 7 — Operations     |              55% | Scheduled audit, SLO policy and sanitized preview/webhook observation adapters               | Publish-ready signal, aggregation, baselines, paging and monthly cadence          |
 
-**Overall rough completion: about 73%.** The Landing foundation alone is further
-ahead (roughly 93%); the overall number is lower because CMS
+**Overall rough completion: about 75%.** The Landing foundation alone is further
+ahead (roughly 94%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
 

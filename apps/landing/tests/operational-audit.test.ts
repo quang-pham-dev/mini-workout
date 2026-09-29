@@ -15,6 +15,7 @@ function snapshot(
     categories: [],
     pricing: null,
     siteShell: {
+      analyticsConsent: null,
       brandName: 'Mini Workout',
       footerTagline: 'Move gently.',
       signInLabel: 'Sign in',

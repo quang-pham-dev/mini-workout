@@ -138,6 +138,15 @@ export function comparePublishedContentSnapshots(
   if (expected.siteShell.footerTagline !== actual.siteShell.footerTagline) {
     issues.push({ code: 'SITE_SETTINGS', path: 'siteShell.footerTagline' });
   }
+  if (
+    JSON.stringify(expected.siteShell.analyticsConsent) !==
+    JSON.stringify(actual.siteShell.analyticsConsent)
+  ) {
+    issues.push({
+      code: 'SITE_SETTINGS',
+      path: 'siteShell.analyticsConsent',
+    });
+  }
   const serializeLinks = (snapshot: PublishedContentSnapshot) =>
     snapshot.siteShell.primaryLinks
       .map(({ key, label, href }) => `${key}:${label}:${href}`)

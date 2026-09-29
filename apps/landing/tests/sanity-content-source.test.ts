@@ -43,6 +43,11 @@ describe('Sanity published-content source', () => {
     }
   });
 
+  it('projects optional approved analytics consent copy with site settings', () => {
+    expect(publishedSiteSettingsQuery).toContain('analyticsConsent {');
+    expect(publishedSiteSettingsQuery).toContain('privacyLink {label, href}');
+  });
+
   it('uses draft-aware queries that preserve the validated mapper contract', () => {
     for (const query of [
       previewArticlesQuery,

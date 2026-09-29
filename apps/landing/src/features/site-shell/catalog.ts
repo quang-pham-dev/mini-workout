@@ -6,12 +6,22 @@ export interface SiteNavigationLink {
   href: string;
 }
 
+export interface AnalyticsConsentViewModel {
+  heading: string;
+  description: string;
+  allowLabel: string;
+  declineLabel: string;
+  manageLabel: string;
+  privacyLink: Readonly<{ label: string; href: string }>;
+}
+
 export interface SiteShellViewModel {
   brandName: string;
   footerTagline: string;
   primaryLinks: readonly SiteNavigationLink[];
   signInLabel: string;
   primaryCtaLabel: string;
+  analyticsConsent: AnalyticsConsentViewModel | null;
 }
 
 const settingsDocuments: readonly unknown[] = [
@@ -21,6 +31,7 @@ const settingsDocuments: readonly unknown[] = [
     status: 'published',
     brandName: 'Mini Workout',
     footerTagline: 'Small steps, built to last.',
+    analyticsConsent: null,
   },
 ];
 

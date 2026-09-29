@@ -117,12 +117,14 @@ project key and optionally `LANDING_POSTHOG_HOST`. The key is public browser
 configuration, not a server token. Do not put a personal or server API key here.
 
 Even when configured, the provider is not imported and no event is captured
-until `mini-workout:analytics-consent=granted` exists in local storage. No
-consent UI is implied by this adapter; keep analytics disabled until approved
-privacy copy and the consent surface are available. Events use bounded route
-templates, stable CTA IDs, aggregate referrer classes and sanitized UTM values.
-Raw referrer URLs, destination URLs, query strings, auth identity and arbitrary
-properties are not accepted.
+until both gates pass: published `siteSettings.analyticsConsent` copy exists and
+`mini-workout:analytics-consent=granted` is stored after an explicit visitor
+choice. The optional Sanity object must contain the complete Legal-approved
+heading, explanation, Allow/Decline/Manage labels and internal privacy-policy
+link. Removing the object or disabling analytics removes the surface and keeps
+the provider off. Events use bounded route templates, stable CTA IDs, aggregate
+referrer classes and sanitized UTM values. Raw referrer URLs, destination URLs,
+query strings, auth identity and arbitrary properties are not accepted.
 
 Experiments have a second, independent kill switch:
 `LANDING_EXPERIMENTS_ENABLED`. It may be enabled only when analytics is enabled,

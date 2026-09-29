@@ -1,4 +1,5 @@
 import type {
+  AnalyticsConsentViewModel,
   SiteNavigationLink,
   SiteShellViewModel,
 } from '../features/site-shell/catalog.js';
@@ -14,6 +15,7 @@ import {
 interface SiteSettingsValue {
   brandName: string;
   footerTagline: string;
+  analyticsConsent: AnalyticsConsentViewModel | null;
 }
 
 interface NavigationValue {
@@ -46,6 +48,53 @@ export function mapSiteSettingsDocument(
     return { ok: false, issues: [{ code: 'document', path: '' }] };
   }
   validateLifecycle(input, 'siteSettings', issues);
+  let analyticsConsent: AnalyticsConsentViewModel | null = null;
+  if (input.analyticsConsent !== undefined && input.analyticsConsent !== null) {
+    if (!isRecord(input.analyticsConsent)) {
+      issues.push({ code: 'consent', path: 'analyticsConsent' });
+    } else {
+      const consent = input.analyticsConsent;
+      analyticsConsent = {
+        heading: requiredString(
+          consent,
+          'heading',
+          'analyticsConsent.heading',
+          issues,
+        ),
+        description: requiredString(
+          consent,
+          'description',
+          'analyticsConsent.description',
+          issues,
+        ),
+        allowLabel: requiredString(
+          consent,
+          'allowLabel',
+          'analyticsConsent.allowLabel',
+          issues,
+        ),
+        declineLabel: requiredString(
+          consent,
+          'declineLabel',
+          'analyticsConsent.declineLabel',
+          issues,
+        ),
+        manageLabel: requiredString(
+          consent,
+          'manageLabel',
+          'analyticsConsent.manageLabel',
+          issues,
+        ),
+        privacyLink: {
+          ...mapInternalLink(
+            consent.privacyLink,
+            'analyticsConsent.privacyLink',
+            issues,
+          ),
+        },
+      };
+    }
+  }
   const value = {
     brandName: requiredString(input, 'brandName', 'brandName', issues),
     footerTagline: requiredString(
@@ -54,6 +103,7 @@ export function mapSiteSettingsDocument(
       'footerTagline',
       issues,
     ),
+    analyticsConsent,
   };
   return issues.length > 0 ? { ok: false, issues } : { ok: true, value };
 }

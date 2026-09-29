@@ -753,10 +753,52 @@ export const siteSettings = defineType({
       type: 'string',
       validation: requiredText,
     }),
+    defineField({
+      name: 'analyticsConsent',
+      title: 'Analytics consent copy',
+      description:
+        'Optional. Add only after Legal approves every field. Removing it disables the consent surface.',
+      type: 'analyticsConsent',
+    }),
   ],
   preview: {
     prepare: () => ({ title: 'Site settings' }),
   },
+});
+
+export const analyticsConsent = defineType({
+  name: 'analyticsConsent',
+  title: 'Analytics consent copy',
+  type: 'object',
+  fields: [
+    defineField({ name: 'heading', type: 'string', validation: requiredText }),
+    defineField({
+      name: 'description',
+      type: 'text',
+      rows: 3,
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'allowLabel',
+      type: 'string',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'declineLabel',
+      type: 'string',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'manageLabel',
+      type: 'string',
+      validation: requiredText,
+    }),
+    defineField({
+      name: 'privacyLink',
+      type: 'internalLink',
+      validation: requiredText,
+    }),
+  ],
 });
 
 export const primaryNavigation = defineType({
@@ -802,6 +844,7 @@ export const schemaTypes = [
   pricingBilling,
   pricingPlan,
   pricingFaqItem,
+  analyticsConsent,
   category,
   author,
   article,

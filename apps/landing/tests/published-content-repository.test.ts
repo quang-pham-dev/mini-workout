@@ -10,6 +10,7 @@ const sanitySnapshot: PublishedContentSnapshot = {
   categories: [],
   pricing: null,
   siteShell: {
+    analyticsConsent: null,
     brandName: 'Mini Workout',
     footerTagline: 'Small steps, built to last.',
     primaryLinks: [],
