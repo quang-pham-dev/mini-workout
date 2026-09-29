@@ -75,6 +75,14 @@ invalid or stale signatures are rejected before the Deploy Hook is called.
 9. Record publish-to-ready duration. Do not claim the 2–5 minute SLA until
    representative measurements pass.
 
+The provider-neutral normalizer in
+`apps/landing/src/operations/publish-ready-signal.ts` is the only approved path
+from correlated completion evidence to the `publish.ready` observation. A
+terminal provider state is insufficient by itself: content-contract, static
+build, artifact-budget and security-policy evidence must all pass. The future
+transport must authenticate Vercel, correlate exactly one accepted publish to
+one completion and then discard provider payloads before calling the normalizer.
+
 ## Response and alert policy
 
 Grouped thresholds, provisional SLOs and activation gates are defined in the

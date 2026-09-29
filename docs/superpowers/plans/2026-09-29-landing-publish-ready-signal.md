@@ -1,6 +1,6 @@
 # Landing Publish-Ready Signal Aggregation
 
-**Status:** In progress
+**Status:** Complete (normalization only; transport remains disconnected)
 **Date:** 2026-09-29
 **Owner:** `apps/landing`
 
@@ -52,3 +52,18 @@ durable correlation/storage, dashboards, paging and live verification.
 
 Leave the future completion adapter disconnected. Existing preview and publish
 webhook observations and the last successful static deployment are unchanged.
+
+## Completion evidence — 2026-09-29
+
+- RED checkpoint: `2917705`; the focused test failed because the normalization
+  module did not exist.
+- Focused GREEN: 20 tests across signal, recorder and SLO policy integration
+  pass.
+- Landing suite: 35 files and 257 tests pass with 88.16% statements and 84.54%
+  branches covered; the new normalizer has 98.43% statement coverage.
+- Landing lint, Astro type-check and ownership boundaries pass.
+- Production-static fixture build emits four pages and `0 B` gzip JavaScript;
+  artifact budget passes at 413,037 B total output.
+- Documentation checks and Turbo boundaries pass across 1,089 files.
+- No HTTP callback, secret, durable store, provider request, deployment or
+  environment mutation was introduced.

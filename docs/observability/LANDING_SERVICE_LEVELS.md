@@ -5,8 +5,10 @@ content publishing. It is policy-as-code in
 `apps/landing/src/operations/service-level-policy.ts`; it does not claim that
 production currently meets an SLO and does not configure a paging provider.
 Preview-enable and publish-webhook boundaries now emit the allowlisted
-observations through the service logger. Publish-to-ready collection remains
-inactive until an authenticated deployment-completion boundary is approved.
+observations through the service logger. A provider-neutral publish-ready
+normalizer now validates lifecycle timing and required release gates, but
+collection remains inactive until an authenticated deployment-completion and
+correlation boundary is approved.
 
 ## Indicators and objectives
 
@@ -41,6 +43,13 @@ An observation contains only:
 Never attach a preview URL, Sanity document ID/content, Deploy Hook URL,
 signature, token, cookie, header, query string, email or request body. Provider
 adapters must normalize to this contract before storage or evaluation.
+
+The publish-ready normalizer accepts a terminal deployment state only after it
+has been correlated to the accepted publish request. `ready` requires the
+content contract, static build, artifact budget and security policy gates to
+pass; a failed or not-run gate emits `failed`. It rejects reversed/future
+timestamps and durations above 24 hours. Its output drops all source evidence
+and retains only the observation allowlist above.
 
 ## Incident policy
 
@@ -78,7 +87,8 @@ Before connecting a telemetry or paging provider:
 
 1. verify the existing preview/webhook log adapter emits only the observation
    allowlist in the target environment;
-2. add and security-review the missing publish-to-ready completion signal;
+2. add and security-review the missing authenticated transport and durable
+   correlation adapter around the existing publish-ready normalizer;
 3. prove success and failure lifecycle correlation without document identity;
 4. collect a non-paging staging baseline;
 5. validate provider aggregation against the pure policy tests;

@@ -1056,6 +1056,14 @@ fields. Preview now propagates request IDs and reports classified actionable
 failures once. A secure Vercel deployment-completion signal, durable aggregation
 and provider alert activation remain open.
 
+**Publish-ready normalization progress (2026-09-29):** A provider-neutral
+contract now validates accepted-to-completed timing, terminal deployment state
+and the content-contract, static-build, artifact-budget and security-policy
+gates before emitting the existing sanitized `publish.ready` observation.
+Missing evidence fails closed and recorder failure remains best-effort. The
+authenticated Vercel transport, durable lifecycle correlation, staging baseline
+and provider alert activation remain external gates.
+
 1. Add scheduled broken-link, stale campaign and experiment-expiry reports.
 2. Add editor preview/publish SLOs and webhook failure alerts.
 3. Review search queries, content performance and CWV monthly.
@@ -1076,9 +1084,9 @@ Brand, Content, Security and infrastructure gates remain incomplete work.
 | 4 — MVP pages      |              82% | MVP plus Legal templates, hardened authoring, Presentation and content launch gate            | Approved content/assets, route activation and Content usability validation        |
 | 5 — Analytics/A-B  |              88% | Typed events, consent, registry, brief/report contract, kill switch and offline readiness     | Approved privacy copy, real experiment/report setup and live A/A result           |
 | 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
-| 7 — Operations     |              55% | Scheduled audit, SLO policy and sanitized preview/webhook observation adapters                | Publish-ready signal, aggregation, baselines, paging and monthly cadence          |
+| 7 — Operations     |              62% | Audit, SLO policy, sanitized adapters and publish-ready lifecycle normalization               | Authenticated transport, durable aggregation, baselines, paging and cadence       |
 
-**Overall rough completion: about 78%.** The Landing foundation alone is further
+**Overall rough completion: about 79%.** The Landing foundation alone is further
 ahead (roughly 95%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.

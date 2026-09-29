@@ -203,7 +203,10 @@ must breach consecutive windows before alerting. See the [Landing service-level
 runbook](../../docs/observability/LANDING_SERVICE_LEVELS.md). Telemetry-provider
 and deployment-completion wiring remain separate activation work. Preview and
 publish-webhook boundaries already emit sanitized best-effort observations to
-the service logger; they never include content, URLs, headers or credentials.
+the service logger. A provider-neutral publish-ready normalizer now aggregates
+terminal deployment state and release gates into the same bounded observation;
+authenticated transport and durable correlation remain disconnected. These
+signals never include content, URLs, headers or credentials.
 
 Before activating Campaign or Pricing routes, run the scoped [content launch
 readiness gate](../../docs/observability/LANDING_CONTENT_LAUNCH.md) against the
