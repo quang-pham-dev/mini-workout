@@ -11,7 +11,7 @@ export function resolveDocumentLocations(
   if (type === 'siteSettings' || type === 'primaryNavigation') {
     return { locations: [{ title: 'Landing preview', href: '/' }] };
   }
-  if (type !== 'article' && type !== 'category') {
+  if (type !== 'article' && type !== 'category' && type !== 'campaignPage') {
     return { message: 'This document has no landing preview route.' };
   }
   if (typeof slug !== 'string' || slug.length === 0) {
@@ -20,13 +20,18 @@ export function resolveDocumentLocations(
       tone: 'caution',
     };
   }
-  const prefix = type === 'article' ? '/articles' : '/movement';
+  const prefix =
+    type === 'article'
+      ? '/articles'
+      : type === 'campaignPage'
+        ? '/campaigns'
+        : '/movement';
   return {
     locations: [{ title: 'Landing preview', href: `${prefix}/${slug}/` }],
   };
 }
 
-const slugLocation = (type: 'article' | 'category') =>
+const slugLocation = (type: 'article' | 'campaignPage' | 'category') =>
   defineLocations({
     select: { slug: 'slug.current' },
     resolve: (value) => resolveDocumentLocations(type, value?.slug),
@@ -34,6 +39,7 @@ const slugLocation = (type: 'article' | 'category') =>
 
 export const presentationLocations = {
   article: slugLocation('article'),
+  campaignPage: slugLocation('campaignPage'),
   category: slugLocation('category'),
   siteSettings: defineLocations(
     resolveDocumentLocations('siteSettings', undefined),

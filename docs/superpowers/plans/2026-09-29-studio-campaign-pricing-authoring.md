@@ -1,6 +1,6 @@
 # Studio Campaign And Pricing Authoring Hardening
 
-**Status:** In progress
+**Status:** Complete
 **Date:** 2026-09-29
 **Owner:** `apps/studio`
 
@@ -48,3 +48,10 @@ Excluded:
    slugs remain cautioned.
 5. Studio test, coverage, lint, type-check and build pass without new env vars or
    dataset writes.
+
+## Result
+
+Completed on 2026-09-29. Pure validators, deterministic preview preparers and
+Campaign Presentation routing are wired into the Studio schema. Pricing remains
+route-gated and no dataset content, environment variable or external dependency
+was added. Verification evidence is recorded in the implementation handoff.

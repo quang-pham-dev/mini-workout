@@ -244,5 +244,13 @@ describe('Studio authoring contract', () => {
         plans: [{}, {}],
       }),
     ).toEqual({ title: 'Pricing', subtitle: 'Draft · 2 plans · USD' });
+    expect(prepareCampaignPreview({})).toEqual({
+      title: 'Untitled Campaign',
+      subtitle: 'Draft',
+    });
+    expect(preparePricingPreview({ plans: [{}] })).toEqual({
+      title: 'Pricing',
+      subtitle: 'Draft · 1 plan',
+    });
   });
 });

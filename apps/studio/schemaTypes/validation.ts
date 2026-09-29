@@ -62,6 +62,76 @@ export function validateCampaignExpiryPolicy(value: unknown): boolean {
   return (mode === 'gone' || mode === 'archive') && successor === undefined;
 }
 
+const campaignSectionTypes = new Set([
+  'campaignHeroV1',
+  'campaignBenefitsV1',
+  'campaignFaqV1',
+  'campaignCtaV1',
+]);
+
+function hasUniqueKeys(value: unknown): boolean {
+  if (!Array.isArray(value) || value.length === 0) return false;
+  const keys = value.map((candidate) =>
+    typeof candidate === 'object' && candidate !== null
+      ? (candidate as Record<string, unknown>)._key
+      : undefined,
+  );
+  return (
+    keys.every((key) => typeof key === 'string' && key.length > 0) &&
+    new Set(keys).size === keys.length
+  );
+}
+
+export function validateCampaignSections(value: unknown): boolean {
+  if (!hasUniqueKeys(value)) return false;
+  const sections = value as Array<Record<string, unknown>>;
+  if (
+    sections.some(
+      ({ _type }) =>
+        typeof _type !== 'string' || !campaignSectionTypes.has(_type),
+    )
+  ) {
+    return false;
+  }
+  const heroCount = sections.filter(
+    ({ _type }) => _type === 'campaignHeroV1',
+  ).length;
+  const ctaCount = sections.filter(
+    ({ _type }) => _type === 'campaignCtaV1',
+  ).length;
+  if (
+    heroCount !== 1 ||
+    sections[0]?._type !== 'campaignHeroV1' ||
+    ctaCount > 1
+  ) {
+    return false;
+  }
+  return sections.every(({ _type, items }) =>
+    _type === 'campaignBenefitsV1' || _type === 'campaignFaqV1'
+      ? hasUniqueKeys(items)
+      : true,
+  );
+}
+
+export function validatePricingCurrencyCode(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Z]{3}$/.test(value);
+}
+
+export function validatePricingLocale(value: unknown): value is string {
+  return typeof value === 'string' && /^[a-z]{2,3}-[A-Z]{2}$/.test(value);
+}
+
+export function validatePricingBilling(value: unknown): boolean {
+  if (typeof value !== 'object' || value === null) return false;
+  const { cadence, interval } = value as Record<string, unknown>;
+  if (cadence === 'one_time') return interval === undefined;
+  return (
+    (cadence === 'month' || cadence === 'year') &&
+    Number.isInteger(interval) &&
+    Number(interval) > 0
+  );
+}
+
 export function validatePricingDocument(value: unknown): boolean {
   if (typeof value !== 'object' || value === null) return false;
   const document = value as Record<string, unknown>;
@@ -73,13 +143,11 @@ export function validatePricingDocument(value: unknown): boolean {
     !isText(document.introduction) ||
     !isText(document.cancellationTerms) ||
     !isText(document.refundTerms) ||
-    typeof currencyCode !== 'string' ||
-    !/^[A-Z]{3}$/.test(currencyCode) ||
+    !validatePricingCurrencyCode(currencyCode) ||
     !Number.isInteger(currencyMinorUnit) ||
     Number(currencyMinorUnit) < 0 ||
     Number(currencyMinorUnit) > 3 ||
-    typeof locale !== 'string' ||
-    !/^[a-z]{2,3}-[A-Z]{2}$/.test(locale) ||
+    !validatePricingLocale(locale) ||
     !Array.isArray(plans) ||
     plans.length === 0
   ) {
@@ -129,16 +197,7 @@ export function validatePricingDocument(value: unknown): boolean {
     planKeys.add(String(plan._key));
     planIds.add(planId);
     if (recommended) recommendations += 1;
-    const { cadence, interval } = billing as Record<string, unknown>;
-    if (cadence === 'one_time') {
-      if (interval !== undefined) return false;
-    } else if (
-      (cadence !== 'month' && cadence !== 'year') ||
-      !Number.isInteger(interval) ||
-      Number(interval) <= 0
-    ) {
-      return false;
-    }
+    if (!validatePricingBilling(billing)) return false;
 
     const entitlementKeys = new Set<string>();
     for (const entitlement of plan.entitlements) {

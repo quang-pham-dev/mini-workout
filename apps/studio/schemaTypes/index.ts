@@ -1,8 +1,13 @@
+import { prepareCampaignPreview, preparePricingPreview } from './previews.js';
 import {
   validateCampaignExpiryPolicy,
   validateCampaignSchedule,
+  validateCampaignSections,
   validateInternalHref,
+  validatePricingBilling,
+  validatePricingCurrencyCode,
   validatePricingDocument,
+  validatePricingLocale,
   validateSlug,
 } from './validation.js';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -286,7 +291,14 @@ export const pricingPlan = defineType({
     defineField({
       name: 'billing',
       type: 'pricingBilling',
-      validation: requiredText,
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validatePricingBilling(value)
+              ? true
+              : 'Recurring billing requires a positive interval; one-time billing must omit it.',
+          ),
     }),
     defineField({
       name: 'entitlements',
@@ -602,7 +614,17 @@ export const campaignPage = defineType({
     defineField({
       name: 'sections',
       type: 'array',
-      validation: (rule) => rule.required().min(1),
+      description:
+        'Start with exactly one hero. Add at most one final conversion CTA.',
+      validation: (rule) =>
+        rule
+          .required()
+          .min(1)
+          .custom((value) =>
+            validateCampaignSections(value)
+              ? true
+              : 'Start with one hero, use unique items and include at most one final CTA.',
+          ),
       of: [
         defineArrayMember({ type: 'campaignHeroV1' }),
         defineArrayMember({ type: 'campaignBenefitsV1' }),
@@ -621,9 +643,12 @@ export const campaignPage = defineType({
   preview: {
     select: {
       title: 'title',
-      subtitle: 'status',
+      status: 'status',
+      startsAt: 'startsAt',
+      endsAt: 'endsAt',
       media: 'sections.0.image.image',
     },
+    prepare: prepareCampaignPreview,
   },
 });
 
@@ -643,7 +668,14 @@ export const pricingPage = defineType({
       name: 'currencyCode',
       description: 'Three-letter uppercase currency code, for example USD.',
       type: 'string',
-      validation: requiredText,
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validatePricingCurrencyCode(value)
+              ? true
+              : 'Use a three-letter uppercase ISO currency code, for example USD.',
+          ),
     }),
     defineField({
       name: 'currencyMinorUnit',
@@ -655,7 +687,14 @@ export const pricingPage = defineType({
       name: 'locale',
       description: 'Formatting locale, for example en-US.',
       type: 'string',
-      validation: requiredText,
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value) =>
+            validatePricingLocale(value)
+              ? true
+              : 'Use a locale such as en-US or vi-VN.',
+          ),
     }),
     defineField({
       name: 'plans',
@@ -687,7 +726,15 @@ export const pricingPage = defineType({
         ? true
         : 'Check currency, minor units, plan IDs, amounts, cadence and recommendation.',
     ),
-  preview: { select: { title: 'title', subtitle: 'status' } },
+  preview: {
+    select: {
+      title: 'title',
+      status: 'status',
+      currencyCode: 'currencyCode',
+      plans: 'plans',
+    },
+    prepare: preparePricingPreview,
+  },
 });
 
 export const siteSettings = defineType({

@@ -1,6 +1,22 @@
 import { schemaTypes } from '../schemaTypes/index.js';
 import { describe, expect, it } from 'vitest';
 
+function arrayMemberTypes(value: unknown): unknown[] {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    !('of' in value) ||
+    !Array.isArray(value.of)
+  ) {
+    return [];
+  }
+  return value.of.map((member) =>
+    typeof member === 'object' && member !== null && 'type' in member
+      ? member.type
+      : undefined,
+  );
+}
+
 describe('Studio schema contract', () => {
   it('registers only the approved offline Article and Category contract', () => {
     expect(schemaTypes.map((schema) => schema.name)).toEqual([
@@ -61,9 +77,9 @@ describe('Studio schema contract', () => {
       ]),
     );
     expect(
-      pricing?.fields
-        ?.find((field) => field.name === 'plans')
-        ?.of?.map((member) => member.type),
+      arrayMemberTypes(
+        pricing?.fields?.find((field) => field.name === 'plans'),
+      ),
     ).toEqual(['pricingPlan']);
   });
 
@@ -74,7 +90,11 @@ describe('Studio schema contract', () => {
     const sections = campaign?.fields?.find(
       (field) => field.name === 'sections',
     );
-    expect(sections?.of?.map((member) => member.type)).toEqual([
+    expect(sections).toMatchObject({
+      description:
+        'Start with exactly one hero. Add at most one final conversion CTA.',
+    });
+    expect(arrayMemberTypes(sections)).toEqual([
       'campaignHeroV1',
       'campaignBenefitsV1',
       'campaignFaqV1',
@@ -95,7 +115,7 @@ describe('Studio schema contract', () => {
       (schema) => schema.name === 'primaryNavigation',
     );
     const links = navigation?.fields?.find((field) => field.name === 'links');
-    expect(links?.of?.map((member) => member.type)).toEqual(['internalLink']);
+    expect(arrayMemberTypes(links)).toEqual(['internalLink']);
   });
 
   it('allows Article sections only through the versioned registry', () => {
@@ -103,7 +123,8 @@ describe('Studio schema contract', () => {
     const sections = article?.fields?.find(
       (field) => field.name === 'sections',
     );
-    expect(sections?.of?.map((member) => member.type)).toEqual([
+    expect(sections).not.toHaveProperty('description');
+    expect(arrayMemberTypes(sections)).toEqual([
       'articleProseV1',
       'articlePullQuoteV1',
     ]);

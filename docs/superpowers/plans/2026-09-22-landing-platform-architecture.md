@@ -882,6 +882,16 @@ mapping, Studio validation and an Astro-only editorial comparison template are
 implemented. The fixture remains `null`; `/pricing/`, sitemap and navigation
 activation remain gated by approved commercial/legal content.
 
+**Studio authoring hardening (2026-09-29):** Campaign composition now fails
+early unless it has one first-position hero, unique section/nested item keys,
+only versioned section types and at most one final CTA. Pricing currency, locale
+and recurring/one-time billing errors surface at their owning fields while the
+whole-document invariant remains in force. Deterministic document cards expose
+Campaign schedule and Pricing plan/currency context; valid Campaign slugs now
+open protected Presentation. Pricing Presentation stays gated with its public
+route. Marketing/Content usability review and approved commercial content are
+still external inputs.
+
 1. Implement approved page templates and section components from design specs.
 2. Add new shared primitives to `packages/ui` only when both Landing and another
    app have a real reusable contract; add Storybook stories and a11y checks.
@@ -1010,13 +1020,13 @@ Brand, Content, Security and infrastructure gates remain incomplete work.
 | 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration                      | Landing observability/runtime decision and production-owned assets                |
 | 2 — SEO shell      |              94% | Metadata, JSON-LD, robots, sitemap, 404/410 routing, budgets and indexing build gate          | Live 308/410 evidence and approved brand/social assets                            |
 | 3 — CMS foundation |              92% | Article/Category/Campaign/Pricing contracts, parity, drafts, Visual Editing and webhooks      | Protected handshake, webhook evidence and generic Page contract                   |
-| 4 — MVP pages      |              68% | Home, Category, Article, Campaign and fixture-free Pricing template                           | Approved campaign/pricing content, production assets and authoring validation     |
+| 4 — MVP pages      |              76% | MVP templates plus hardened Campaign/Pricing authoring and Campaign Presentation              | Approved content/assets and Marketing/Content usability validation                |
 | 5 — Analytics/A-B  |              66% | Typed events, consent-gated adapter, deterministic registry, kill switch and visible exposure | Consent UI/legal approval, approved brief/reporting and live A/A result           |
 | 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
 | 7 — Operations     |              55% | Scheduled audit, SLO policy and sanitized preview/webhook observation adapters                | Publish-ready signal, aggregation, baselines, paging and monthly cadence          |
 
-**Overall rough completion: about 72%.** The Landing foundation alone is further
-ahead (roughly 91%); the overall number is lower because CMS
+**Overall rough completion: about 73%.** The Landing foundation alone is further
+ahead (roughly 92%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
 

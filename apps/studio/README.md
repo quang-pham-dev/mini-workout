@@ -60,8 +60,14 @@ The Studio desk groups Articles, Categories and Campaigns under Editorial, with
 Authors under People. Site shell and Pricing are explicit Configuration
 singletons. Slug, internal-link and commercial authoring validation mirrors the
 Landing published-content boundary, and document previews expose identifying
-content. Additional page types are added only after their Landing contracts
-exist.
+content. Campaign authoring additionally requires exactly one first-position
+hero, unique section/item keys and at most one final CTA. Pricing surfaces
+currency, locale and recurring/one-time billing errors at their owning fields
+while retaining whole-document commercial validation. Campaign document cards
+show status and schedule and link into protected Presentation; Pricing cards
+show status, plan count and currency but remain without a Presentation location
+until `/pricing/` is approved. Additional page types are added only after their
+Landing contracts exist.
 
 Landing still defaults to local fixtures, but its activation gate is now
 verified against this published dataset. Select `LANDING_CONTENT_SOURCE=sanity`

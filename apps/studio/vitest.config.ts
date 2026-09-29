@@ -6,7 +6,9 @@ export default mergeConfig(
   defineConfig({
     test: {
       include: ['tests/**/*.test.ts'],
-      coverage: { include: ['schemaTypes/validation.ts'] },
+      coverage: {
+        include: ['schemaTypes/previews.ts', 'schemaTypes/validation.ts'],
+      },
     },
   }),
 );
