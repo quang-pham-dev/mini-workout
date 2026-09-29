@@ -50,3 +50,17 @@ validation.
 Remove the new scope from release automation or keep
 `LANDING_ANALYTICS_ENABLED=false`. Existing Campaign/Pricing readiness behavior
 is intentionally unchanged.
+
+## Completion evidence — 2026-09-29
+
+- RED checkpoint: `a5dffdc`; focused GREEN contract includes the pnpm argument
+  delimiter regression and all readiness states.
+- Landing suite: 33 files and 232 tests passed; statement coverage remains above
+  the repository threshold.
+- Landing lint, Astro type-check and Astro ownership boundaries passed.
+- Production-static fixture build emitted four pages with `0 B` gzip JavaScript;
+  artifact budget and documentation checks passed.
+- CLI negative smoke test emitted only
+  `error:consent_copy_missing:siteShell.analyticsConsent` for an enabled fixture
+  target without approved consent content. No provider call, deploy or
+  environment mutation was performed.

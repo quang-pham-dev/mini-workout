@@ -1,19 +1,30 @@
 import { classifyCampaignLifecycle } from '../content/published-campaign.js';
 import type { PublishedContentSnapshot } from '../content/published-content-repository.js';
 
-export type LaunchSurface = 'campaign' | 'pricing';
+export type LaunchSurface = 'campaign' | 'pricing' | 'analytics-consent';
 
 export interface ContentLaunchReadinessIssue {
   severity: 'error' | 'warning';
-  code: 'campaign_ending_soon' | 'campaign_not_active' | 'pricing_missing';
+  code:
+    | 'analytics_disabled'
+    | 'campaign_ending_soon'
+    | 'campaign_not_active'
+    | 'consent_copy_missing'
+    | 'experiments_not_approved'
+    | 'pricing_missing'
+    | 'privacy_page_missing';
   path: string;
 }
 
 const warningWindowMs = 7 * 24 * 60 * 60 * 1_000;
-const launchSurfaceOrder: readonly LaunchSurface[] = ['campaign', 'pricing'];
+const defaultLaunchSurfaces: readonly LaunchSurface[] = ['campaign', 'pricing'];
+const launchSurfaceOrder: readonly LaunchSurface[] = [
+  ...defaultLaunchSurfaces,
+  'analytics-consent',
+];
 
 function isLaunchSurface(value: string): value is LaunchSurface {
-  return value === 'campaign' || value === 'pricing';
+  return launchSurfaceOrder.includes(value as LaunchSurface);
 }
 
 function issueOrder(
@@ -28,7 +39,7 @@ function issueOrder(
 function normalizeSurfaces(
   surfaces: readonly LaunchSurface[] | undefined,
 ): readonly LaunchSurface[] {
-  const selected = surfaces ?? launchSurfaceOrder;
+  const selected = surfaces ?? defaultLaunchSurfaces;
   if (
     selected.length === 0 ||
     selected.some((value) => !launchSurfaceOrder.includes(value))
@@ -41,11 +52,15 @@ function normalizeSurfaces(
 export function parseLaunchSurfaces(
   args: readonly string[],
 ): readonly LaunchSurface[] {
-  if (args.length === 0) return launchSurfaceOrder;
-  if (args.some((argument) => !argument.startsWith('--require='))) {
+  if (args.length === 0) return defaultLaunchSurfaces;
+  const normalizedArgs = args[0] === '--' ? args.slice(1) : args;
+  if (
+    normalizedArgs.length === 0 ||
+    normalizedArgs.some((argument) => !argument.startsWith('--require='))
+  ) {
     throw new Error('Launch readiness surfaces are invalid.');
   }
-  const values = args.flatMap((argument) =>
+  const values = normalizedArgs.flatMap((argument) =>
     argument.slice('--require='.length).split(','),
   );
   if (values.length === 0 || !values.every(isLaunchSurface)) {
@@ -59,6 +74,10 @@ export function assessLandingContentLaunchReadiness(
     content: PublishedContentSnapshot;
     now: Date;
     requiredSurfaces?: readonly LaunchSurface[];
+    analytics?: Readonly<{
+      enabled: boolean;
+      experimentsEnabled: boolean;
+    }>;
   }>,
 ): readonly ContentLaunchReadinessIssue[] {
   const now = input.now.getTime();
@@ -97,6 +116,48 @@ export function assessLandingContentLaunchReadiness(
       code: 'pricing_missing',
       path: 'pricing',
     });
+  }
+
+  if (requiredSurfaces.includes('analytics-consent')) {
+    const analytics = input.analytics ?? {
+      enabled: false,
+      experimentsEnabled: false,
+    };
+    const consent = input.content.siteShell.analyticsConsent;
+
+    if (!analytics.enabled) {
+      issues.push({
+        severity: 'error',
+        code: 'analytics_disabled',
+        path: 'analytics',
+      });
+    }
+    if (analytics.experimentsEnabled) {
+      issues.push({
+        severity: 'error',
+        code: 'experiments_not_approved',
+        path: 'experiments',
+      });
+    }
+    if (!consent) {
+      issues.push({
+        severity: 'error',
+        code: 'consent_copy_missing',
+        path: 'siteShell.analyticsConsent',
+      });
+    } else if (
+      !input.content.marketingPages.some(
+        (page) =>
+          page.template === 'legal.v1' &&
+          page.seo.canonicalPath === consent.privacyLink.href,
+      )
+    ) {
+      issues.push({
+        severity: 'error',
+        code: 'privacy_page_missing',
+        path: 'siteShell.analyticsConsent.privacyLink',
+      });
+    }
   }
 
   return issues.sort(issueOrder);

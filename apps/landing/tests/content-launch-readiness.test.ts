@@ -264,6 +264,7 @@ describe('Landing content launch readiness', () => {
     [['--require=campaign'], ['campaign']],
     [['--require=pricing,campaign'], ['campaign', 'pricing']],
     [['--require=analytics-consent'], ['analytics-consent']],
+    [['--', '--require=analytics-consent'], ['analytics-consent']],
   ])('parses launch surfaces from %j', (args, expected) => {
     expect(parseLaunchSurfaces(args)).toEqual(expected);
   });

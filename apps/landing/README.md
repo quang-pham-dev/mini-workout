@@ -143,6 +143,13 @@ exposure is captured once after the registered CTA/island is visible. Sanity
 does not own traffic allocation. Preview builds may force an allowlisted variant
 with `?mw_experiment=<id>&mw_variant=<id>`; production ignores this override.
 
+Before activating analytics in any environment, run the independent content and
+configuration gate documented in [Landing Content Launch Readiness](../../docs/observability/LANDING_CONTENT_LAUNCH.md):
+`pnpm check:landing-launch-readiness -- --require=analytics-consent`. It requires
+published consent copy, a matching published Generic Legal Page, valid enabled
+analytics configuration and experiments still disabled. It does not replace
+Legal approval or live reporting validation.
+
 `check-boundaries` applies the Astro-native ownership rule to `.astro` imports,
 including files ESLint does not parse. `check-budget` inspects the production
 artifact and enforces 120 KB gzip JavaScript, 48 KB gzip CSS, 512 KB per file

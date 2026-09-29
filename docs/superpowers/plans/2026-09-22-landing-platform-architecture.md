@@ -959,6 +959,15 @@ without a reload. No fallback legal copy is embedded in code. Legal approval,
 privacy-route content, production PostHog activation, reporting and live A/A
 evidence remain external gates.
 
+**Analytics activation-gate progress (2026-09-29):** The scoped launch-readiness
+command now joins the exact target analytics configuration to the validated
+published snapshot. It requires analytics enabled, complete consent copy and an
+exact privacy-link match to a published Generic Legal Page, while rejecting
+experiment activation until its independent brief/reporting/A/A gates exist.
+The default Campaign/Pricing gate remains uncoupled, output is limited to stable
+codes and paths, and no PostHog key or Legal copy is emitted. Legal approval,
+production activation, reporting and live A/A evidence remain external gates.
+
 1. Define typed event and property schemas; extend the PostHog adapter without
    letting features call the SDK directly.
 2. Implement the conservative consent baseline and explicit Astro public PostHog
@@ -1055,11 +1064,11 @@ Brand, Content, Security and infrastructure gates remain incomplete work.
 | 2 — SEO shell      |              94% | Metadata, JSON-LD, robots, sitemap, 404/410 routing, budgets and indexing build gate          | Live 308/410 evidence and approved brand/social assets                            |
 | 3 — CMS foundation |              96% | Article/Category/Campaign/Pricing/Page contracts, parity, drafts, Visual Editing and webhooks | Protected handshake, webhook delivery evidence and Zod adoption decision          |
 | 4 — MVP pages      |              82% | MVP plus Legal templates, hardened authoring, Presentation and content launch gate            | Approved content/assets, route activation and Content usability validation        |
-| 5 — Analytics/A-B  |              78% | Typed events, CMS-gated consent UI, lazy adapter, registry, kill switch and visible exposure  | Approved privacy document, experiment brief/reporting and live A/A result         |
+| 5 — Analytics/A-B  |              83% | Typed events, consent UI, lazy adapter, registry, kill switch and activation readiness gate   | Approved privacy document, experiment brief/reporting and live A/A result         |
 | 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
 | 7 — Operations     |              55% | Scheduled audit, SLO policy and sanitized preview/webhook observation adapters                | Publish-ready signal, aggregation, baselines, paging and monthly cadence          |
 
-**Overall rough completion: about 76%.** The Landing foundation alone is further
+**Overall rough completion: about 77%.** The Landing foundation alone is further
 ahead (roughly 95%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
