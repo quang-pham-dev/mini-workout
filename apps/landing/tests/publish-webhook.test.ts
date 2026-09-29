@@ -45,6 +45,7 @@ function request(
 function setup(
   overrides: {
     fetch?: typeof fetch;
+    recorder?: { record: ReturnType<typeof vi.fn> };
     reporter?: { report: ReturnType<typeof vi.fn> };
   } = {},
 ) {
@@ -59,6 +60,7 @@ function setup(
     deliveryStore: createMemoryDeliveryStore(),
     fetch: fetchStub,
     now: () => now,
+    recorder: overrides.recorder,
     reporter,
     webhookSecret: secret,
   });
@@ -67,7 +69,8 @@ function setup(
 
 describe('Sanity publish webhook', () => {
   it('authenticates the raw body and triggers one bounded Vercel deploy request', async () => {
-    const { fetchStub, handler } = setup();
+    const recorder = { record: vi.fn() };
+    const { fetchStub, handler } = setup({ recorder });
 
     const response = await handler(request());
 
@@ -82,6 +85,28 @@ describe('Sanity publish webhook', () => {
       deployHookUrl,
       expect.objectContaining({ method: 'POST', redirect: 'error' }),
     );
+    expect(recorder.record).toHaveBeenCalledWith({
+      at: new Date(now).toISOString(),
+      durationMs: 0,
+      operation: 'publish.webhook',
+      outcome: 'accepted',
+    });
+  });
+
+  it('records expected input rejection without reporting it', async () => {
+    const recorder = { record: vi.fn() };
+    const { handler, reporter } = setup({ recorder });
+
+    const response = await handler(request({ idempotencyKey: 'has spaces' }));
+
+    expect(response.status).toBe(400);
+    expect(recorder.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operation: 'publish.webhook',
+        outcome: 'input_rejected',
+      }),
+    );
+    expect(reporter.report).not.toHaveBeenCalled();
   });
 
   it.each([

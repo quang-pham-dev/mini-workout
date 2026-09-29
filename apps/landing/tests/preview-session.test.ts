@@ -6,6 +6,71 @@ import {
 import { describe, expect, it, vi } from 'vitest';
 
 describe('secure preview session', () => {
+  it('records success with a request ID and bounded duration', async () => {
+    const recorder = { record: vi.fn() };
+    const reporter = { report: vi.fn() };
+    const handler = createEnablePreviewHandler({
+      createValidator: () => async () => ({ isValid: true }),
+      dataset: 'production',
+      now: () => 1_800_000_000_000,
+      projectId: 'project123',
+      recorder,
+      reporter,
+      token: 'server-secret',
+    });
+
+    const response = await handler(
+      new Request('https://preview.example.com/api/draft-mode/enable', {
+        headers: { 'x-request-id': 'preview-request-1' },
+      }),
+    );
+
+    expect(response.headers.get('x-request-id')).toBe('preview-request-1');
+    expect(recorder.record).toHaveBeenCalledWith({
+      at: new Date(1_800_000_000_000).toISOString(),
+      durationMs: 0,
+      operation: 'preview.enable',
+      outcome: 'success',
+    });
+    expect(reporter.report).not.toHaveBeenCalled();
+  });
+
+  it('reports dependency failure once while telemetry failures remain best-effort', async () => {
+    const recorder = {
+      record: vi.fn(() => {
+        throw new Error('recorder secret');
+      }),
+    };
+    const reporter = { report: vi.fn() };
+    const handler = createEnablePreviewHandler({
+      createValidator: () => async () => {
+        throw new Error('provider secret');
+      },
+      dataset: 'production',
+      now: () => 1_800_000_000_000,
+      projectId: 'project123',
+      recorder,
+      reporter,
+      token: 'server-secret',
+    });
+
+    const response = await handler(
+      new Request('https://preview.example.com/api/draft-mode/enable'),
+    );
+
+    expect(response.status).toBe(503);
+    expect(await response.text()).not.toMatch(
+      /provider secret|recorder secret/i,
+    );
+    expect(reporter.report).toHaveBeenCalledTimes(1);
+    expect(recorder.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        operation: 'preview.enable',
+        outcome: 'dependency_failed',
+      }),
+    );
+  });
+
   it('fails closed when server-only preview configuration is missing', async () => {
     const validate = vi.fn();
     const handler = createEnablePreviewHandler({
