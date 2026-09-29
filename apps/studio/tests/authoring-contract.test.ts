@@ -1,8 +1,16 @@
 import {
+  prepareCampaignPreview,
+  preparePricingPreview,
+} from '../schemaTypes/previews.js';
+import {
   validateCampaignExpiryPolicy,
   validateCampaignSchedule,
+  validateCampaignSections,
   validateInternalHref,
+  validatePricingBilling,
+  validatePricingCurrencyCode,
   validatePricingDocument,
+  validatePricingLocale,
   validateSlug,
 } from '../schemaTypes/validation.js';
 import { editorialDeskGroups, singletonDocumentTypes } from '../structure.js';
@@ -169,5 +177,72 @@ describe('Studio authoring contract', () => {
         successor: { label: 'Stale', href: '/movement/mobility/' },
       }),
     ).toBe(false);
+  });
+
+  it('validates Campaign section order, cardinality and nested keys', () => {
+    const hero = { _key: 'hero', _type: 'campaignHeroV1' };
+    const benefits = {
+      _key: 'benefits',
+      _type: 'campaignBenefitsV1',
+      items: [{ _key: 'benefit-1' }, { _key: 'benefit-2' }],
+    };
+    const cta = { _key: 'cta', _type: 'campaignCtaV1' };
+
+    expect(validateCampaignSections([hero, benefits, cta])).toBe(true);
+    expect(validateCampaignSections([benefits, hero])).toBe(false);
+    expect(validateCampaignSections([hero, { ...cta, _key: 'hero' }])).toBe(
+      false,
+    );
+    expect(
+      validateCampaignSections([hero, cta, { ...cta, _key: 'cta-2' }]),
+    ).toBe(false);
+    expect(
+      validateCampaignSections([
+        hero,
+        {
+          ...benefits,
+          items: [{ _key: 'duplicate' }, { _key: 'duplicate' }],
+        },
+      ]),
+    ).toBe(false);
+  });
+
+  it('provides field-level Pricing validation', () => {
+    expect(validatePricingCurrencyCode('USD')).toBe(true);
+    expect(validatePricingCurrencyCode('usd')).toBe(false);
+    expect(validatePricingLocale('en-US')).toBe(true);
+    expect(validatePricingLocale('en_us')).toBe(false);
+    expect(validatePricingBilling({ cadence: 'month', interval: 1 })).toBe(
+      true,
+    );
+    expect(validatePricingBilling({ cadence: 'month' })).toBe(false);
+    expect(validatePricingBilling({ cadence: 'one_time' })).toBe(true);
+    expect(validatePricingBilling({ cadence: 'one_time', interval: 1 })).toBe(
+      false,
+    );
+  });
+
+  it('prepares deterministic Campaign and Pricing document cards', () => {
+    expect(
+      prepareCampaignPreview({
+        title: 'Autumn mobility',
+        status: 'published',
+        startsAt: '2026-09-01T00:00:00.000Z',
+        endsAt: '2026-10-01T00:00:00.000Z',
+        media: 'image',
+      }),
+    ).toEqual({
+      title: 'Autumn mobility',
+      subtitle: 'Published · 2026-09-01 → 2026-10-01',
+      media: 'image',
+    });
+    expect(
+      preparePricingPreview({
+        title: 'Pricing',
+        status: 'draft',
+        currencyCode: 'USD',
+        plans: [{}, {}],
+      }),
+    ).toEqual({ title: 'Pricing', subtitle: 'Draft · 2 plans · USD' });
   });
 });

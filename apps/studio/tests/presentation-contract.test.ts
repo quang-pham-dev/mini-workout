@@ -9,6 +9,7 @@ describe('Studio Presentation locations', () => {
       '/articles/a-gentler-way-to-explore-mobility/',
     ],
     ['category', 'mobility', '/movement/mobility/'],
+    ['campaignPage', 'autumn-mobility', '/campaigns/autumn-mobility/'],
     ['siteSettings', undefined, '/'],
     ['primaryNavigation', undefined, '/'],
   ])('maps %s to its landing route', (type, slug, href) => {
