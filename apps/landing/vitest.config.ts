@@ -11,6 +11,7 @@ export default mergeConfig(
           'src/content/**/*.ts',
           'src/lib/env.ts',
           'src/lib/seo/**/*.ts',
+          'src/operations/**/*.ts',
           'src/analytics/**/*.ts',
           'src/experimentation/**/*.ts',
           'src/publish/**/*.ts',

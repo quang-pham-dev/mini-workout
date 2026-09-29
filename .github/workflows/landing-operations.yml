@@ -1,0 +1,33 @@
+name: Landing operational audit
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: landing-operational-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Links, campaigns & experiments
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      LANDING_CONTENT_SOURCE: ${{ vars.LANDING_AUDIT_CONTENT_SOURCE || 'fixtures' }}
+      SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      SANITY_DATASET: ${{ vars.SANITY_DATASET || 'production' }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Prepare
+        uses: ./.github/composite-actions/prepare
+
+      - name: Audit published Landing contracts
+        run: pnpm check:landing-operations

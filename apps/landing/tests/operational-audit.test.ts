@@ -128,6 +128,35 @@ describe('Landing operational audit', () => {
     });
   });
 
+  it('does not report an expiry warning before a Campaign starts', () => {
+    const scheduled = {
+      campaignId: 'scheduled-2026',
+      slug: 'scheduled',
+      status: 'published' as const,
+      title: 'Scheduled',
+      audienceDescription: 'Adults.',
+      startsAt: '2026-09-30T00:00:00.000Z',
+      endsAt: '2026-10-01T00:00:00.000Z',
+      expiryPolicy: { mode: 'archive' as const },
+      sections: [],
+      seo: {
+        title: 'Scheduled',
+        description: 'Scheduled movement.',
+        canonicalPath: '/campaigns/scheduled/' as const,
+      },
+    };
+
+    expect(audit(snapshot({ campaigns: [scheduled] }))).toEqual([]);
+  });
+
+  it('warns when an enabled experiment approaches its end date', () => {
+    expect(audit(snapshot(), [experiment()])).toContainEqual({
+      severity: 'warning',
+      code: 'experiment_expiring_soon',
+      path: 'experiments.home-cta-aa.v1',
+    });
+  });
+
   it('reports enabled expiry and overdue experiment cleanup', () => {
     expect(
       audit(snapshot(), [experiment()], '2026-10-09T00:00:00.000Z'),
@@ -170,6 +199,50 @@ describe('Landing operational audit', () => {
       severity: 'error',
       code: 'broken_campaign_redirect',
       path: 'campaigns.autumn.expiryPolicy.successor',
+    });
+  });
+
+  it('warns when authored navigation still points at a Campaign redirect', () => {
+    const campaign = {
+      campaignId: 'autumn-2026',
+      slug: 'autumn',
+      status: 'published' as const,
+      title: 'Autumn',
+      audienceDescription: 'Adults.',
+      startsAt: '2026-08-01T00:00:00.000Z',
+      endsAt: '2026-09-01T00:00:00.000Z',
+      expiryPolicy: {
+        mode: 'redirect' as const,
+        successor: { label: 'Continue', href: '/' },
+      },
+      sections: [],
+      seo: {
+        title: 'Autumn',
+        description: 'Autumn movement.',
+        canonicalPath: '/campaigns/autumn/' as const,
+      },
+    };
+
+    expect(
+      audit(
+        snapshot({
+          campaigns: [campaign],
+          siteShell: {
+            ...snapshot().siteShell,
+            primaryLinks: [
+              {
+                key: 'campaign',
+                label: 'Autumn',
+                href: '/campaigns/autumn/',
+              },
+            ],
+          },
+        }),
+      ),
+    ).toContainEqual({
+      severity: 'warning',
+      code: 'redirected_internal_link',
+      path: 'siteShell.primaryLinks.campaign',
     });
   });
 });

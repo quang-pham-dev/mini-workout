@@ -11,6 +11,7 @@
     "check-boundaries": "node scripts/check-boundaries.mjs",
     "check-budget": "node scripts/check-budget.mjs",
     "check-indexing-build": "node scripts/check-indexing-build.mjs",
+    "check-operations": "node --env-file-if-exists=.env --import tsx scripts/check-operations.ts",
     "check-rollout": "node --env-file-if-exists=.env --import tsx scripts/check-rollout.ts",
     "check-content-parity": "node --env-file-if-exists=.env --import tsx scripts/check-sanity-parity.ts",
     "check-types": "astro check",

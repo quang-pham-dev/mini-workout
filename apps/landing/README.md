@@ -66,6 +66,7 @@ pnpm --filter @mini-workout/landing test
 pnpm --filter @mini-workout/landing build
 pnpm --filter @mini-workout/landing check-budget
 pnpm --filter @mini-workout/landing check-rollout
+pnpm check:landing-operations
 pnpm test:e2e:landing
 ```
 
@@ -163,3 +164,10 @@ the production indexing gate is intentionally enabled. For a protected Vercel
 candidate, provide `VERCEL_AUTOMATION_BYPASS_SECRET` through the local/CI
 environment; the checker sends it only as the recommended protection-bypass
 request header and never includes it in a URL or output.
+
+The daily operational audit is independent of live rollout verification. It
+checks internal-link, Campaign and experiment contracts from fixtures by
+default, or from a public published Sanity dataset when explicitly configured.
+Warnings remain non-blocking; broken links and overdue experiment work fail the
+job. Configuration, output codes and ownership are documented in the [Landing
+operational audit runbook](../../docs/observability/LANDING_OPERATIONAL_AUDIT.md).

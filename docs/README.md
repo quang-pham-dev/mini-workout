@@ -20,6 +20,8 @@ guidance, testing strategy, and product roadmap.
 - [`observability/LANDING_ROLLOUT_RUNBOOK.md`](observability/LANDING_ROLLOUT_RUNBOOK.md)
   — Landing domain matrix, security-header checks, cutover and rollback
   procedure.
+- [`observability/LANDING_OPERATIONAL_AUDIT.md`](observability/LANDING_OPERATIONAL_AUDIT.md)
+  — scheduled broken-link, Campaign lifecycle and experiment-expiry audit.
 - [`NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) —
   product scope and learning roadmap, with implementation status.
 

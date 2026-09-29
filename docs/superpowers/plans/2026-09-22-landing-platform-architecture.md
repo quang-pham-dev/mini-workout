@@ -970,12 +970,20 @@ are stable.
 
 ### Phase 7 — Operational hardening
 
+**Offline audit progress (2026-09-29):** Item 1 is implemented as a daily and
+manually dispatched, read-only audit over the validated published-content and
+experiment contracts. It checks internal destinations, Campaign expiry/archive
+maintenance and experiment expiry/cleanup with stable, sanitized findings. The
+workflow defaults to fixtures and can opt into a public Sanity dataset without
+a read token. Live crawling remains part of Phase 6; editor publish SLOs,
+webhook alerts and the monthly operating cadence below remain open.
+
 1. Add scheduled broken-link, stale campaign and experiment-expiry reports.
 2. Add editor preview/publish SLOs and webhook failure alerts.
 3. Review search queries, content performance and CWV monthly.
 4. Revisit CMS/vendor costs and content model complexity after real usage.
 
-### Rough progress snapshot — 2026-09-28
+### Rough progress snapshot — 2026-09-29
 
 These percentages are planning estimates, not release-readiness claims. They
 measure the full Phase 0–7 plan with each phase weighted equally; external
@@ -990,10 +998,10 @@ Brand, Content, Security and infrastructure gates remain incomplete work.
 | 4 — MVP pages      |              68% | Home, Category, Article, Campaign and fixture-free Pricing template                           | Approved campaign/pricing content, production assets and authoring validation     |
 | 5 — Analytics/A-B  |              66% | Typed events, consent-gated adapter, deterministic registry, kill switch and visible exposure | Consent UI/legal approval, approved brief/reporting and live A/A result           |
 | 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
-| 7 — Operations     |               0% | Requirements documented                                                                       | Scheduled audits, alerts, SLOs and operating cadence                              |
+| 7 — Operations     |              30% | Scheduled contract audit, stable findings, least-privilege workflow and runbook               | Live-link evidence, alerts, SLOs and monthly operating cadence                    |
 
-**Overall rough completion: about 65%.** The Landing foundation alone is further
-ahead (roughly 87%); the overall number is lower because CMS
+**Overall rough completion: about 69%.** The Landing foundation alone is further
+ahead (roughly 89%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
 
