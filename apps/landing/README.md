@@ -67,6 +67,7 @@ pnpm --filter @mini-workout/landing build
 pnpm --filter @mini-workout/landing check-budget
 pnpm --filter @mini-workout/landing check-rollout
 pnpm check:landing-operations
+pnpm check:landing-launch-readiness
 pnpm test:e2e:landing
 ```
 
@@ -180,3 +181,10 @@ runbook](../../docs/observability/LANDING_SERVICE_LEVELS.md). Telemetry-provider
 and deployment-completion wiring remain separate activation work. Preview and
 publish-webhook boundaries already emit sanitized best-effort observations to
 the service logger; they never include content, URLs, headers or credentials.
+
+Before activating Campaign or Pricing routes, run the scoped [content launch
+readiness gate](../../docs/observability/LANDING_CONTENT_LAUNCH.md) against the
+intended published source. Fixtures fail the default gate intentionally because
+they contain neither surface. A pass proves validated content availability and
+lifecycle eligibility only; it does not publish content or replace commercial,
+legal, asset or rollout approval.
