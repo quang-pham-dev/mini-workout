@@ -35,14 +35,34 @@ describe('Studio schema contract', () => {
       'pricingPlan',
       'pricingFaqItem',
       'analyticsConsent',
+      'legalSectionV1',
       'category',
       'author',
       'article',
       'campaignPage',
       'pricingPage',
+      'marketingPage',
       'siteSettings',
       'primaryNavigation',
     ]);
+  });
+
+  it('constrains generic pages to the versioned legal template', () => {
+    const page = schemaTypes.find((schema) => schema.name === 'marketingPage');
+    expect(page?.fields?.map((field) => field.name)).toEqual(
+      expect.arrayContaining([
+        'template',
+        'slug',
+        'effectiveDate',
+        'sections',
+        'seo',
+      ]),
+    );
+    expect(
+      arrayMemberTypes(
+        page?.fields?.find((field) => field.name === 'sections'),
+      ),
+    ).toEqual(['legalSectionV1']);
   });
 
   it('keeps schemaVersion and lifecycle explicit on documents', () => {

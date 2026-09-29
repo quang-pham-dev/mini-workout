@@ -10,6 +10,7 @@ describe('Studio Presentation locations', () => {
     ],
     ['category', 'mobility', '/movement/mobility/'],
     ['campaignPage', 'autumn-mobility', '/campaigns/autumn-mobility/'],
+    ['marketingPage', 'privacy', '/privacy/'],
     ['siteSettings', undefined, '/'],
     ['primaryNavigation', undefined, '/'],
   ])('maps %s to its landing route', (type, slug, href) => {
