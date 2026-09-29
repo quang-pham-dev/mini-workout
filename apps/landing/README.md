@@ -171,3 +171,10 @@ default, or from a public published Sanity dataset when explicitly configured.
 Warnings remain non-blocking; broken links and overdue experiment work fail the
 job. Configuration, output codes and ownership are documented in the [Landing
 operational audit runbook](../../docs/observability/LANDING_OPERATIONAL_AUDIT.md).
+
+Preview and publishing use a provisional, provider-neutral SLO and incident
+policy. Expected authorization/input failures and duplicate deliveries are
+excluded; low-volume periods report insufficient data, and actionable failures
+must breach consecutive windows before alerting. See the [Landing service-level
+runbook](../../docs/observability/LANDING_SERVICE_LEVELS.md). Telemetry-provider
+and deployment-completion wiring remain separate activation work.

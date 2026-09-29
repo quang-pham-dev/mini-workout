@@ -173,7 +173,7 @@ describe('Landing service-level policy', () => {
     expect(() =>
       evaluateLandingServiceLevels({
         now,
-        observations: invalid as LandingServiceObservation[],
+        observations: [invalid as LandingServiceObservation],
       }),
     ).toThrow('Landing service observation is invalid.');
   });

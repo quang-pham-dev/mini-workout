@@ -77,6 +77,11 @@ invalid or stale signatures are rejected before the Deploy Hook is called.
 
 ## Response and alert policy
 
+Grouped thresholds, provisional SLOs and activation gates are defined in the
+[Landing service-level runbook](LANDING_SERVICE_LEVELS.md). The table below
+describes per-request handling; it must not be translated into one page per
+response.
+
 | Result                       | Meaning                                           | Action                                                                           |
 | ---------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------- |
 | `202 accepted`               | Deploy Hook accepted a new request                | Observe the Vercel build                                                         |

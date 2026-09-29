@@ -978,6 +978,14 @@ workflow defaults to fixtures and can opt into a public Sanity dataset without
 a read token. Live crawling remains part of Phase 6; editor publish SLOs,
 webhook alerts and the monthly operating cadence below remain open.
 
+**Service-level policy progress (2026-09-29):** Item 2 now has a tested,
+provider-neutral policy for preview availability, publish-webhook availability
+and publish-to-ready latency. It requires minimum samples, excludes expected
+editor/delivery outcomes, groups actionable failures across consecutive windows
+and fails fast on configuration incidents. Provider adapters, durable
+observations, staging baselines and paging activation remain explicit gates, so
+no production SLO compliance is claimed yet.
+
 1. Add scheduled broken-link, stale campaign and experiment-expiry reports.
 2. Add editor preview/publish SLOs and webhook failure alerts.
 3. Review search queries, content performance and CWV monthly.
@@ -998,10 +1006,10 @@ Brand, Content, Security and infrastructure gates remain incomplete work.
 | 4 — MVP pages      |              68% | Home, Category, Article, Campaign and fixture-free Pricing template                           | Approved campaign/pricing content, production assets and authoring validation     |
 | 5 — Analytics/A-B  |              66% | Typed events, consent-gated adapter, deterministic registry, kill switch and visible exposure | Consent UI/legal approval, approved brief/reporting and live A/A result           |
 | 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
-| 7 — Operations     |              30% | Scheduled contract audit, stable findings, least-privilege workflow and runbook               | Live-link evidence, alerts, SLOs and monthly operating cadence                    |
+| 7 — Operations     |              45% | Scheduled audit plus tested preview/publish SLO and grouped-incident policy                   | Provider wiring, baselines, paging activation and monthly operating cadence       |
 
-**Overall rough completion: about 69%.** The Landing foundation alone is further
-ahead (roughly 89%); the overall number is lower because CMS
+**Overall rough completion: about 71%.** The Landing foundation alone is further
+ahead (roughly 90%); the overall number is lower because CMS
 integration, campaign/pricing, analytics, production rollout and operations are
 part of the approved plan rather than optional polish.
 

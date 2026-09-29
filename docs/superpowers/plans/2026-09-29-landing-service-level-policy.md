@@ -1,6 +1,6 @@
 # Landing Service-Level Policy
 
-**Status:** In progress
+**Status:** Complete
 **Date:** 2026-09-29
 **Owner:** `apps/landing`
 
@@ -62,3 +62,11 @@ Excluded:
 - Landing lint, type-check and coverage;
 - docs check and static build/budget regression;
 - maintainer review against `docs/ERROR_HANDLING_CONVENTION.md`.
+
+## Result
+
+Completed on 2026-09-29. The pure evaluator and runbook implement all acceptance
+criteria without adding a provider, secret or runtime mutation. Production
+observation collection and alert delivery remain behind the documented
+activation gate and require a separately reviewed authenticated boundary for
+deployment-completion signals.

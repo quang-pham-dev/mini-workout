@@ -22,6 +22,8 @@ guidance, testing strategy, and product roadmap.
   procedure.
 - [`observability/LANDING_OPERATIONAL_AUDIT.md`](observability/LANDING_OPERATIONAL_AUDIT.md)
   — scheduled broken-link, Campaign lifecycle and experiment-expiry audit.
+- [`observability/LANDING_SERVICE_LEVELS.md`](observability/LANDING_SERVICE_LEVELS.md)
+  — provisional editor-preview and publishing SLO/incident policy.
 - [`NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) —
   product scope and learning roadmap, with implementation status.
 
