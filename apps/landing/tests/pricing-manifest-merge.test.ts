@@ -1,5 +1,7 @@
+import { comparePublishedContentSnapshots } from '../src/content/content-parity.js';
 import { createPublishedContentRepository } from '../src/content/published-content-repository.js';
 import { exportLandingMigrationManifest } from '../src/migration/export-manifest.js';
+import { createPublishedContentSnapshotFromManifest } from '../src/migration/manifest-snapshot.js';
 import {
   PricingManifestMergeError,
   mergeApprovedPricing,
@@ -52,6 +54,21 @@ describe('approved Pricing manifest merge', () => {
 
     expect(source.pricing).toBeNull();
     expect(merged.pricing).toEqual(approvedPricing);
+  });
+
+  it('turns the approved manifest into the semantic parity baseline', async () => {
+    const source = await manifest();
+    const merged = mergeApprovedPricing(source, approvedPricing);
+    const expected = createPublishedContentSnapshotFromManifest(merged);
+    const actual = createPublishedContentSnapshotFromManifest(
+      structuredClone(merged),
+    );
+
+    expect(comparePublishedContentSnapshots(expected, actual)).toEqual({
+      ok: true,
+      issues: [],
+    });
+    expect(expected.pricing?.plans[0]?.amountMinor).toBe(1200);
   });
 
   it('rejects overwrite when the manifest already contains Pricing', async () => {
