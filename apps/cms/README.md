@@ -159,6 +159,20 @@ not exported, seeded or approved for public use. See the
 [deployment readiness checklist](docs/DEPLOYMENT_READINESS.md) only after this
 gate passes.
 
+When Product and Legal supply the approved Pricing JSON, merge it into a new
+manifest without mutating or overwriting either reviewed input:
+
+```bash
+pnpm --silent --filter @mini-workout/landing migration:merge-pricing \
+  /tmp/landing-manifest.json /path/to/approved-pricing.json \
+  > /tmp/landing-approved.json
+```
+
+Use `/tmp/landing-approved.json` for the next dry-run/apply and as
+`LANDING_PARITY_BASELINE_MANIFEST` when checking the imported Strapi snapshot.
+The [Pricing input format](docs/PRICING_CONTENT_INPUT.md) documents the complete
+approval and validation flow.
+
 Then verify the Astro consumer against a local authenticated snapshot in both
 delivery modes:
 

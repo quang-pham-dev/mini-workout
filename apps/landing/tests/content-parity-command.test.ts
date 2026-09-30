@@ -39,12 +39,14 @@ describe('content parity command configuration', () => {
   });
 
   it.each([
-    [{ LANDING_CONTENT_SOURCE: 'unsupported' }, 'CONFIG_INVALID'],
-    [{ LANDING_CONTENT_SOURCE: 'sanity' }, 'CONFIG_INVALID'],
-    [{ LANDING_CONTENT_SOURCE: 'strapi' }, 'CONFIG_INVALID'],
-  ])('fails closed for invalid provider configuration', (env, code) => {
+    { LANDING_CONTENT_SOURCE: 'unsupported' },
+    { LANDING_CONTENT_SOURCE: 'sanity' },
+    { LANDING_CONTENT_SOURCE: 'strapi' },
+  ])('fails closed for invalid provider configuration', (env) => {
     expect(() => resolveContentParityRepositoryConfig(env)).toThrowError(
-      expect.objectContaining<Partial<ContentParityCommandError>>({ code }),
+      expect.objectContaining<Partial<ContentParityCommandError>>({
+        code: 'CONFIG_INVALID',
+      }),
     );
   });
 });

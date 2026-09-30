@@ -561,8 +561,16 @@ approved:
   enters the public fixture corpus or a migration manifest.
 - Documented the exact Product/Legal Pricing approval payload and kept Pricing
   activation fail-closed until those real values are supplied.
+- Replaced the Sanity-specific parity command with one provider-neutral gate
+  for fixtures, Sanity and Strapi. It can use either the original fixture
+  baseline or an approved migration manifest, which prevents reviewed Pricing
+  additions from being misclassified as drift.
+- Added a non-mutating Pricing approval merge command. It validates the source
+  manifest and the full Landing Pricing contract, rejects existing Pricing with
+  `RESOURCE_CONFLICT`, emits only a new manifest on stdout and uses sanitized
+  stable error codes.
 - Verified Strapi typecheck/lint/tests/admin build and local start/health on
-  Node 22.20.0. Verified Landing typecheck/lint and 280 tests, CMS 10 tests,
+  Node 22.20.0. Verified Landing typecheck/lint and 289 tests, CMS 10 tests,
   shared contracts 8 tests, static fixture build and Strapi preview SSR build.
 
 ### Evidence and discoveries
@@ -616,12 +624,12 @@ approved:
   handshake remains.
 - M4 publish automation: **45%** — Level 1 authenticated delivery and tests are
   complete; deployed proof and durable Level 2 delivery remain.
-- M5 content migration: **82%** — contract/export/planning, blocker reporting,
+- M5 content migration: **88%** — contract/export/planning, blocker reporting,
   durable storage configuration, local binary resolution/checksums,
   CMS-controlled pricing visibility, guarded idempotent apply tooling, local
   HTTP apply-twice proof, semantic snapshot round-trip and both Astro delivery
-  builds are complete; approved Pricing values and the deployed staging
-  rehearsal remain.
+  builds, provider-neutral parity and guarded Pricing merge are complete;
+  approved Pricing values and the deployed staging rehearsal remain.
 - M6–M7: **0%**.
-- Strapi migration overall: **about 68%**. Existing Landing UI/SEO foundation
+- Strapi migration overall: **about 69%**. Existing Landing UI/SEO foundation
   remains about **95%** complete.

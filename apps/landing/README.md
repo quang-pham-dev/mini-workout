@@ -97,18 +97,30 @@ note. Add routes only when their unique content and SEO metadata/canonical
 contract are complete.
 
 Published content is loaded through one repository. `LANDING_CONTENT_SOURCE`
-defaults to `fixtures`; set it to `sanity` only with `SANITY_PROJECT_ID` and
-`SANITY_DATASET`. An activated Sanity build fails closed on configuration,
+defaults to `fixtures`; select `sanity` with `SANITY_PROJECT_ID` and
+`SANITY_DATASET`, or `strapi` with `STRAPI_API_URL` and the server-only
+`STRAPI_API_READ_TOKEN`. An activated CMS build fails closed on configuration,
 provider or contract errors and never silently publishes stale fixture content.
 
-Before switching a real environment to Sanity, compare its published snapshot
-with the reviewed local fixture baseline. The checker reports only stable issue
-codes and content paths; it does not print copy, asset URLs or provider errors.
+Before switching a real environment, compare its published snapshot with the
+reviewed baseline. The checker reports only stable issue codes and content
+paths; it does not print copy, asset URLs, tokens or provider errors.
 
 ```sh
 SANITY_PROJECT_ID=<project-id> SANITY_DATASET=<dataset> \
+  LANDING_CONTENT_SOURCE=sanity \
+  pnpm check:landing-content-parity
+
+STRAPI_API_URL=https://studio.example.com \
+  STRAPI_API_READ_TOKEN=<published-read-token> \
+  LANDING_CONTENT_SOURCE=strapi \
+  LANDING_PARITY_BASELINE_MANIFEST=/tmp/landing-approved.json \
   pnpm check:landing-content-parity
 ```
+
+Omit `LANDING_PARITY_BASELINE_MANIFEST` to compare with fixtures. Supply the
+approved manifest after adding Pricing or other intentionally changed content,
+so approved additions are not incorrectly reported as drift.
 
 Parity covers Article/Category route inventory, canonical and SEO values,
 Article-to-Category relationships, ordered section identities and reserved media

@@ -35,6 +35,7 @@
     "LANDING_ROLLOUT_URL",
     "LANDING_ROLLOUT_INDEXABLE",
     "LANDING_CONTENT_SOURCE",
+    "LANDING_PARITY_BASELINE_MANIFEST",
     "LANDING_OUTPUT",
     "SANITY_PROJECT_ID",
     "SANITY_DATASET",
@@ -102,7 +103,14 @@
       "cache": false
     },
     "check-content-parity": {
-      "env": ["SANITY_DATASET", "SANITY_PROJECT_ID"],
+      "env": [
+        "LANDING_CONTENT_SOURCE",
+        "LANDING_PARITY_BASELINE_MANIFEST",
+        "SANITY_DATASET",
+        "SANITY_PROJECT_ID",
+        "STRAPI_API_READ_TOKEN",
+        "STRAPI_API_URL"
+      ],
       "cache": false
     },
     "dev": {

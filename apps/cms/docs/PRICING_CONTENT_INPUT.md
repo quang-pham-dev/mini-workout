@@ -55,11 +55,40 @@ example, `1200` with USD means USD 12.00. Do not include payment-provider IDs,
 secrets or checkout URLs; those belong to the product/payment system and are
 resolved from the stable `planId`.
 
+## Validate and merge locally
+
+Keep the reviewed Pricing object in a separate JSON file, then merge it into a
+new manifest:
+
+```bash
+pnpm --silent --filter @mini-workout/landing migration:export > /tmp/landing-base.json
+pnpm --silent --filter @mini-workout/landing migration:merge-pricing \
+  /tmp/landing-base.json /path/to/approved-pricing.json \
+  > /tmp/landing-approved.json
+```
+
+The command never edits either input. The output path must be distinct from
+both inputs because shell redirection truncates a file before the command reads
+it. If the source manifest already contains Pricing, the command exits with
+`RESOURCE_CONFLICT`; invalid manifest or Pricing input exits with
+`INPUT_INVALID`. Neither failure prints commercial content.
+
+After importing the approved manifest, use it as the semantic parity baseline:
+
+```bash
+LANDING_CONTENT_SOURCE=strapi \
+  STRAPI_API_URL=http://127.0.0.1:1337 \
+  STRAPI_API_READ_TOKEN=<local-read-token> \
+  LANDING_PARITY_BASELINE_MANIFEST=/tmp/landing-approved.json \
+  pnpm check:landing-content-parity
+```
+
 ## Review and activation gates
 
 1. Product and legal approve plan amounts, billing cadence, entitlements,
    cancellation terms, refund terms and CTA copy.
-2. Engineering inserts the approved object into a freshly exported manifest.
+2. Engineering merges the approved object into a freshly exported manifest
+   using `migration:merge-pricing`.
 3. The shared manifest parser and Landing pricing mapper validate it locally.
 4. Run the guarded migration dry-run, then the revision-confirmed apply twice.
 5. Run semantic parity and both local Strapi-sourced Astro build modes.
