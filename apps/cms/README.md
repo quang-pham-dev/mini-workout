@@ -94,15 +94,18 @@ Export a provider-neutral manifest from the currently reviewed Landing corpus,
 then generate a deterministic Strapi import plan:
 
 ```bash
-pnpm --filter @mini-workout/landing migration:export > /tmp/landing-manifest.json
+pnpm --silent --filter @mini-workout/landing migration:export > /tmp/landing-manifest.json
 pnpm --filter @mini-workout/cms migration:plan /tmp/landing-manifest.json
+pnpm --filter @mini-workout/cms migration:resolve-media /tmp/landing-manifest.json ../landing/public
 ```
 
-The planner never writes to Strapi. It orders authors/media, categories,
-related content and singletons, and reports blockers such as missing Pricing or
-media binaries. Re-running it with the same manifest produces the same plan
-revision. An apply command will only be added after durable media storage and
-idempotent upsert behavior are verified.
+Both commands are read-only. The planner orders authors/media, categories,
+related content and singletons. The resolver confines assets to the supplied
+root, rejects traversal and escaping symlinks, allows raster web formats up to
+20 MiB, and records SHA-256 metadata. An apply command will only be added after
+idempotent Strapi upsert behavior is verified. Exit code `2` means resolution
+succeeded but another reported migration blocker, such as missing approved
+Pricing, still prevents apply.
 
 ## Checks
 

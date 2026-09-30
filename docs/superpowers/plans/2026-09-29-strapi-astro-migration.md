@@ -578,7 +578,9 @@ approved:
 
 ### Open gates
 
-- Configure and verify the selected S3-compatible media provider.
+- Verify Cloudflare R2 upload/read/delete against the deployed CMS and rehearse
+  media restore. Provider configuration, production validation and team setup
+  documentation are implemented offline.
 - Create production-like PostgreSQL and run restore/upgrade rehearsal (S5).
 - Seed/import all content, create scoped API tokens and run an authenticated
   snapshot/semantic parity build (S2 completion).
@@ -587,16 +589,16 @@ approved:
 - Exercise the Level 1 publish webhook against deployed Strapi and Vercel.
   Replace process-local duplicate suppression with the Level 2 durable
   HMAC/outbox/coalescing path before broad editor access (S4 completion).
-- Complete the idempotent Strapi apply client after S3 media resolution, add the
-  missing reviewed Pricing corpus, then run semantic parity. Perform M6
-  cutover/rollback and M7 decommission afterward.
+- Complete the idempotent Strapi apply client using the verified local-media
+  resolution report, add the missing reviewed Pricing corpus, then run semantic
+  parity. Perform M6 cutover/rollback and M7 decommission afterward.
 
 ### Rough progress
 
 - M0 spikes/decisions: **55%** — runtime and contracts proven; infrastructure
   restore, real preview and publish delivery remain.
-- M1 CMS foundation: **80%** — schemas/runtime/container definition complete;
-  object storage and production infrastructure remain.
+- M1 CMS foundation: **88%** — schemas/runtime/container and R2 provider
+  configuration are complete; deployed storage and infrastructure proof remain.
 - M2 contract/source: **88%** — the shared versioned runtime contract, provider
   mapping and unit evidence are complete; authenticated live snapshot parity
   remains.
@@ -604,8 +606,10 @@ approved:
   handshake remains.
 - M4 publish automation: **45%** — Level 1 authenticated delivery and tests are
   complete; deployed proof and durable Level 2 delivery remain.
-- M5 content migration: **25%** — contract/export/planning and blocker reporting
-  are complete; binary media resolution, apply/upsert and live parity remain.
+- M5 content migration: **45%** — contract/export/planning, blocker reporting,
+  durable storage configuration, local binary resolution/checksums and
+  CMS-controlled pricing visibility are complete; apply/upsert, approved
+  Pricing input and live parity remain.
 - M6–M7: **0%**.
-- Strapi migration overall: **about 50%**. Existing Landing UI/SEO foundation
+- Strapi migration overall: **about 58%**. Existing Landing UI/SEO foundation
   remains about **95%** complete.

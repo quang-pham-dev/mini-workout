@@ -16,6 +16,7 @@
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
     "migration:plan": "node --import tsx scripts/plan-landing-migration.ts",
+    "migration:resolve-media": "node --import tsx scripts/resolve-landing-media.ts",
     "start": "strapi start",
     "strapi": "strapi",
     "test": "vitest run --passWithNoTests",
