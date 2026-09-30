@@ -1,9 +1,18 @@
 # Landing Platform Architecture and Delivery Plan
 
-**Status:** Architecture and MVP fallbacks approved; static foundation may proceed; preview/publish integration gates remain open
+**Status:** Core Astro architecture approved and substantially implemented;
+Sanity-specific CMS decisions are superseded by the proposed Strapi migration
+plan dated 2026-09-29
 **Date:** 2026-09-22
 **Owner:** Frontend / Growth Platform
 **Decision class:** Cross-app architecture, content platform, experimentation, SEO
+
+> **CMS decision update (2026-09-29):** The project has selected self-hosted
+> Strapi 5 instead of Sanity. Preserve the provider-neutral architecture and
+> completed Landing contracts in this document, but use
+> [`2026-09-29-strapi-astro-migration.md`](2026-09-29-strapi-astro-migration.md)
+> for CMS, preview, publish, migration and decommission work. Historical Sanity
+> sections below remain as implementation context until cutover is complete.
 
 ## 1. Executive decision
 
