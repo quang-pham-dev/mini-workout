@@ -4,6 +4,9 @@ import {
   StrapiApplyError,
   createStrapiApplyClient,
 } from '../src/migration/strapi-apply-client';
+import { mkdtemp, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
 const token = 'migration-token-must-never-appear';
@@ -38,6 +41,32 @@ function response(body: unknown, status = 200): Response {
 }
 
 describe('Strapi migration apply client', () => {
+  it('rejects invalid client configuration and mismatched plans', async () => {
+    expect(() =>
+      createStrapiApplyClient({ apiUrl: 'not-a-url', token, fetcher: vi.fn() }),
+    ).toThrowError(expect.objectContaining({ code: 'CONFIG_INVALID' }));
+    expect(() =>
+      createStrapiApplyClient({
+        apiUrl: 'ftp://studio.example.com',
+        token,
+        fetcher: vi.fn(),
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'CONFIG_INVALID' }));
+
+    const client = createStrapiApplyClient({
+      apiUrl: 'https://studio.example.com',
+      token,
+      fetcher: vi.fn(),
+    });
+    await expect(
+      client.apply({
+        dryRun: true,
+        plan: readyPlanWithRevision('first'),
+        media: { ...noMedia, planRevision: 'second' },
+      }),
+    ).rejects.toMatchObject({ code: 'INPUT_INVALID' });
+  });
+
   it('dry-runs deterministic creates and updates without a write request', async () => {
     const fetcher = vi
       .fn<typeof fetch>()
@@ -138,6 +167,184 @@ describe('Strapi migration apply client', () => {
     });
   });
 
+  it('uploads a missing checksum exactly once with approved metadata', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'cms-apply-upload-'));
+    const filePath = join(directory, 'movement.webp');
+    await writeFile(filePath, 'webp fixture');
+    const checksum = 'b'.repeat(64);
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(response({ data: [] }))
+      .mockResolvedValueOnce(
+        response([{ id: 42, name: `migration-${checksum}.webp` }], 201),
+      );
+    const client = createStrapiApplyClient({
+      apiUrl: 'https://studio.example.com',
+      token,
+      fetcher,
+    });
+
+    const report = await client.apply({
+      dryRun: false,
+      media: {
+        ...noMedia,
+        assets: [
+          {
+            source: '/movement.webp',
+            filePath,
+            mimeType: 'image/webp',
+            bytes: 12,
+            sha256: checksum,
+          },
+        ],
+      },
+      plan: plan([
+        operation(1, 'media', '/movement.webp', {
+          src: '/movement.webp',
+          alt: 'Movement',
+          caption: 'Gentle movement',
+        }),
+      ]),
+    });
+
+    expect(report.totals).toEqual({
+      create: 0,
+      update: 0,
+      reuse: 0,
+      upload: 1,
+    });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher.mock.calls[1]?.[1]).toMatchObject({
+      method: 'POST',
+      body: expect.any(FormData),
+    });
+  });
+
+  it('creates dependency-ordered drafts and maps relations, media, dynamic zones and pricing', async () => {
+    const checksum = 'c'.repeat(64);
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        response({
+          data: [{ id: 41, name: `migration-${checksum}.webp` }],
+        }),
+      )
+      .mockResolvedValueOnce(response({ data: [] }))
+      .mockResolvedValueOnce(
+        response({ data: { documentId: 'author-doc' } }, 201),
+      )
+      .mockResolvedValueOnce(response({ data: [] }))
+      .mockResolvedValueOnce(
+        response({ data: { documentId: 'category-doc' } }, 201),
+      )
+      .mockResolvedValueOnce(response({ data: [] }))
+      .mockResolvedValueOnce(
+        response({ data: { documentId: 'article-doc' } }, 201),
+      )
+      .mockResolvedValueOnce(response({ data: { documentId: 'pricing-doc' } }))
+      .mockResolvedValueOnce(response({ data: { documentId: 'pricing-doc' } }));
+    const client = createStrapiApplyClient({
+      apiUrl: 'https://studio.example.com',
+      token,
+      fetcher,
+    });
+    const image = {
+      src: '/movement.webp',
+      alt: 'Movement',
+      caption: 'Gentle movement',
+      width: 1600,
+      height: 900,
+    };
+
+    const report = await client.apply({
+      dryRun: false,
+      media: {
+        ...noMedia,
+        assets: [
+          {
+            source: image.src,
+            filePath: '/unused/movement.webp',
+            mimeType: 'image/webp',
+            bytes: 10,
+            sha256: checksum,
+          },
+        ],
+      },
+      plan: plan([
+        operation(1, 'media', image.src, image),
+        operation(1, 'author', 'Editorial', {
+          name: 'Editorial',
+          type: 'Organization',
+        }),
+        operation(2, 'category', 'mobility', {
+          _type: 'category',
+          schemaVersion: 1,
+          slug: 'mobility',
+          name: 'Mobility',
+          image,
+          seo: {
+            title: 'Mobility',
+            description: 'Move gently.',
+            canonicalPath: '/movement/mobility/',
+          },
+        }),
+        operation(3, 'article', 'gentle-mobility', {
+          _type: 'article',
+          schemaVersion: 1,
+          slug: 'gentle-mobility',
+          title: 'Gentle mobility',
+          category: { slug: 'mobility' },
+          author: { name: 'Editorial' },
+          image,
+          sections: [
+            {
+              _key: 'section-1',
+              _type: 'prose.v1',
+              heading: 'Begin',
+              paragraphs: ['Move gently.'],
+            },
+          ],
+        }),
+        operation(4, 'pricing-page', 'pricing', {
+          _type: 'pricingPage',
+          schemaVersion: 1,
+          plans: [{ _key: 'monthly', planId: 'monthly' }],
+        }),
+      ]),
+    });
+
+    expect(report.totals).toEqual({
+      create: 3,
+      update: 1,
+      reuse: 1,
+      upload: 0,
+    });
+    const categoryBody = JSON.parse(
+      String(fetcher.mock.calls[4]?.[1]?.body),
+    ) as { data: Record<string, unknown> };
+    expect(categoryBody.data).toMatchObject({
+      image: { image: 41, alt: 'Movement', caption: 'Gentle movement' },
+      seo: { title: 'Mobility', description: 'Move gently.' },
+    });
+    expect(JSON.stringify(categoryBody)).not.toContain('canonicalPath');
+
+    const articleBody = JSON.parse(
+      String(fetcher.mock.calls[6]?.[1]?.body),
+    ) as { data: Record<string, unknown> };
+    expect(articleBody.data).toMatchObject({
+      author: 'author-doc',
+      category: 'category-doc',
+      sections: [{ __component: 'article.prose-v1', heading: 'Begin' }],
+    });
+
+    const pricingBody = JSON.parse(
+      String(fetcher.mock.calls[8]?.[1]?.body),
+    ) as { data: { plans: Array<Record<string, unknown>> } };
+    expect(pricingBody.data.plans).toEqual([
+      { planId: 'monthly', enabled: true },
+    ]);
+  });
+
   it('rejects duplicate stable keys before writing', async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
       response({
@@ -197,4 +404,15 @@ function operation(
   payload: Record<string, unknown>,
 ): MigrationImportPlan['operations'][number] {
   return { phase, kind, key, payload, references: [] };
+}
+
+function readyPlanWithRevision(revision: string): MigrationImportPlan {
+  return {
+    schemaVersion: 1,
+    sourceRevision: 'fixture-v1',
+    planRevision: revision,
+    readyToApply: true,
+    operations: [],
+    blockers: [],
+  };
 }

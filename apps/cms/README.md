@@ -102,10 +102,47 @@ pnpm --filter @mini-workout/cms migration:resolve-media /tmp/landing-manifest.js
 Both commands are read-only. The planner orders authors/media, categories,
 related content and singletons. The resolver confines assets to the supplied
 root, rejects traversal and escaping symlinks, allows raster web formats up to
-20 MiB, and records SHA-256 metadata. An apply command will only be added after
-idempotent Strapi upsert behavior is verified. Exit code `2` means resolution
-succeeded but another reported migration blocker, such as missing approved
-Pricing, still prevents apply.
+20 MiB, and records SHA-256 metadata. Exit code `2` means resolution succeeded
+but another reported migration blocker, such as missing approved Pricing,
+still prevents apply.
+
+### Dry-run and apply
+
+Create a dedicated temporary custom Content API token with only these
+permissions:
+
+- `find`, `create` and `update` for Author, Category, Article, Campaign,
+  Marketing Page and the three single types;
+- Upload `find` and `upload`.
+
+Configure it outside source control:
+
+```text
+STRAPI_API_URL=https://studio.example.com
+STRAPI_MIGRATION_TOKEN=<temporary-custom-token>
+```
+
+The command defaults to dry-run and performs discovery GET requests only:
+
+```bash
+pnpm --filter @mini-workout/cms migration:apply /tmp/landing-manifest.json ../landing/public
+```
+
+The report classifies every operation as `create`, `update`, `reuse` or
+`upload`. It stops before network access when Pricing or media resolution is
+blocked. Duplicate stable keys fail with `RESOURCE_CONFLICT`.
+
+Apply requires the exact revision printed by the latest dry-run:
+
+```bash
+pnpm --filter @mini-workout/cms migration:apply /tmp/landing-manifest.json ../landing/public --apply --confirm-plan=<planRevision>
+```
+
+All content writes target draft state. The migration never publishes content;
+Product must review Preview and publish from Strapi Admin. Media is reused by a
+deterministic full SHA-256 name, and collection documents are updated by Strapi
+5 `documentId` after stable-key lookup. Remove or rotate the temporary token
+after migration.
 
 ## Checks
 

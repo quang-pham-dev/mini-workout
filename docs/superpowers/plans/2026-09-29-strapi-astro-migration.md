@@ -589,9 +589,10 @@ approved:
 - Exercise the Level 1 publish webhook against deployed Strapi and Vercel.
   Replace process-local duplicate suppression with the Level 2 durable
   HMAC/outbox/coalescing path before broad editor access (S4 completion).
-- Complete the idempotent Strapi apply client using the verified local-media
-  resolution report, add the missing reviewed Pricing corpus, then run semantic
-  parity. Perform M6 cutover/rollback and M7 decommission afterward.
+- Run the idempotent apply client against a production-like Strapi service after
+  adding the missing reviewed Pricing corpus, then run semantic parity. The
+  offline client, dry-run, revision confirmation and duplicate prevention are
+  implemented. Perform M6 cutover/rollback and M7 decommission afterward.
 
 ### Rough progress
 
@@ -606,10 +607,10 @@ approved:
   handshake remains.
 - M4 publish automation: **45%** — Level 1 authenticated delivery and tests are
   complete; deployed proof and durable Level 2 delivery remain.
-- M5 content migration: **45%** — contract/export/planning, blocker reporting,
-  durable storage configuration, local binary resolution/checksums and
-  CMS-controlled pricing visibility are complete; apply/upsert, approved
-  Pricing input and live parity remain.
+- M5 content migration: **65%** — contract/export/planning, blocker reporting,
+  durable storage configuration, local binary resolution/checksums,
+  CMS-controlled pricing visibility and guarded idempotent apply tooling are
+  complete; approved Pricing input, live rehearsal and semantic parity remain.
 - M6–M7: **0%**.
-- Strapi migration overall: **about 58%**. Existing Landing UI/SEO foundation
+- Strapi migration overall: **about 63%**. Existing Landing UI/SEO foundation
   remains about **95%** complete.

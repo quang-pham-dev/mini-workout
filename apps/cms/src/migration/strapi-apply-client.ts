@@ -47,6 +47,7 @@ const dynamicZoneComponents: Record<string, string> = {
 };
 
 export class StrapiApplyError extends Error {
+  readonly cause?: unknown;
   readonly category: 'validation' | 'conflict' | 'dependency' | 'configuration';
   readonly code:
     | 'INPUT_INVALID'
@@ -60,10 +61,11 @@ export class StrapiApplyError extends Error {
     message: string;
     cause?: unknown;
   }) {
-    super(input.message, { cause: input.cause });
+    super(input.message);
     this.name = 'StrapiApplyError';
     this.category = input.category;
     this.code = input.code;
+    this.cause = input.cause;
   }
 }
 
