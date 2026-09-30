@@ -84,7 +84,9 @@ describe('Strapi migration apply client', () => {
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
-        response([{ id: 41, name: `migration-${'a'.repeat(64)}.webp` }]),
+        response({
+          data: [{ id: 41, name: `migration-${'a'.repeat(64)}.webp` }],
+        }),
       )
       .mockResolvedValueOnce(
         response({ data: [{ documentId: 'author-document' }] }),
