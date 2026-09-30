@@ -16,6 +16,7 @@
     "check-operations": "node --env-file-if-exists=.env --import tsx scripts/check-operations.ts",
     "check-rollout": "node --env-file-if-exists=.env --import tsx scripts/check-rollout.ts",
     "check-content-parity": "node --env-file-if-exists=.env --import tsx scripts/check-sanity-parity.ts",
+    "migration:export": "node --import tsx scripts/export-strapi-migration.ts",
     "check-types": "astro check",
     "prelint": "pnpm check-boundaries",
     "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts' 'scripts/**/*.ts' astro.config.mjs vitest.config.ts --max-warnings 0",
@@ -27,6 +28,7 @@
   "dependencies": {
     "@astrojs/vercel": "11.0.11",
     "@mini-workout/analytics": "workspace:*",
+    "@mini-workout/contracts": "workspace:*",
     "@mini-workout/observability": "workspace:*",
     "@sanity/client": "8.7.0",
     "@sanity/preview-url-secret": "4.1.5",

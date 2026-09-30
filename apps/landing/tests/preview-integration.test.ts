@@ -1,11 +1,11 @@
 import { previewIntegration } from '../preview-integration.mjs';
 import { describe, expect, it, vi } from 'vitest';
 
-function runSetup(enabled: boolean) {
+function runSetup(enabled: boolean, contentSource = 'sanity') {
   const injectRoute = vi.fn();
   const addMiddleware = vi.fn();
   const injectScript = vi.fn();
-  previewIntegration(enabled).hooks['astro:config:setup']({
+  previewIntegration(enabled, contentSource).hooks['astro:config:setup']({
     addMiddleware,
     injectRoute,
     injectScript,
@@ -35,5 +35,18 @@ describe('preview-only integration', () => {
         ([route]) => route.pattern === '/api/webhooks/sanity/publish',
       )?.[0],
     ).toMatchObject({ prerender: false });
+  });
+
+  it('injects Strapi preview without Sanity routes or visual editing', () => {
+    const hooks = runSetup(true, 'strapi');
+
+    expect(
+      hooks.injectRoute.mock.calls.map(([route]) => route.pattern),
+    ).toEqual([
+      '/api/preview/strapi',
+      '/api/webhooks/strapi/publish',
+      '/api/draft-mode/disable',
+    ]);
+    expect(hooks.injectScript).not.toHaveBeenCalled();
   });
 });

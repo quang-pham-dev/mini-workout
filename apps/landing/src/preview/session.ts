@@ -11,6 +11,7 @@ import {
 } from '@mini-workout/observability';
 
 export const previewCookieName = 'sanity-preview-perspective';
+const strapiPreviewCookieName = 'strapi-preview-perspective';
 
 interface PreviewValidationResult {
   isValid: boolean;
@@ -174,13 +175,18 @@ export function createEnablePreviewHandler(
 }
 
 export function createDisablePreviewResponse(): Response {
+  const headers = new Headers({
+    ...privateNoStoreHeaders,
+    location: '/',
+  });
+  headers.append('set-cookie', previewCookie('', 0));
+  headers.append(
+    'set-cookie',
+    `${strapiPreviewCookieName}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`,
+  );
   return new Response(null, {
     status: 307,
-    headers: {
-      ...privateNoStoreHeaders,
-      location: '/',
-      'set-cookie': previewCookie('', 0),
-    },
+    headers,
   });
 }
 
@@ -189,8 +195,12 @@ export function getPreviewState(request: Request): {
   noindex: true;
 } {
   const cookie = request.headers.get('cookie') ?? '';
-  const enabled = cookie
-    .split(';')
-    .some((part) => part.trim().startsWith(`${previewCookieName}=`));
+  const enabled = cookie.split(';').some((part) => {
+    const candidate = part.trim();
+    return (
+      candidate.startsWith(`${previewCookieName}=`) ||
+      candidate.startsWith(`${strapiPreviewCookieName}=`)
+    );
+  });
   return { enabled, noindex: true };
 }

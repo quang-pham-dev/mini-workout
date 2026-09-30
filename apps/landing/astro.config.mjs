@@ -19,6 +19,7 @@ const {
   output,
   analytics,
   experimentsEnabled,
+  contentSource,
 } = parseLandingEnv(process.env);
 const preview = output === 'preview';
 
@@ -28,7 +29,7 @@ export default defineConfig({
   ...(preview ? { adapter: vercel() } : {}),
   trailingSlash: 'always',
   integrations: [
-    previewIntegration(preview),
+    previewIntegration(preview, contentSource),
     analyticsIntegration(analytics.enabled),
   ],
   vite: {

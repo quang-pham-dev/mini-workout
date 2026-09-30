@@ -77,4 +77,23 @@ describe('published content repository activation', () => {
 
     await expect(repository.load()).rejects.toThrow('CMS unavailable');
   });
+
+  it('activates Strapi only through its isolated snapshot source', async () => {
+    const load = vi.fn().mockResolvedValue(sanitySnapshot);
+    const createStrapiSource = vi.fn(() => ({ load }));
+    const repository = createPublishedContentRepository(
+      {
+        contentSource: 'strapi',
+        strapiApiUrl: 'https://studio.example.com/',
+        strapiApiReadToken: 'read-token',
+      },
+      { createStrapiSource },
+    );
+
+    await expect(repository.load()).resolves.toBe(sanitySnapshot);
+    expect(createStrapiSource).toHaveBeenCalledWith({
+      apiUrl: 'https://studio.example.com/',
+      token: 'read-token',
+    });
+  });
 });

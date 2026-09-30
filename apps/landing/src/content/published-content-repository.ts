@@ -13,6 +13,7 @@ import type { SiteShellViewModel } from '../features/site-shell/catalog.js';
 import { parseLandingEnv } from '../lib/env.js';
 import { getPreviewState } from '../preview/session.js';
 import { createPublishedContentSource } from './sanity/content-source.js';
+import { createStrapiContentSource } from './strapi/content-source.js';
 
 export interface PublishedContentSnapshot {
   articles: readonly ArticleViewModel[];
@@ -24,9 +25,11 @@ export interface PublishedContentSnapshot {
 }
 
 interface RepositoryConfig {
-  contentSource: 'fixtures' | 'sanity';
+  contentSource: 'fixtures' | 'sanity' | 'strapi';
   sanityProjectId?: string;
   sanityDataset?: string;
+  strapiApiUrl?: string;
+  strapiApiReadToken?: string;
 }
 
 export interface ContentRepository {
@@ -41,6 +44,10 @@ interface RepositoryDependencies {
   createSanitySource: (config: {
     projectId: string;
     dataset: string;
+  }) => SanitySnapshotSource;
+  createStrapiSource: (config: {
+    apiUrl: string;
+    token: string;
   }) => SanitySnapshotSource;
 }
 
@@ -75,12 +82,15 @@ const defaultDependencies: RepositoryDependencies = {
       },
     };
   },
+  createStrapiSource: ({ apiUrl, token }) =>
+    createStrapiContentSource({ apiUrl, token }),
 };
 
 export function createPublishedContentRepository(
   config: RepositoryConfig,
-  dependencies: RepositoryDependencies = defaultDependencies,
+  dependencyOverrides: Partial<RepositoryDependencies> = {},
 ): ContentRepository {
+  const dependencies = { ...defaultDependencies, ...dependencyOverrides };
   let snapshotPromise: Promise<PublishedContentSnapshot> | undefined;
 
   return {
@@ -95,12 +105,19 @@ export function createPublishedContentRepository(
               pricing: getPublishedPricing(),
               siteShell: getPublishedSiteShell(),
             })
-          : dependencies
-              .createSanitySource({
-                projectId: config.sanityProjectId ?? '',
-                dataset: config.sanityDataset ?? '',
-              })
-              .load();
+          : config.contentSource === 'sanity'
+            ? dependencies
+                .createSanitySource({
+                  projectId: config.sanityProjectId ?? '',
+                  dataset: config.sanityDataset ?? '',
+                })
+                .load()
+            : dependencies
+                .createStrapiSource({
+                  apiUrl: config.strapiApiUrl ?? '',
+                  token: config.strapiApiReadToken ?? '',
+                })
+                .load();
       return snapshotPromise;
     },
   };
@@ -112,6 +129,8 @@ const landingEnv = parseLandingEnv({
   LANDING_SITE_URL: process.env.LANDING_SITE_URL,
   SANITY_DATASET: process.env.SANITY_DATASET,
   SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
+  STRAPI_API_URL: process.env.STRAPI_API_URL,
+  STRAPI_API_READ_TOKEN: process.env.STRAPI_API_READ_TOKEN,
   VERCEL_ENV: process.env.VERCEL_ENV,
   LANDING_OUTPUT: process.env.LANDING_OUTPUT,
 });
@@ -120,6 +139,8 @@ export const publishedContentRepository = createPublishedContentRepository({
   contentSource: landingEnv.contentSource,
   sanityProjectId: landingEnv.sanityProjectId,
   sanityDataset: landingEnv.sanityDataset,
+  strapiApiUrl: landingEnv.strapiApiUrl,
+  strapiApiReadToken: landingEnv.strapiApiReadToken,
 });
 
 const requestRepositories = new WeakMap<Request, ContentRepository>();
@@ -131,17 +152,25 @@ export function getContentRepository(request: Request): ContentRepository {
   const existing = requestRepositories.get(request);
   if (existing) return existing;
 
-  const source = createPublishedContentSource({
-    projectId: process.env.SANITY_PROJECT_ID,
-    dataset: process.env.SANITY_DATASET,
-    token: process.env.SANITY_API_READ_TOKEN,
-    studioUrl: process.env.SANITY_STUDIO_URL,
-    preview: true,
-  });
   let snapshotPromise: Promise<PublishedContentSnapshot> | undefined;
   const repository: ContentRepository = {
-    load: () =>
-      (snapshotPromise ??= Promise.all([
+    load: () => {
+      if (landingEnv.contentSource === 'strapi') {
+        const source = createStrapiContentSource({
+          apiUrl: process.env.STRAPI_API_URL,
+          token: process.env.STRAPI_PREVIEW_READ_TOKEN,
+          preview: true,
+        });
+        return (snapshotPromise ??= source.load());
+      }
+      const source = createPublishedContentSource({
+        projectId: process.env.SANITY_PROJECT_ID,
+        dataset: process.env.SANITY_DATASET,
+        token: process.env.SANITY_API_READ_TOKEN,
+        studioUrl: process.env.SANITY_STUDIO_URL,
+        preview: true,
+      });
+      return (snapshotPromise ??= Promise.all([
         source.getArticles(),
         source.getCampaigns(),
         source.getCategories(),
@@ -164,7 +193,8 @@ export function getContentRepository(request: Request): ContentRepository {
           pricing,
           siteShell,
         }),
-      )),
+      ));
+    },
   };
   requestRepositories.set(request, repository);
   return repository;

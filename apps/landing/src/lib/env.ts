@@ -33,9 +33,11 @@ export interface LandingEnv {
   productAppUrl: string;
   studioUrl: string;
   indexable: boolean;
-  contentSource: 'fixtures' | 'sanity';
+  contentSource: 'fixtures' | 'sanity' | 'strapi';
   sanityProjectId?: string;
   sanityDataset?: string;
+  strapiApiUrl?: string;
+  strapiApiReadToken?: string;
   output: 'static' | 'preview';
   analytics: Readonly<{
     enabled: boolean;
@@ -61,6 +63,8 @@ export function parseLandingEnv(
       | 'SANITY_DATASET'
       | 'SANITY_PROJECT_ID'
       | 'SANITY_STUDIO_URL'
+      | 'STRAPI_API_URL'
+      | 'STRAPI_API_READ_TOKEN'
       | 'VERCEL_ENV'
       | 'VERCEL_PROJECT_PRODUCTION_URL'
       | 'VERCEL_URL'
@@ -95,8 +99,24 @@ export function parseLandingEnv(
     throw new Error('LANDING_OUTPUT must be static or preview.');
   }
   const contentSource = env.LANDING_CONTENT_SOURCE ?? 'fixtures';
-  if (contentSource !== 'fixtures' && contentSource !== 'sanity') {
-    throw new Error('LANDING_CONTENT_SOURCE must be fixtures or sanity.');
+  if (
+    contentSource !== 'fixtures' &&
+    contentSource !== 'sanity' &&
+    contentSource !== 'strapi'
+  ) {
+    throw new Error(
+      'LANDING_CONTENT_SOURCE must be fixtures, sanity, or strapi.',
+    );
+  }
+  const strapiApiUrl =
+    contentSource === 'strapi'
+      ? parseOrigin(env.STRAPI_API_URL?.trim() ?? '', 'STRAPI_API_URL')
+      : undefined;
+  const strapiApiReadToken = env.STRAPI_API_READ_TOKEN?.trim();
+  if (contentSource === 'strapi' && !strapiApiReadToken) {
+    throw new Error(
+      'Strapi content source requires STRAPI_API_URL and STRAPI_API_READ_TOKEN.',
+    );
   }
   if (
     contentSource === 'sanity' &&
@@ -119,10 +139,13 @@ export function parseLandingEnv(
     env.MEMBER_APP_URL?.trim() || defaultProductAppUrl,
     'MEMBER_APP_URL',
   );
-  const studioUrl = parseOrigin(
-    env.SANITY_STUDIO_URL?.trim() || 'http://localhost:3333',
-    'SANITY_STUDIO_URL',
-  );
+  const studioUrl =
+    contentSource === 'strapi' && strapiApiUrl
+      ? strapiApiUrl
+      : parseOrigin(
+          env.SANITY_STUDIO_URL?.trim() || 'http://localhost:3333',
+          'SANITY_STUDIO_URL',
+        );
 
   return {
     siteUrl,
@@ -146,5 +169,6 @@ export function parseLandingEnv(
           sanityDataset: env.SANITY_DATASET,
         }
       : {}),
+    ...(contentSource === 'strapi' ? { strapiApiUrl, strapiApiReadToken } : {}),
   };
 }

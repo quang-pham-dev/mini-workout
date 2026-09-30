@@ -28,6 +28,8 @@ if (requiredSurfaces) {
           SANITY_DATASET: process.env.SANITY_DATASET,
           SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
           SANITY_STUDIO_URL: process.env.SANITY_STUDIO_URL,
+          STRAPI_API_URL: process.env.STRAPI_API_URL,
+          STRAPI_API_READ_TOKEN: process.env.STRAPI_API_READ_TOKEN,
           VERCEL_ENV: process.env.VERCEL_ENV,
           VERCEL_PROJECT_PRODUCTION_URL:
             process.env.VERCEL_PROJECT_PRODUCTION_URL,

@@ -91,7 +91,29 @@ describe('parseLandingEnv', () => {
     );
     expect(() =>
       parseLandingEnv({ LANDING_CONTENT_SOURCE: 'fallback' }),
-    ).toThrow('LANDING_CONTENT_SOURCE must be fixtures or sanity.');
+    ).toThrow('LANDING_CONTENT_SOURCE must be fixtures, sanity, or strapi.');
+  });
+
+  it('requires a private Strapi origin and build token before activation', () => {
+    expect(
+      parseLandingEnv({
+        LANDING_CONTENT_SOURCE: 'strapi',
+        STRAPI_API_URL: 'https://studio.example.com',
+        STRAPI_API_READ_TOKEN: 'read-token',
+      }),
+    ).toMatchObject({
+      contentSource: 'strapi',
+      strapiApiUrl: 'https://studio.example.com/',
+      strapiApiReadToken: 'read-token',
+    });
+    expect(() =>
+      parseLandingEnv({
+        LANDING_CONTENT_SOURCE: 'strapi',
+        STRAPI_API_URL: 'https://studio.example.com',
+      }),
+    ).toThrow(
+      'Strapi content source requires STRAPI_API_URL and STRAPI_API_READ_TOKEN.',
+    );
   });
 
   it('allows crawling only for an explicitly enabled production deployment', () => {
