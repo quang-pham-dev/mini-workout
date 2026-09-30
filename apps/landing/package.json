@@ -17,6 +17,7 @@
     "check-rollout": "node --env-file-if-exists=.env --import tsx scripts/check-rollout.ts",
     "check-content-parity": "node --env-file-if-exists=.env --import tsx scripts/check-sanity-parity.ts",
     "migration:export": "node --import tsx scripts/export-strapi-migration.ts",
+    "rehearse:strapi-build": "node --import tsx scripts/rehearse-strapi-build.ts",
     "check-types": "astro check",
     "prelint": "pnpm check-boundaries",
     "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts' 'scripts/**/*.ts' astro.config.mjs vitest.config.ts --max-warnings 0",

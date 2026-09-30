@@ -34,7 +34,11 @@ describe('local Strapi snapshot round trip', () => {
     expect(
       comparePublishedContentSnapshots(rehearsal.expected, actual),
     ).toEqual({ ok: true, issues: [] });
-    expect(server.requests()).toEqual({ authorized: 1, unauthorized: 0 });
+    expect(server.requests()).toEqual({
+      authorized: 1,
+      unauthorized: 0,
+      preview: 0,
+    });
   });
 
   it('rejects an invalid token without returning content', async () => {
@@ -55,6 +59,10 @@ describe('local Strapi snapshot round trip', () => {
         strapiApiReadToken: 'wrong-token',
       }).load(),
     ).rejects.toMatchObject({ code: 'DEPENDENCY_UNAVAILABLE' });
-    expect(server.requests()).toEqual({ authorized: 0, unauthorized: 1 });
+    expect(server.requests()).toEqual({
+      authorized: 0,
+      unauthorized: 1,
+      preview: 0,
+    });
   });
 });

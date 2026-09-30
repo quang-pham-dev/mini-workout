@@ -86,7 +86,8 @@ Product manages Landing pricing through the Strapi Pricing singleton. The CMS
 controls presentation and whether an individual plan is visible, while the
 member/billing backend remains authoritative for the price charged and product
 availability. Follow the [Pricing authoring contract](docs/PRICING_AUTHORING.md)
-before publishing approved prices or legal terms.
+and [approved Pricing input format](docs/PRICING_CONTENT_INPUT.md) before
+publishing prices or legal terms.
 
 ## Offline content migration planning
 
@@ -157,6 +158,18 @@ count unchanged. Synthetic Pricing in this test is contract data only; it is
 not exported, seeded or approved for public use. See the
 [deployment readiness checklist](docs/DEPLOYMENT_READINESS.md) only after this
 gate passes.
+
+Then verify the Astro consumer against a local authenticated snapshot in both
+delivery modes:
+
+```bash
+pnpm --filter @mini-workout/landing rehearse:strapi-build
+```
+
+This produces disposable static and Vercel preview artifacts under the system
+temporary directory, exercises the separately authenticated preview snapshot,
+and removes the artifacts afterward. Changing only the Strapi origin and token
+is sufficient when the same workflow later moves to staging.
 
 ## Checks
 

@@ -553,8 +553,16 @@ approved:
   planner orders authors/media, categories, related documents and singletons,
   uses stable business keys and blocks unsafe apply when required content or
   media binaries are missing.
+- Added an authenticated local snapshot round-trip and repeatable Astro build
+  rehearsal. The fixture corpus is exported through the provider-neutral
+  manifest, served through Strapi-compatible published/preview endpoints,
+  remapped into Landing view models, checked for semantic parity, and built as
+  both static public and Vercel preview artifacts. Contract-only Pricing never
+  enters the public fixture corpus or a migration manifest.
+- Documented the exact Product/Legal Pricing approval payload and kept Pricing
+  activation fail-closed until those real values are supplied.
 - Verified Strapi typecheck/lint/tests/admin build and local start/health on
-  Node 22.20.0. Verified Landing typecheck/lint and 277 tests, CMS 10 tests,
+  Node 22.20.0. Verified Landing typecheck/lint and 280 tests, CMS 10 tests,
   shared contracts 8 tests, static fixture build and Strapi preview SSR build.
 
 ### Evidence and discoveries
@@ -608,11 +616,12 @@ approved:
   handshake remains.
 - M4 publish automation: **45%** — Level 1 authenticated delivery and tests are
   complete; deployed proof and durable Level 2 delivery remain.
-- M5 content migration: **70%** — contract/export/planning, blocker reporting,
+- M5 content migration: **82%** — contract/export/planning, blocker reporting,
   durable storage configuration, local binary resolution/checksums,
-  CMS-controlled pricing visibility, guarded idempotent apply tooling and local
-  HTTP apply-twice proof are complete; approved Pricing input, deployed staging
-  rehearsal and semantic parity remain.
+  CMS-controlled pricing visibility, guarded idempotent apply tooling, local
+  HTTP apply-twice proof, semantic snapshot round-trip and both Astro delivery
+  builds are complete; approved Pricing values and the deployed staging
+  rehearsal remain.
 - M6–M7: **0%**.
-- Strapi migration overall: **about 65%**. Existing Landing UI/SEO foundation
+- Strapi migration overall: **about 68%**. Existing Landing UI/SEO foundation
   remains about **95%** complete.

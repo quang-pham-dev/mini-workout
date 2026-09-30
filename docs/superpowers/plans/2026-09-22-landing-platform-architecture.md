@@ -1084,16 +1084,16 @@ These percentages are planning estimates, not release-readiness claims. They
 measure the full Phase 0–7 plan with each phase weighted equally; external
 Brand, Content, Security and infrastructure gates remain incomplete work.
 
-| Phase              | Rough completion | Evidence now available                                                                        | Material remaining                                                                |
-| ------------------ | ---------------: | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 0 — Spikes         |              75% | Local A–F evidence; campaign Build Output routing; Astro/design-system and budget checks      | Protected preview handshake, live 308/410, deploy timing, Lighthouse/a11y and CWV |
-| 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration                      | Landing observability/runtime decision and production-owned assets                |
-| 2 — SEO shell      |              94% | Metadata, JSON-LD, robots, sitemap, 404/410 routing, budgets and indexing build gate          | Live 308/410 evidence and approved brand/social assets                            |
-| 3 — CMS foundation |              96% | Article/Category/Campaign/Pricing/Page contracts, parity, drafts, Visual Editing and webhooks | Protected handshake, webhook delivery evidence and Zod adoption decision          |
-| 4 — MVP pages      |              82% | MVP plus Legal templates, hardened authoring, Presentation and content launch gate            | Approved content/assets, route activation and Content usability validation        |
-| 5 — Analytics/A-B  |              88% | Typed events, consent, registry, brief/report contract, kill switch and offline readiness     | Approved privacy copy, real experiment/report setup and live A/A result           |
-| 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
-| 7 — Operations     |              62% | Audit, SLO policy, sanitized adapters and publish-ready lifecycle normalization               | Authenticated transport, durable aggregation, baselines, paging and cadence       |
+| Phase              | Rough completion | Evidence now available                                                                           | Material remaining                                                                |
+| ------------------ | ---------------: | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| 0 — Spikes         |              75% | Local A–F evidence; campaign Build Output routing; Astro/design-system and budget checks         | Protected preview handshake, live 308/410, deploy timing, Lighthouse/a11y and CWV |
+| 1 — Workspace      |              88% | Astro app, Turbo/CI tasks, env validation, boundaries, E2E orchestration                         | Landing observability/runtime decision and production-owned assets                |
+| 2 — SEO shell      |              94% | Metadata, JSON-LD, robots, sitemap, 404/410 routing, budgets and indexing build gate             | Live 308/410 evidence and approved brand/social assets                            |
+| 3 — CMS foundation |              97% | Versioned Strapi snapshot, local semantic round-trip, static/preview builds and publish boundary | Protected handshake, deployed webhook/storage/restore evidence                    |
+| 4 — MVP pages      |              82% | MVP plus Legal templates, hardened authoring, Presentation and content launch gate               | Approved content/assets, route activation and Content usability validation        |
+| 5 — Analytics/A-B  |              88% | Typed events, consent, registry, brief/report contract, kill switch and offline readiness        | Approved privacy copy, real experiment/report setup and live A/A result           |
+| 6 — Rollout        |              35% | Vercel apps, env destinations, security headers, verifier and rollback runbook                   | Live evidence, custom domains, auth callbacks, crawl maps and gradual cutover     |
+| 7 — Operations     |              62% | Audit, SLO policy, sanitized adapters and publish-ready lifecycle normalization                  | Authenticated transport, durable aggregation, baselines, paging and cadence       |
 
 **Overall rough completion: about 79%.** The Landing foundation alone is further
 ahead (roughly 95%); the overall number is lower because CMS
