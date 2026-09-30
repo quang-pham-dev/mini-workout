@@ -144,6 +144,20 @@ deterministic full SHA-256 name, and collection documents are updated by Strapi
 5 `documentId` after stable-key lookup. Remove or rotate the temporary token
 after migration.
 
+Before connecting to any deployed environment, run the complete local HTTP
+rehearsal. It uses an authenticated in-memory Strapi-compatible server on an
+ephemeral `127.0.0.1` port and applies the same plan twice:
+
+```bash
+pnpm --filter @mini-workout/cms test:migration-rehearsal
+```
+
+The second pass must reuse media, update documents and leave every resource
+count unchanged. Synthetic Pricing in this test is contract data only; it is
+not exported, seeded or approved for public use. See the
+[deployment readiness checklist](docs/DEPLOYMENT_READINESS.md) only after this
+gate passes.
+
 ## Checks
 
 ```bash

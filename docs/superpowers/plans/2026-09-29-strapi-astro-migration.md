@@ -592,7 +592,8 @@ approved:
 - Run the idempotent apply client against a production-like Strapi service after
   adding the missing reviewed Pricing corpus, then run semantic parity. The
   offline client, dry-run, revision confirmation and duplicate prevention are
-  implemented. Perform M6 cutover/rollback and M7 decommission afterward.
+  implemented and an authenticated local HTTP apply-twice rehearsal passes.
+  Perform M6 cutover/rollback and M7 decommission afterward.
 
 ### Rough progress
 
@@ -607,10 +608,11 @@ approved:
   handshake remains.
 - M4 publish automation: **45%** — Level 1 authenticated delivery and tests are
   complete; deployed proof and durable Level 2 delivery remain.
-- M5 content migration: **65%** — contract/export/planning, blocker reporting,
+- M5 content migration: **70%** — contract/export/planning, blocker reporting,
   durable storage configuration, local binary resolution/checksums,
-  CMS-controlled pricing visibility and guarded idempotent apply tooling are
-  complete; approved Pricing input, live rehearsal and semantic parity remain.
+  CMS-controlled pricing visibility, guarded idempotent apply tooling and local
+  HTTP apply-twice proof are complete; approved Pricing input, deployed staging
+  rehearsal and semantic parity remain.
 - M6–M7: **0%**.
-- Strapi migration overall: **about 63%**. Existing Landing UI/SEO foundation
+- Strapi migration overall: **about 65%**. Existing Landing UI/SEO foundation
   remains about **95%** complete.
