@@ -24,7 +24,7 @@ export interface PublishedContentSnapshot {
   siteShell: SiteShellViewModel;
 }
 
-interface RepositoryConfig {
+export interface RepositoryConfig {
   contentSource: 'fixtures' | 'sanity' | 'strapi';
   sanityProjectId?: string;
   sanityDataset?: string;
