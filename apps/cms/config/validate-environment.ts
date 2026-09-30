@@ -14,6 +14,8 @@ const productionSecrets = [
   'TRANSFER_TOKEN_SALT',
   'STRAPI_PREVIEW_SECRET',
   'STRAPI_WEBHOOK_TOKEN',
+  'R2_ACCESS_KEY_ID',
+  'R2_SECRET_ACCESS_KEY',
 ] as const;
 
 export class CmsConfigurationError extends Error {
@@ -37,6 +39,25 @@ function requireSecret(
   }
 }
 
+function requireHttpsOrigin(env: NodeJS.ProcessEnv, name: string): void {
+  let value: URL;
+  try {
+    value = new URL(env[name] ?? '');
+  } catch {
+    throw new CmsConfigurationError(`${name} must be a valid HTTPS origin.`);
+  }
+  if (
+    value.protocol !== 'https:' ||
+    value.pathname !== '/' ||
+    value.search ||
+    value.hash ||
+    value.username ||
+    value.password
+  ) {
+    throw new CmsConfigurationError(`${name} must be a valid HTTPS origin.`);
+  }
+}
+
 export function validateCmsEnvironment(env: NodeJS.ProcessEnv): void {
   if (env.NODE_ENV !== 'production') return;
 
@@ -48,6 +69,16 @@ export function validateCmsEnvironment(env: NodeJS.ProcessEnv): void {
   if (!env.DATABASE_URL?.trim() && !env.DATABASE_HOST?.trim()) {
     throw new CmsConfigurationError(
       'Production PostgreSQL requires DATABASE_URL or DATABASE_HOST.',
+    );
+  }
+  if (env.CMS_UPLOAD_PROVIDER !== 'r2') {
+    throw new CmsConfigurationError(
+      'CMS_UPLOAD_PROVIDER must be r2 in production.',
+    );
+  }
+  if (!env.R2_BUCKET?.trim()) {
+    throw new CmsConfigurationError(
+      'R2_BUCKET must be configured for production.',
     );
   }
   for (const name of productionSecrets) requireSecret(env, name);
@@ -70,41 +101,8 @@ export function validateCmsEnvironment(env: NodeJS.ProcessEnv): void {
     );
   }
 
-  let publicUrl: URL;
-  try {
-    publicUrl = new URL(env.PUBLIC_URL ?? '');
-  } catch {
-    throw new CmsConfigurationError('PUBLIC_URL must be a valid HTTPS origin.');
-  }
-  if (
-    publicUrl.protocol !== 'https:' ||
-    publicUrl.pathname !== '/' ||
-    publicUrl.search ||
-    publicUrl.hash ||
-    publicUrl.username ||
-    publicUrl.password
-  ) {
-    throw new CmsConfigurationError('PUBLIC_URL must be a valid HTTPS origin.');
-  }
-
-  let previewUrl: URL;
-  try {
-    previewUrl = new URL(env.LANDING_PREVIEW_URL ?? '');
-  } catch {
-    throw new CmsConfigurationError(
-      'LANDING_PREVIEW_URL must be a valid HTTPS origin.',
-    );
-  }
-  if (
-    previewUrl.protocol !== 'https:' ||
-    previewUrl.pathname !== '/' ||
-    previewUrl.search ||
-    previewUrl.hash ||
-    previewUrl.username ||
-    previewUrl.password
-  ) {
-    throw new CmsConfigurationError(
-      'LANDING_PREVIEW_URL must be a valid HTTPS origin.',
-    );
-  }
+  requireHttpsOrigin(env, 'PUBLIC_URL');
+  requireHttpsOrigin(env, 'LANDING_PREVIEW_URL');
+  requireHttpsOrigin(env, 'R2_ENDPOINT');
+  requireHttpsOrigin(env, 'R2_PUBLIC_URL');
 }

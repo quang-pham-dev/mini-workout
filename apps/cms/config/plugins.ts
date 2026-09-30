@@ -23,7 +23,9 @@ const deniedTypes = [
   'application/x-mach-binary',
 ];
 
-const config = (): Core.Config.Plugin => ({
+const config = ({
+  env,
+}: Core.Config.Shared.ConfigParams): Core.Config.Plugin => ({
   'users-permissions': {
     config: {
       jwtManagement: 'refresh',
@@ -34,6 +36,32 @@ const config = (): Core.Config.Plugin => ({
   },
   upload: {
     config: {
+      ...(env('CMS_UPLOAD_PROVIDER', 'local') === 'r2'
+        ? {
+            provider: 'aws-s3',
+            providerOptions: {
+              baseUrl: env('R2_PUBLIC_URL'),
+              rootPath: env('R2_ROOT_PATH', 'landing'),
+              s3Options: {
+                credentials: {
+                  accessKeyId: env('R2_ACCESS_KEY_ID'),
+                  secretAccessKey: env('R2_SECRET_ACCESS_KEY'),
+                },
+                endpoint: env('R2_ENDPOINT'),
+                forcePathStyle: true,
+                region: 'auto',
+                params: {
+                  Bucket: env('R2_BUCKET'),
+                },
+              },
+            },
+            actionOptions: {
+              upload: {},
+              uploadStream: {},
+              delete: {},
+            },
+          }
+        : {}),
       security: {
         allowedTypes: allowedMediaTypes,
         deniedTypes,

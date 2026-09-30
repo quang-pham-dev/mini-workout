@@ -27,6 +27,7 @@
     "@mini-workout/contracts": "workspace:*",
     "@strapi/database": "5.55.1",
     "@strapi/plugin-users-permissions": "5.55.1",
+    "@strapi/provider-upload-aws-s3": "5.55.1",
     "@strapi/strapi": "5.55.1",
     "better-sqlite3": "12.8.0",
     "pg": "8.16.3",
@@ -45,8 +46,8 @@
     "@vitest/coverage-v8": "catalog:test-unit",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "typescript": "catalog:",
     "tsx": "4.23.12",
+    "typescript": "catalog:",
     "vitest": "catalog:test-unit"
   },
   "engines": {

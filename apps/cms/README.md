@@ -75,9 +75,10 @@ Production startup fails closed unless PostgreSQL, an HTTPS `PUBLIC_URL`, and
 all Strapi secrets are configured. The container enables this validation with
 `CMS_VALIDATE_RUNTIME_CONFIG=true` and exposes `/_health` on port `1337`.
 
-The checked-in image definition does not make local uploads durable. Configure
-the approved S3-compatible upload provider before production cutover; until
-then, media/storage readiness remains an open migration gate.
+Production uses Cloudflare R2 through Strapi's S3-compatible upload provider;
+local development keeps filesystem uploads. Follow the
+[R2 setup runbook](docs/CLOUDFLARE_R2_SETUP.md) before cutover. Never store R2
+credentials in source control.
 
 ## Offline content migration planning
 

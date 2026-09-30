@@ -18,6 +18,12 @@ const productionEnvironment: NodeJS.ProcessEnv = {
   LANDING_PREVIEW_URL: 'https://preview.example.com',
   STRAPI_PREVIEW_SECRET: 'j'.repeat(48),
   STRAPI_WEBHOOK_TOKEN: 'k'.repeat(48),
+  CMS_UPLOAD_PROVIDER: 'r2',
+  R2_ENDPOINT: 'https://account-id.r2.cloudflarestorage.com',
+  R2_BUCKET: 'mini-workout-cms',
+  R2_ACCESS_KEY_ID: 'l'.repeat(32),
+  R2_SECRET_ACCESS_KEY: 'm'.repeat(48),
+  R2_PUBLIC_URL: 'https://media.example.com',
 };
 
 describe('CMS production environment', () => {
@@ -68,5 +74,20 @@ describe('CMS production environment', () => {
         LANDING_PREVIEW_URL: 'http://preview.example.com/path',
       }),
     ).toThrow('LANDING_PREVIEW_URL must be a valid HTTPS origin.');
+  });
+
+  it('requires durable R2 storage in production', () => {
+    expect(() =>
+      validateCmsEnvironment({
+        ...productionEnvironment,
+        CMS_UPLOAD_PROVIDER: 'local',
+      }),
+    ).toThrow('CMS_UPLOAD_PROVIDER must be r2 in production.');
+    expect(() =>
+      validateCmsEnvironment({
+        ...productionEnvironment,
+        R2_PUBLIC_URL: 'http://media.example.com/path',
+      }),
+    ).toThrow('R2_PUBLIC_URL must be a valid HTTPS origin.');
   });
 });
