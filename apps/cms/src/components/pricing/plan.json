@@ -44,6 +44,11 @@
       "type": "boolean",
       "required": true,
       "default": false
+    },
+    "enabled": {
+      "type": "boolean",
+      "required": true,
+      "default": true
     }
   }
 }

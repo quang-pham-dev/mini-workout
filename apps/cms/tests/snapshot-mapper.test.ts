@@ -2,6 +2,7 @@ import {
   SnapshotMappingError,
   normalizeArticleDocument,
   normalizeCampaignDocument,
+  normalizePricingDocument,
 } from '../src/api/landing/services/snapshot-mapper';
 import { describe, expect, it } from 'vitest';
 
@@ -124,4 +125,57 @@ describe('Strapi snapshot mapper', () => {
       }),
     ).toThrowError(SnapshotMappingError);
   });
+
+  it('publishes only pricing plans enabled by Product', () => {
+    const pricing = normalizePricingDocument({
+      schemaVersion: 1,
+      title: 'Plans',
+      introduction: 'Choose a plan.',
+      currencyCode: 'USD',
+      currencyMinorUnit: 2,
+      locale: 'en-US',
+      plans: [
+        pricingPlan({ id: 1, planId: 'monthly', enabled: true }),
+        pricingPlan({ id: 2, planId: 'paused', enabled: false }),
+      ],
+      faq: [{ id: 3, question: 'Can I cancel?', answer: 'Yes.' }],
+      cancellationTerms: 'Cancel from your account.',
+      refundTerms: 'See the approved refund policy.',
+      seo: { title: 'Pricing', description: 'Mini Workout pricing.' },
+    });
+
+    expect(pricing.plans).toHaveLength(1);
+    expect(pricing.plans).toMatchObject([{ planId: 'monthly' }]);
+  });
+
+  it('fails closed when Product disables every pricing plan', () => {
+    expect(() =>
+      normalizePricingDocument({
+        schemaVersion: 1,
+        title: 'Plans',
+        introduction: 'Choose a plan.',
+        currencyCode: 'USD',
+        currencyMinorUnit: 2,
+        locale: 'en-US',
+        plans: [pricingPlan({ id: 1, planId: 'paused', enabled: false })],
+        faq: [{ id: 3, question: 'Can I cancel?', answer: 'Yes.' }],
+        cancellationTerms: 'Cancel from your account.',
+        refundTerms: 'See the approved refund policy.',
+        seo: { title: 'Pricing', description: 'Mini Workout pricing.' },
+      }),
+    ).toThrow('Expected at least one enabled pricing plan');
+  });
 });
+
+function pricingPlan(input: { id: number; planId: string; enabled: boolean }) {
+  return {
+    ...input,
+    name: input.planId,
+    summary: 'A product-approved plan.',
+    amountMinor: 1000,
+    billing: { cadence: 'month', interval: 1 },
+    entitlements: [{ id: input.id + 10, label: 'Daily movement' }],
+    cta: { label: 'Start', action: 'register' },
+    recommended: false,
+  };
+}

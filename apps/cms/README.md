@@ -80,6 +80,14 @@ local development keeps filesystem uploads. Follow the
 [R2 setup runbook](docs/CLOUDFLARE_R2_SETUP.md) before cutover. Never store R2
 credentials in source control.
 
+## Pricing operations
+
+Product manages Landing pricing through the Strapi Pricing singleton. The CMS
+controls presentation and whether an individual plan is visible, while the
+member/billing backend remains authoritative for the price charged and product
+availability. Follow the [Pricing authoring contract](docs/PRICING_AUTHORING.md)
+before publishing approved prices or legal terms.
+
 ## Offline content migration planning
 
 Export a provider-neutral manifest from the currently reviewed Landing corpus,

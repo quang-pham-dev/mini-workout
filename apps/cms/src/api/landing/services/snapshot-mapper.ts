@@ -356,12 +356,23 @@ function normalizePricingPlan(value: unknown, index: number): UnknownRecord {
   };
 }
 
+function isEnabledPricingPlan(value: unknown): boolean {
+  return record(value, 'pricing.plan').enabled !== false;
+}
+
 export function normalizePricingDocument(value: unknown): UnknownRecord {
   const pricing = record(value, 'pricing');
   if (!Array.isArray(pricing.plans) || pricing.plans.length === 0) {
     throw new SnapshotMappingError(
       'pricing.plans',
       'Expected at least one pricing plan',
+    );
+  }
+  const enabledPlans = pricing.plans.filter(isEnabledPricingPlan);
+  if (enabledPlans.length === 0) {
+    throw new SnapshotMappingError(
+      'pricing.plans',
+      'Expected at least one enabled pricing plan',
     );
   }
   return {
@@ -376,7 +387,7 @@ export function normalizePricingDocument(value: unknown): UnknownRecord {
       'pricing.currencyMinorUnit',
     ),
     locale: string(pricing.locale, 'pricing.locale'),
-    plans: pricing.plans.map(normalizePricingPlan),
+    plans: enabledPlans.map(normalizePricingPlan),
     faq: normalizeKeyedItems(pricing.faq, 'pricing.faq', [
       'question',
       'answer',
