@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_internal_links",
+  "info": {
+    "displayName": "Internal link"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true,
+      "regex": "^/(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?:[a-z0-9-]+/)*[a-z0-9-]*/?$"
+    }
+  }
+}

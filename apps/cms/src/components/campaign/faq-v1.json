@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_campaign_faqs_v1",
+  "info": {
+    "displayName": "FAQ v1"
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "items": {
+      "type": "component",
+      "component": "campaign.faq-item-v1",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    }
+  }
+}

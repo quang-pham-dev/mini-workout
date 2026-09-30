@@ -1,0 +1,36 @@
+{
+  "kind": "singleType",
+  "collectionName": "primary_navigations",
+  "info": {
+    "singularName": "primary-navigation",
+    "pluralName": "primary-navigations",
+    "displayName": "Primary navigation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "schemaVersion": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "min": 1,
+      "max": 1
+    },
+    "links": {
+      "type": "component",
+      "component": "shared.internal-link",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "signInLabel": {
+      "type": "string",
+      "required": true
+    },
+    "primaryCtaLabel": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

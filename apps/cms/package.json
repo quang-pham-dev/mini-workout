@@ -1,0 +1,61 @@
+{
+  "name": "@mini-workout/cms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted Strapi content service for the Mini Workout landing platform",
+  "scripts": {
+    "build": "strapi build",
+    "check-types": "tsc --noEmit",
+    "clean": "strapi clean",
+    "console": "strapi console",
+    "deploy": "strapi deploy",
+    "dev": "strapi develop",
+    "develop": "strapi develop",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "migration:plan": "node --import tsx scripts/plan-landing-migration.ts",
+    "start": "strapi start",
+    "strapi": "strapi",
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "upgrade": "npx @strapi/upgrade latest",
+    "upgrade:dry": "npx @strapi/upgrade latest --dry"
+  },
+  "dependencies": {
+    "@mini-workout/contracts": "workspace:*",
+    "@strapi/database": "5.55.1",
+    "@strapi/plugin-users-permissions": "5.55.1",
+    "@strapi/strapi": "5.55.1",
+    "better-sqlite3": "12.8.0",
+    "pg": "8.16.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.30.3",
+    "styled-components": "^6.0.0"
+  },
+  "devDependencies": {
+    "@mini-workout/eslint-config": "workspace:*",
+    "@mini-workout/prettier-config": "workspace:*",
+    "@mini-workout/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@vitest/coverage-v8": "catalog:test-unit",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "tsx": "4.23.12",
+    "vitest": "catalog:test-unit"
+  },
+  "engines": {
+    "node": ">=22.12.0 <23",
+    "pnpm": ">=10.0.0"
+  },
+  "strapi": {
+    "uuid": "acf6d947-9867-4aff-877f-875e671bdefd",
+    "installId": "fbb663766f2ddbdf254cdf44671272becae8e05e5d1f7e56084283b3fdb5bc9b"
+  },
+  "prettier": "@mini-workout/prettier-config/base"
+}

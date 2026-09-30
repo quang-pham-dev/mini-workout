@@ -1,0 +1,49 @@
+{
+  "collectionName": "components_pricing_plans",
+  "info": {
+    "displayName": "Pricing plan"
+  },
+  "attributes": {
+    "planId": {
+      "type": "uid",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "summary": {
+      "type": "text",
+      "required": true
+    },
+    "amountMinor": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "billing": {
+      "type": "component",
+      "component": "pricing.billing",
+      "repeatable": false,
+      "required": true
+    },
+    "entitlements": {
+      "type": "component",
+      "component": "pricing.entitlement",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "cta": {
+      "type": "component",
+      "component": "shared.conversion-cta",
+      "repeatable": false,
+      "required": true
+    },
+    "recommended": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    }
+  }
+}

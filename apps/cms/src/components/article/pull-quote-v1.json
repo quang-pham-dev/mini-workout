@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_article_pull_quote_v1",
+  "info": {
+    "displayName": "Pull quote v1"
+  },
+  "attributes": {
+    "quote": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

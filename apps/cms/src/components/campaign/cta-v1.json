@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_campaign_ctas_v1",
+  "info": {
+    "displayName": "Final CTA v1"
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "copy": {
+      "type": "text",
+      "required": true
+    },
+    "cta": {
+      "type": "component",
+      "component": "shared.conversion-cta",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

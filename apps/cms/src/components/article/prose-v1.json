@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_article_prose_v1",
+  "info": {
+    "displayName": "Prose v1"
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "paragraphs": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

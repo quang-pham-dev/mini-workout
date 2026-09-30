@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_pricing_billings",
+  "info": {
+    "displayName": "Billing"
+  },
+  "attributes": {
+    "cadence": {
+      "type": "enumeration",
+      "enum": ["month", "year", "one_time"],
+      "required": true
+    },
+    "interval": {
+      "type": "integer",
+      "min": 1
+    }
+  }
+}

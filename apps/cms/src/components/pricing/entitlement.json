@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_pricing_entitlements",
+  "info": {
+    "displayName": "Entitlement"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

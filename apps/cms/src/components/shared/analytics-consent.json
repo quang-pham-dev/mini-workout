@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_shared_analytics_consents",
+  "info": {
+    "displayName": "Analytics consent"
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "allowLabel": {
+      "type": "string",
+      "required": true
+    },
+    "declineLabel": {
+      "type": "string",
+      "required": true
+    },
+    "manageLabel": {
+      "type": "string",
+      "required": true
+    },
+    "privacyLink": {
+      "type": "component",
+      "component": "shared.internal-link",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

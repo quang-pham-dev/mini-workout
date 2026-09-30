@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_category_focuses_v1",
+  "info": {
+    "displayName": "Category focus v1"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

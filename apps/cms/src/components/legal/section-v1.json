@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_legal_sections_v1",
+  "info": {
+    "displayName": "Legal section v1"
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "paragraphs": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

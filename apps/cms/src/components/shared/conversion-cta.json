@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_shared_conversion_ctas",
+  "info": {
+    "displayName": "Conversion CTA"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "action": {
+      "type": "enumeration",
+      "enum": ["register", "login"],
+      "required": true,
+      "default": "register"
+    }
+  }
+}

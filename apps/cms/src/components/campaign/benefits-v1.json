@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_campaign_benefits_v1",
+  "info": {
+    "displayName": "Benefits v1"
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "items": {
+      "type": "component",
+      "component": "campaign.benefit-item-v1",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    }
+  }
+}

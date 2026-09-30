@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_campaign_expiry_policies",
+  "info": {
+    "displayName": "Expiry policy"
+  },
+  "attributes": {
+    "mode": {
+      "type": "enumeration",
+      "enum": ["gone", "redirect", "archive"],
+      "required": true,
+      "default": "gone"
+    },
+    "successor": {
+      "type": "component",
+      "component": "shared.internal-link",
+      "repeatable": false
+    }
+  }
+}

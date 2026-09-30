@@ -1,0 +1,57 @@
+{
+  "kind": "collectionType",
+  "collectionName": "marketing_pages",
+  "info": {
+    "singularName": "marketing-page",
+    "pluralName": "marketing-pages",
+    "displayName": "Marketing page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "schemaVersion": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "min": 1,
+      "max": 1
+    },
+    "template": {
+      "type": "enumeration",
+      "enum": ["legal.v1"],
+      "required": true,
+      "default": "legal.v1"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "introduction": {
+      "type": "text",
+      "required": true
+    },
+    "effectiveDate": {
+      "type": "date",
+      "required": true
+    },
+    "sections": {
+      "type": "component",
+      "component": "legal.section-v1",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_campaign_benefit_items_v1",
+  "info": {
+    "displayName": "Benefit item v1"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

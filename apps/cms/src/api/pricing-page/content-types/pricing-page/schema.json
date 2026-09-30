@@ -1,0 +1,75 @@
+{
+  "kind": "singleType",
+  "collectionName": "pricing_pages",
+  "info": {
+    "singularName": "pricing-page",
+    "pluralName": "pricing-pages",
+    "displayName": "Pricing page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "schemaVersion": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "min": 1,
+      "max": 1
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "introduction": {
+      "type": "text",
+      "required": true
+    },
+    "currencyCode": {
+      "type": "string",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 3,
+      "regex": "^[A-Z]{3}$"
+    },
+    "currencyMinorUnit": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "max": 3
+    },
+    "locale": {
+      "type": "string",
+      "required": true,
+      "regex": "^[a-z]{2,3}-[A-Z]{2}$"
+    },
+    "plans": {
+      "type": "component",
+      "component": "pricing.plan",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "faq": {
+      "type": "component",
+      "component": "pricing.faq-item",
+      "repeatable": true,
+      "required": true,
+      "min": 1
+    },
+    "cancellationTerms": {
+      "type": "text",
+      "required": true
+    },
+    "refundTerms": {
+      "type": "text",
+      "required": true
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

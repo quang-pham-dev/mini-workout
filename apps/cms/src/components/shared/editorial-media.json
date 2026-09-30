@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_editorial_media",
+  "info": {
+    "displayName": "Editorial media"
+  },
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "alt": {
+      "type": "string",
+      "required": true
+    },
+    "caption": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

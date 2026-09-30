@@ -13,6 +13,7 @@ export default defineConfig([
       '**/.turbo/**',
       '**/.next-build/**',
       '**/coverage/**',
+      '**/types/generated/**',
       '*.config.js',
       '*.config.mjs',
       '**/.agent/**',

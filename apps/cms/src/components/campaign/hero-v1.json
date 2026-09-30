@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_campaign_heroes_v1",
+  "info": {
+    "displayName": "Hero v1"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true
+    },
+    "headline": {
+      "type": "string",
+      "required": true
+    },
+    "introduction": {
+      "type": "text",
+      "required": true
+    },
+    "image": {
+      "type": "component",
+      "component": "shared.editorial-media",
+      "repeatable": false,
+      "required": true
+    },
+    "cta": {
+      "type": "component",
+      "component": "shared.conversion-cta",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

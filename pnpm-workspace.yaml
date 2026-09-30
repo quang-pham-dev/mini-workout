@@ -10,6 +10,18 @@ packages:
   - '!**/test/**'
   - '!**/__tests__/**/fixtures/**'
 
+# pnpm 10 blocks dependency lifecycle scripts unless they are explicitly
+# trusted. Keep this list narrow: these packages provide native bindings used
+# by the existing Prisma/SWC toolchain and the self-hosted Strapi application.
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@swc/core'
+  - better-sqlite3
+  - esbuild
+  - prisma
+  - unrs-resolver
+
 catalog:
   '@commitlint/cli': ^20.5.3
   '@commitlint/config-conventional': ^20.5.3
