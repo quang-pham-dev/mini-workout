@@ -668,6 +668,24 @@ The built artifact was served locally and the user confirmed the Landing UI.
 Only local SQLite/uploads and build artifacts were involved; nothing was
 deployed.
 
+### Local CMS container build and runtime smoke — 2026-10-01
+
+Built `mini-workout-cms:local` successfully from the repository root. The first
+build exposed missing workspace contract inputs and incorrect assumptions about
+Strapi output paths; the Dockerfile now builds `@mini-workout/contracts` before
+CMS, and copies Strapi's actual `.strapi/client` and `dist` outputs into the
+portable production bundle. The image starts the installed Strapi CLI directly
+so startup does not invoke Corepack or resolve/download a package manager.
+Dockerfile regression tests cover those workspace inputs, artifact paths and
+startup command.
+
+The resulting image started locally against an ephemeral SQLite database with
+throwaway secrets and local uploads; Strapi reported healthy startup and
+`GET /_health` returned `204`. The container and temporary database were
+removed after the smoke test. This verifies local image packaging and process
+startup only: production PostgreSQL, R2 credentials, persistent volumes,
+backups/restores and a deployed healthcheck remain open gates.
+
 ### M4 Level 2 local implementation addendum — 2026-09-30
 
 **Scope:** implement durable publish delivery locally before any deployed
@@ -771,9 +789,8 @@ acceptance, safe error mapping and deploy-hook retry behavior.
 - Both snapshot routes return `403` anonymously, proving that Public access is
   not enabled by default.
 - pnpm production deploy successfully created a portable production dependency
-  bundle. The final Docker build is not yet run because the workstation had
-  only about 5 GiB free after Strapi installation; image-build verification
-  remains part of S5.
+  bundle. The local Docker image build and SQLite startup/health smoke now pass;
+  the smoke does not count as PostgreSQL/R2 or deployed-environment evidence.
 - pnpm 10 required a narrow native-build allowlist for Strapi/Prisma/SWC rather
   than a global lifecycle-script bypass.
 - The contract package emits ESM for Astro and CJS for Strapi, so the shared

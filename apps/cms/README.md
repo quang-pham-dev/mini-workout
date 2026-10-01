@@ -85,6 +85,8 @@ docker build -f apps/cms/Dockerfile -t mini-workout-cms .
 Production startup fails closed unless PostgreSQL, an HTTPS `PUBLIC_URL`, and
 all Strapi secrets are configured. The container enables this validation with
 `CMS_VALIDATE_RUNTIME_CONFIG=true` and exposes `/_health` on port `1337`.
+The runtime invokes the installed Strapi binary directly; it does not select or
+download a package-manager version at startup.
 
 Production uses Cloudflare R2 through Strapi's S3-compatible upload provider;
 local development keeps filesystem uploads. Follow the
