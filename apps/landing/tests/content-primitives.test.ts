@@ -86,7 +86,7 @@ describe('content validation primitives', () => {
     expect(contentIssues).toEqual([]);
   });
 
-  it('accepts projected Sanity image CDN assets but rejects other remote hosts', () => {
+  it('accepts HTTPS CMS media and local Strapi uploads but rejects unsafe URLs', () => {
     const sanityIssues = issues();
     expect(
       mapLocalMedia(
@@ -115,9 +115,45 @@ describe('content validation primitives', () => {
       'image',
       remoteIssues,
     );
-    expect(remoteIssues).toContainEqual({
-      code: 'media_src',
-      path: 'image.src',
-    });
+    expect(remoteIssues).toEqual([]);
+
+    const localStrapiIssues = issues();
+    expect(
+      mapLocalMedia(
+        {
+          src: 'http://127.0.0.1:1337/uploads/asset.webp',
+          alt: 'A local CMS image.',
+          width: 1200,
+          height: 800,
+          caption: 'Local upload.',
+        },
+        'image',
+        localStrapiIssues,
+      ).src,
+    ).toContain('/uploads/asset.webp');
+    expect(localStrapiIssues).toEqual([]);
+
+    for (const src of [
+      'http://images.example.com/asset.webp',
+      'https://user:pass@images.example.com/asset.webp',
+      'javascript:alert(1)',
+    ]) {
+      const unsafeIssues = issues();
+      mapLocalMedia(
+        {
+          src,
+          alt: 'Unsafe image.',
+          width: 1200,
+          height: 800,
+          caption: 'Unsafe.',
+        },
+        'image',
+        unsafeIssues,
+      );
+      expect(unsafeIssues).toContainEqual({
+        code: 'media_src',
+        path: 'image.src',
+      });
+    }
   });
 });

@@ -3,6 +3,7 @@ const placeholderValues = new Set([
   'replace-me',
   'replace-with-four-comma-separated-keys',
   'tobemodified',
+  'local-only-publish-signing-secret-change-before-deploy-00000000',
 ]);
 
 const productionSecrets = [
@@ -13,7 +14,7 @@ const productionSecrets = [
   'JWT_SECRET',
   'TRANSFER_TOKEN_SALT',
   'STRAPI_PREVIEW_SECRET',
-  'STRAPI_WEBHOOK_TOKEN',
+  'STRAPI_WEBHOOK_SIGNING_SECRET',
   'R2_ACCESS_KEY_ID',
   'R2_SECRET_ACCESS_KEY',
 ] as const;
@@ -59,6 +60,14 @@ function requireHttpsOrigin(env: NodeJS.ProcessEnv, name: string): void {
 }
 
 export function validateCmsEnvironment(env: NodeJS.ProcessEnv): void {
+  if (
+    Boolean(env.LANDING_PUBLISH_WEBHOOK_URL?.trim()) !==
+    Boolean(env.STRAPI_WEBHOOK_SIGNING_SECRET?.trim())
+  ) {
+    throw new CmsConfigurationError(
+      'LANDING_PUBLISH_WEBHOOK_URL and STRAPI_WEBHOOK_SIGNING_SECRET must be configured together.',
+    );
+  }
   if (env.NODE_ENV !== 'production') return;
 
   if (env.DATABASE_CLIENT !== 'postgres') {
@@ -85,7 +94,7 @@ export function validateCmsEnvironment(env: NodeJS.ProcessEnv): void {
 
   for (const name of [
     'STRAPI_PREVIEW_SECRET',
-    'STRAPI_WEBHOOK_TOKEN',
+    'STRAPI_WEBHOOK_SIGNING_SECRET',
   ] as const) {
     if ((env[name]?.trim().length ?? 0) < 32) {
       throw new CmsConfigurationError(
@@ -103,6 +112,26 @@ export function validateCmsEnvironment(env: NodeJS.ProcessEnv): void {
 
   requireHttpsOrigin(env, 'PUBLIC_URL');
   requireHttpsOrigin(env, 'LANDING_PREVIEW_URL');
+  let publishWebhookUrl: URL;
+  try {
+    publishWebhookUrl = new URL(env.LANDING_PUBLISH_WEBHOOK_URL ?? '');
+  } catch {
+    throw new CmsConfigurationError(
+      'LANDING_PUBLISH_WEBHOOK_URL must be a valid HTTPS webhook URL.',
+    );
+  }
+  if (
+    publishWebhookUrl.protocol !== 'https:' ||
+    publishWebhookUrl.pathname !== '/api/webhooks/strapi/publish' ||
+    publishWebhookUrl.username ||
+    publishWebhookUrl.password ||
+    publishWebhookUrl.search ||
+    publishWebhookUrl.hash
+  ) {
+    throw new CmsConfigurationError(
+      'LANDING_PUBLISH_WEBHOOK_URL must be a valid HTTPS webhook URL.',
+    );
+  }
   requireHttpsOrigin(env, 'R2_ENDPOINT');
   requireHttpsOrigin(env, 'R2_PUBLIC_URL');
 }

@@ -103,6 +103,54 @@ describe('Strapi content source', () => {
     );
   });
 
+  it('resolves Strapi local upload paths against the configured CMS origin', async () => {
+    const snapshot = structuredClone({
+      ...emptySnapshot,
+      articles: [] as unknown[],
+    });
+    snapshot.articles = [
+      {
+        _type: 'article',
+        schemaVersion: 1,
+        status: 'published',
+        slug: 'local-upload-test',
+        category: { slug: 'mobility', name: 'Mobility' },
+        title: 'Local upload test',
+        dek: 'A local CMS media URL.',
+        author: { name: 'Mini Workout', type: 'Organization' },
+        image: {
+          src: '/uploads/mobility.webp',
+          alt: 'A mobility pose.',
+          width: 1200,
+          height: 800,
+          caption: 'Move gently.',
+        },
+        sections: [
+          {
+            _key: 'intro',
+            _type: 'prose.v1',
+            heading: 'Start gently',
+            paragraphs: ['Move within your comfortable range.'],
+          },
+        ],
+        seo: { title: 'Mobility', description: 'Move gently.' },
+      },
+    ];
+    const source = createStrapiContentSource({
+      apiUrl: 'http://127.0.0.1:1337/',
+      token: 'read-token',
+      fetch: vi
+        .fn<typeof globalThis.fetch>()
+        .mockResolvedValue(new Response(JSON.stringify(snapshot))),
+    });
+
+    const actual = await source.load();
+
+    expect(actual.articles[0]?.image.src).toBe(
+      'http://127.0.0.1:1337/uploads/mobility.webp',
+    );
+  });
+
   it('fails closed for missing configuration and invalid upstream data', async () => {
     expect(() => createStrapiContentSource({})).toThrowError(
       StrapiContentSourceError,

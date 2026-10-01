@@ -901,6 +901,12 @@ mapping, Studio validation and an Astro-only editorial comparison template are
 implemented. The fixture remains `null`; `/pricing/`, sitemap and navigation
 activation remain gated by approved commercial/legal content.
 
+**Local activation follow-up (2026-10-01):** Product/Legal-approved Pricing is
+published in local Strapi. Astro now emits `/pricing/` and its sitemap entry
+only when the published Pricing singleton exists. The current approved Primary
+Navigation does not include Pricing; it remains unchanged pending a Product
+decision on whether a header link should be added.
+
 **Studio authoring hardening (2026-09-29):** Campaign composition now fails
 early unless it has one first-position hero, unique section/nested item keys,
 only versioned section types and at most one final CTA. Pricing currency, locale

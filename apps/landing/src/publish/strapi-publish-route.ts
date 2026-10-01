@@ -17,7 +17,7 @@ const handler = createStrapiPublishWebhookHandler({
   deployHookUrl: process.env.VERCEL_DEPLOY_HOOK_URL,
   recorder: createLandingServiceObservationRecorder(logger),
   reporter: createLoggerErrorReporter(logger),
-  webhookToken: process.env.STRAPI_WEBHOOK_TOKEN,
+  signingSecret: process.env.STRAPI_WEBHOOK_SIGNING_SECRET,
 });
 
 export const POST: APIRoute = ({ request }) => handler(request);

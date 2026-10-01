@@ -1,5 +1,31 @@
 # Landing Publishing Runbook
 
+## Strapi durable publication path
+
+The Strapi migration uses the CMS-owned PostgreSQL outbox. Strapi records
+allowlisted post-commit publish/unpublish/delete and media events, then sends a
+coalesced HMAC-signed batch to the protected Landing preview deployment. The
+Landing receiver validates the raw body, timestamp and delivery ID before
+calling the public site's Vercel Deploy Hook. Local development uses the same
+outbox worker and receiver with SQLite and localhost.
+
+Configure these values in the CMS and protected Landing preview project:
+
+| Project       | Variable                        | Purpose                                            |
+| ------------- | ------------------------------- | -------------------------------------------------- |
+| CMS           | `LANDING_PUBLISH_WEBHOOK_URL`   | Exact protected preview webhook URL                |
+| CMS + preview | `STRAPI_WEBHOOK_SIGNING_SECRET` | Shared random secret, at least 32 characters       |
+| Preview       | `VERCEL_DEPLOY_HOOK_URL`        | Private Deploy Hook for the public Landing project |
+
+Do not configure Strapi's built-in bearer webhook for this path. The outbox
+worker claims rows with a lease, waits for five seconds of inactivity and
+retries failures with bounded exponential backoff. Check pending/leased rows
+and retry timestamps in `cms_publish_outbox` when deliveries stop. Successful
+Landing responses mark the batch delivered. If the receiver accepts a request
+but its response is lost, a retry can reach another serverless instance and
+trigger a duplicate build; durable receiver-side idempotency remains a staging
+gate before broad editor access.
+
 ## Scope and ownership
 
 This runbook covers the Sanity-to-Vercel publication path for
@@ -139,12 +165,9 @@ compare route, status, canonical and sitemap maps. A scheduled external
 broken-link job remains Phase 7 work; until then this is a release checklist
 item owned by the Landing maintainer.
 
-## Known limitation
+## Sanity path limitation
 
-The in-process delivery store prevents duplicate/concurrent triggers within one
-warm function instance and releases failed deliveries for retry. It is not a
-distributed durable queue. Vercel Deploy Hook deduplication is the MVP
-cross-instance coalescing boundary. If measured webhook volume, missed SLA or
-provider behavior makes that insufficient, add a durable queue/idempotency
-store in a separately reviewed architecture change; do not silently treat
-serverless memory as durable state.
+The legacy Sanity path uses an in-process delivery store and remains an MVP
+cross-instance limitation. The Strapi migration uses the durable CMS outbox
+described above; it still needs a durable receiver-side idempotency store to
+eliminate duplicate Deploy Hook calls across separate serverless instances.

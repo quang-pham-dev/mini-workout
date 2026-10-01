@@ -50,18 +50,29 @@ short-lived preview URLs; it is never placed in a URL.
 
 ## Publishing webhook
 
-Create a Strapi webhook targeting the protected Landing preview deployment:
+Strapi writes publication events to its PostgreSQL outbox and delivers them to
+the protected Landing preview deployment with an HMAC signature. Native Strapi
+webhook configuration is not part of this path.
 
 ```text
-https://preview.example.com/api/webhooks/strapi/publish
+LANDING_PUBLISH_WEBHOOK_URL=https://preview.example.com/api/webhooks/strapi/publish
+STRAPI_WEBHOOK_SIGNING_SECRET=<same high-entropy secret in Landing>
 ```
 
-Subscribe only to entry publish, unpublish and delete plus media update/delete.
-Do not subscribe to entry update: saving a draft must not deploy the public
-site. Configure the same high-entropy value as `STRAPI_WEBHOOK_TOKEN` in CMS
-and Landing; Strapi sends it through the default `Authorization: Bearer ...`
-header configured in `config/server.ts`. Landing also needs its private
-`VERCEL_DEPLOY_HOOK_URL`.
+The CMS subscriber listens only for `entry.publish`, `entry.unpublish`,
+`entry.delete`, `media.update` and `media.delete`; draft `entry.update` does not
+queue a build. It persists a small allowlisted event record, waits for five
+seconds of inactivity, signs the batch, and retries failed deliveries with
+bounded exponential backoff. The Landing endpoint verifies the raw-body HMAC
+and forwards accepted batches to its constrained Vercel Deploy Hook.
+
+Local rehearsal uses SQLite and localhost only. Copy the matching local-only
+secret and URL from both `.env.example` files, start Landing in preview mode on
+port 4321 and start Strapi. Publish/unpublish a local test entry, then inspect
+the `cms_publish_outbox` table: duplicate events should produce one row, a
+delivered row should have `delivered_at`, and an unavailable receiver should
+leave a row scheduled for retry. Never use the documented local placeholder
+secret in a deployed environment.
 
 ## Production
 

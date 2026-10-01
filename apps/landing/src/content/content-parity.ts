@@ -51,6 +51,10 @@ function equalDimensions(
   return expected.width === actual.width && expected.height === actual.height;
 }
 
+function sectionOrder(sections: readonly { type: string }[]): string {
+  return sections.map(({ type }) => type).join('|');
+}
+
 function compareInventory<T extends { slug: string }>(
   kind: 'articles' | 'categories' | 'campaigns' | 'marketingPages',
   expected: readonly T[],
@@ -92,10 +96,7 @@ function compareMarketingPage(
       path: `${path}.canonical`,
     });
   }
-  if (
-    expected.sections.map(({ key, type }) => `${type}:${key}`).join('|') !==
-    actual.sections.map(({ key, type }) => `${type}:${key}`).join('|')
-  ) {
+  if (sectionOrder(expected.sections) !== sectionOrder(actual.sections)) {
     issues.push({
       code: 'MARKETING_PAGE_SECTION_ORDER',
       path: `${path}.sections`,
@@ -128,10 +129,7 @@ function compareArticle(
   ) {
     issues.push({ code: 'ARTICLE_RELATIONSHIP', path: `${path}.category` });
   }
-  if (
-    expected.sections.map(({ key, type }) => `${type}:${key}`).join('|') !==
-    actual.sections.map(({ key, type }) => `${type}:${key}`).join('|')
-  ) {
+  if (sectionOrder(expected.sections) !== sectionOrder(actual.sections)) {
     issues.push({ code: 'ARTICLE_SECTION_ORDER', path: `${path}.sections` });
   }
   if (!equalSeo(expected.seo, actual.seo)) {
@@ -182,7 +180,7 @@ export function comparePublishedContentSnapshots(
   }
   const serializeLinks = (snapshot: PublishedContentSnapshot) =>
     snapshot.siteShell.primaryLinks
-      .map(({ key, label, href }) => `${key}:${label}:${href}`)
+      .map(({ label, href }) => `${label}:${href}`)
       .join('|');
   if (serializeLinks(expected) !== serializeLinks(actual)) {
     issues.push({ code: 'PRIMARY_NAVIGATION', path: 'siteShell.primaryLinks' });

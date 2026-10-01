@@ -1,32 +1,71 @@
 ---
 import LegalPage from '../features/pages/LegalPage.astro';
+import PricingPage from '../features/pricing/PricingPage.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
 import {
   getContentRepository,
   publishedContentRepository,
 } from '../content/published-content-repository.js';
 import type { MarketingPageViewModel } from '../features/pages/catalog.js';
+import type { PricingViewModel } from '../features/pricing/catalog.js';
 import type { GetStaticPaths } from 'astro';
 
-interface Props {
-  page: MarketingPageViewModel;
-}
+type Props =
+  | { kind: 'marketing-page'; page: MarketingPageViewModel }
+  | { kind: 'pricing'; pricing: PricingViewModel };
 
 export const getStaticPaths = (async () => {
-  const { marketingPages } = await publishedContentRepository.load();
-  return marketingPages.map((page) => ({
-    params: { slug: page.slug },
-    props: { page },
-  }));
+  const { marketingPages, pricing } = await publishedContentRepository.load();
+  return [
+    ...marketingPages.map((page) => ({
+      params: { slug: page.slug },
+      props: { kind: 'marketing-page' as const, page },
+    })),
+    ...(pricing
+      ? [
+          {
+            params: { slug: 'pricing' },
+            props: { kind: 'pricing' as const, pricing },
+          },
+        ]
+      : []),
+  ];
 }) satisfies GetStaticPaths;
 export const prerender = !import.meta.env.LANDING_PREVIEW;
 
-let { page } = Astro.props;
-if (!page && Astro.params.slug) {
+let props: Props | undefined = Object.hasOwn(Astro.props, 'kind')
+  ? Astro.props
+  : undefined;
+if (!props && Astro.params.slug) {
   const snapshot = await getContentRepository(Astro.request).load();
-  page = snapshot.marketingPages.find(
-    ({ slug }) => slug === Astro.params.slug,
-  )!;
+  if (Astro.params.slug === 'pricing' && snapshot.pricing) {
+    props = { kind: 'pricing', pricing: snapshot.pricing };
+  } else {
+    const page = snapshot.marketingPages.find(
+      ({ slug }) => slug === Astro.params.slug,
+    );
+    if (page) props = { kind: 'marketing-page', page };
+  }
 }
+if (!props) Astro.response.status = 404;
 ---
 
-<LegalPage page={page} />
+{props?.kind === 'pricing' ? (
+  <PricingPage pricing={props.pricing} />
+) : props?.kind === 'marketing-page' ? (
+  <LegalPage page={props.page} />
+) : (
+  <SiteLayout
+    title="Page not found | Mini Workout"
+    description="The page you requested could not be found."
+    canonicalPath="/404/"
+    noindex={true}
+  >
+    <section class="page-content" aria-labelledby="page-title">
+      <h1 id="page-title">This page could not be found.</h1>
+      <p>
+        <a href="/">Return to the Mini Workout home page.</a>
+      </p>
+    </section>
+  </SiteLayout>
+)}

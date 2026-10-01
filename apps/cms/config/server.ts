@@ -14,12 +14,6 @@ const config = ({
     app: {
       keys: env.array('APP_KEYS')!,
     },
-    webhooks: {
-      populateRelations: env.bool('WEBHOOKS_POPULATE_RELATIONS', false),
-      defaultHeaders: {
-        Authorization: `Bearer ${env('STRAPI_WEBHOOK_TOKEN', 'development-only')}`,
-      },
-    },
   };
 };
 

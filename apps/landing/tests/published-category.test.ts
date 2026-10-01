@@ -79,7 +79,7 @@ describe('published Category content boundary', () => {
       'unsafe media',
       {
         image: {
-          src: 'https://evil.example/image.webp',
+          src: 'http://evil.example/image.webp',
           alt: 'Remote image.',
           width: 100,
           height: 100,

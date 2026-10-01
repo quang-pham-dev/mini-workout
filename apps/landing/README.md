@@ -4,9 +4,10 @@ Astro owns the public marketing and editorial surface on the root domain. This
 app is intentionally static-first. The Home, Mobility category and first
 Mobility Article vertical slices exercise the approved architecture. Campaign
 now has an offline content/lifecycle contract and reusable route/template, but
-no public fixture or generated URL. Pricing has a fixture-free contract,
-Sanity/repository boundary and reusable Astro template; its public route remains
-gated by approved commercial inputs.
+no public fixture or generated URL. Pricing has a fixture-free fallback
+contract and reusable Astro template. The Product/Legal-approved Pricing
+singleton is published in local Strapi, so Strapi-backed static builds generate
+`/pricing/`; fixture-only builds continue to omit the route.
 Generic `legal.v1` pages now have a constrained root-route contract and
 server-rendered Astro template. Their fixture inventory is empty, so
 `/privacy/` is not generated until an approved Sanity document is published.
@@ -39,7 +40,8 @@ server-rendered Astro template. Their fixture inventory is empty, so
 - Pricing is a CMS singleton with exact minor-unit amounts, explicit currency
   exponent/locale, billing cadence, entitlements, conversion action,
   cancellation/refund copy and at most one approved recommendation. The local
-  fixture is `null`, so no `/pricing/` route or invented price is published.
+  fixture remains `null`; the route is generated only when the selected content
+  source provides a published Pricing singleton.
 - Generic pages currently accept only `legal.v1` with structured
   `legalSection.v1` blocks, an explicit effective date and a non-reserved root
   slug. The operational audit verifies that the consent privacy link resolves
@@ -65,6 +67,13 @@ separate Vercel SSR deployment built with `LANDING_OUTPUT=preview`, protected
 by Deployment Protection and configured with a server-only
 `SANITY_API_READ_TOKEN`. Preview responses are always private, `no-store` and
 `noindex`; the static artifact does not contain draft-mode endpoints.
+
+The protected preview build also hosts the Strapi publication receiver. Set
+`STRAPI_WEBHOOK_SIGNING_SECRET` to the same high-entropy value as the CMS and
+`VERCEL_DEPLOY_HOOK_URL` to the private Deploy Hook for the public static
+Landing project. The receiver checks a five-minute timestamp window, delivery
+ID and HMAC over the exact raw request body before accepting an allowlisted
+batch. Configure these values only in the preview/automation environment.
 
 ```sh
 pnpm --filter @mini-workout/landing dev
@@ -92,9 +101,9 @@ Keep the separate editor-preview project on the Astro preset with
 `LANDING_OUTPUT=preview`.
 
 Only explicitly published paths are included in `src/pages/sitemap.xml.ts`.
-The sitemap currently contains Home, Mobility and the published Mobility field
-note. Add routes only when their unique content and SEO metadata/canonical
-contract are complete.
+Fixture builds currently contain Home, Mobility and the published Mobility
+field note; a Strapi-backed build also includes `/pricing/` when Pricing is
+published and its SEO/canonical contract is valid.
 
 Published content is loaded through one repository. `LANDING_CONTENT_SOURCE`
 defaults to `fixtures`; select `sanity` with `SANITY_PROJECT_ID` and

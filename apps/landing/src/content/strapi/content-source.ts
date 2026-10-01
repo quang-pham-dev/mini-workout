@@ -53,6 +53,38 @@ function parseApiOrigin(value: string | undefined): URL {
   }
 }
 
+function resolveLocalUploadUrls<T>(value: T, apiUrl: URL): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => resolveLocalUploadUrls(item, apiUrl)) as T;
+  }
+  if (typeof value !== 'object' || value === null) return value;
+
+  const record = value as Record<string, unknown>;
+  const resolved = Object.fromEntries(
+    Object.entries(record).map(([key, item]) => {
+      if (
+        key === 'image' &&
+        typeof item === 'object' &&
+        item !== null &&
+        !Array.isArray(item)
+      ) {
+        const image = item as Record<string, unknown>;
+        if (
+          typeof image.src === 'string' &&
+          image.src.startsWith('/uploads/')
+        ) {
+          return [
+            key,
+            { ...image, src: new URL(image.src, apiUrl).toString() },
+          ];
+        }
+      }
+      return [key, resolveLocalUploadUrls(item, apiUrl)];
+    }),
+  );
+  return resolved as T;
+}
+
 export function createStrapiContentSource(options: ContentSourceOptions): {
   load: () => Promise<PublishedContentSnapshot>;
 } {
@@ -112,7 +144,10 @@ export function createStrapiContentSource(options: ContentSourceOptions): {
           'Published content exceeded the snapshot size limit',
         );
       }
-      const envelope = parseLandingSnapshotV1(JSON.parse(text) as unknown);
+      const envelope = resolveLocalUploadUrls(
+        parseLandingSnapshotV1(JSON.parse(text) as unknown),
+        apiUrl,
+      );
       return {
         articles: mapPublishedArticleDocuments(envelope.articles),
         campaigns: mapPublishedCampaignDocuments(envelope.campaigns),

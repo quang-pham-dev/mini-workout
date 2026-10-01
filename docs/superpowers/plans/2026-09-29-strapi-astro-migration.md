@@ -1,8 +1,8 @@
 # Strapi 5 + Astro Landing Migration Plan
 
 **Status:** Approved; M1 foundation and M2 adapter implemented; M3 preview code
-implemented pending deployed handshake; M4 Level 1 delivery implemented; M5–M7
-remain open
+implemented pending deployed handshake; M4 Level 2 durable delivery implemented
+locally pending deployed proof; M5–M7 remain open
 **Date:** 2026-09-29
 **Owner:** Growth Platform / Content Platform
 **Decision class:** CMS replacement, independent runtime boundary, editorial publishing, SEO
@@ -79,7 +79,9 @@ package must not become a miscellaneous type bucket.
 
 ## 3. Target topology
 
-Recommended production topology:
+Recommended production topology. All hostnames are deployment configuration,
+not application constants; supply each origin through the environment for the
+target environment:
 
 ```text
 mini-workout.com                  -> apps/landing, static public deployment
@@ -414,9 +416,8 @@ uses a known image plus compatible backup.
 
 ### Phase M4 — Publish automation
 
-- Implement the Level 1 webhook path and run S4.
-- Add HMAC/outbox hardening before broad editor access unless the risk is
-  explicitly accepted for an MVP window.
+- Implement durable HMAC/outbox delivery with event allowlists, retry,
+  coalescing and replay protection; run S4 before broad editor access.
 - Connect sanitized observations and operational runbook.
 - Ensure publish/unpublish changes sitemap, canonicals and status behavior.
 
@@ -507,12 +508,17 @@ Migration is complete only when:
 Recommended defaults are listed so implementation can proceed quickly once
 approved:
 
-1. **Hosting shape:** one Docker host/PaaS service for Strapi plus managed
+1. **Database and media target — confirmed 2026-09-30:** retain SQLite and local
+   uploads for development; production uses PostgreSQL and Cloudflare R2. This
+   selects the database/provider target but does not select the hosting vendor.
+2. **Hosting shape:** one Docker host/PaaS service for Strapi plus managed
    PostgreSQL (**recommended**) versus self-managing both application and DB.
-2. **Media:** S3-compatible object storage with CDN (**recommended**) versus
-   Cloudinary or durable local volume.
-3. **Domain:** keep `studio.mini-workout.com` for both `/admin` and `/api`
-   (**recommended for MVP**) versus separate Admin/API origins.
+3. **Domain:** confirmed env-driven 2026-10-01. No hostname is fixed by the
+   application or this plan. Configure public Landing, CMS, API and preview
+   origins per environment using `LANDING_SITE_URL`, `PUBLIC_URL`,
+   `STRAPI_API_URL` and `LANDING_PREVIEW_URL` respectively. A single CMS origin
+   for `/admin` and `/api` remains the recommended MVP topology, but the origin
+   itself is configurable.
 4. **Publish hardening:** build Level 1 then immediately Level 2 before cutover
    (**recommended**) versus accepting bearer-only webhooks for a timeboxed MVP.
 
@@ -527,6 +533,185 @@ approved:
 - [Strapi: Docker/self-hosting](https://docs.strapi.io/cms/installation/docker)
 
 ## 16. Implementation progress — 2026-09-30
+
+### Local M5 continuation verification — 2026-09-30
+
+The fixture exporter and planner ran against a fresh local manifest. Both local
+media binaries resolved and passed type/size/path validation with SHA-256
+checksums. Apply correctly remains blocked by `REQUIRED_PRICING_MISSING`; no
+synthetic Pricing was added to the migration manifest. The authenticated
+apply-twice HTTP rehearsal passed (2/2 tests), CMS suite passed (34/34), and
+the Astro static plus protected preview build rehearsal passed with two
+authenticated snapshot requests and one preview request. The resolver exited
+with its documented blocker status (`2`) because approved Pricing is not yet
+available. This does not authorize or evidence a remote apply, R2 account
+operation, PostgreSQL restore, or deployment cutover.
+
+### Local phase checkpoint — 2026-10-01
+
+Repeated the local-first verification with no external credentials or writes:
+
+- CMS suite: **34/34 tests passed**, including authenticated HTTP apply-twice
+  and invalid-token-no-mutation checks.
+- Landing suite: **292/292 tests passed**, including Strapi source,
+  fixture-parity, manifest merge, preview and publish-delivery contracts.
+- Strapi build rehearsal: static build and protected Vercel preview build both
+  passed; two authenticated snapshot requests and one preview request were
+  observed. Astro's SSR build reports that `getStaticPaths()` is ignored for
+  dynamic pages in server output; that is expected for protected on-demand
+  preview routes, while the public artifact remains static.
+- No Product/Legal-approved Pricing payload is present in the repository.
+  `REQUIRED_PRICING_MISSING` therefore remains an intentional apply blocker.
+
+No production phase is claimed complete by these local checks. M5 still needs
+approved Pricing and an authenticated apply/parity run against the eventual
+selected deployed environment; the same workflow will use environment
+configuration rather than staging-specific code or infrastructure. M6–M7
+remain unstarted until deployment, cutover and observation-window inputs exist.
+
+### Product- and Legal-approved Pricing payload — 2026-10-01
+
+Product supplied the Pricing singleton and confirmed the plan values; Legal has
+now approved the cancellation and refund wording. Kept USD
+$23.99/month and $240/year. The annual discount against twelve monthly payments
+is approximately 16.63%, so the annual summary, FAQ and entitlement now say
+"about 17%"; the annual FAQ states $240/year ($20/month). Merged the payload
+into a fresh fixture manifest and ran the import planner plus media resolver.
+The pricing contract validated, both local media assets resolved, and the
+resolver reported `readyToApply: true`. The corrected approved payload is kept
+in the ignored local file `apps/cms/.tmp/approved-pricing.json`; the merged
+manifest is `/tmp/landing-approved-pricing-manifest.json`.
+
+The user approved applying this exact payload to local Strapi. The first local
+Strapi startup confirmed SQLite at `apps/cms/.tmp/data.db`, but the instance has
+no administrator yet and `STRAPI_MIGRATION_TOKEN` is not configured, so no API
+request or content write was made. After the user creates the initial local
+administrator and a temporary narrowly scoped migration API token, continue
+with local dry-run, apply, repeat-apply, snapshot verification and semantic
+parity. Keep the token outside source control and revoke it after migration.
+
+Staging remains environment/configuration parity only: no staging-specific code
+or infrastructure is planned. A deployed parity check remains a later release
+gate, using the same workflow with that environment's variables when an actual
+deployment target is selected.
+
+### Local migration API and apply-gate checkpoint — 2026-10-01
+
+Started Strapi 5.55.1 against local SQLite and confirmed the user's migration
+URL/token are configured locally without printing the token. The first
+read-only dry-run exposed two local integration defects before any content
+write: resolved media-only blockers were still treated as blocking by the apply
+command, and the content-type schemas had no REST routers registered. Added a
+regression test and fixed readiness to clear only media blockers validated by
+the resolver; non-media blockers and resolver issues still stop apply. Added
+Strapi core routes/controllers/services for the content types supported by the
+manifest, limiting routes to read/create/update operations (no delete routes).
+CMS type-check, Strapi production build and focused migration tests passed.
+
+The initial permission check found missing Custom token scopes; this was an
+interim checkpoint and is superseded by the continuation below. Public access
+remains disabled; no Public-role permissions are to be added.
+
+### Local apply and draft parity continuation — 2026-10-01
+
+The user updated the temporary Custom token with `find/create/update` for
+Author, Category and Article; `find/update` for Pricing Page, Site Setting and
+Primary Navigation; and `find/upload` for Upload. The permissioned dry-run
+passed on local Strapi at manifest revision
+`7c8b56d66faa22fd7a7f8893c69faae4b4b0992bda1648d60f1ee7bdc11e7ac1`:
+zero creates, six updates and two media reuses. Local apply completed with the
+same totals; it updated the existing local documents and did not create
+duplicates or upload the two existing assets again.
+
+The first semantic draft-snapshot check exposed a media URL mismatch: Strapi's
+local provider returns `/uploads/...`, while Landing previously accepted only
+site-local images and Sanity CDN URLs. Landing now resolves Strapi-local upload
+paths against the configured Strapi API origin; media validation accepts HTTPS
+provider URLs and only loopback HTTP URLs under `/uploads/`. The parity
+comparator now compares ordered section types and navigation labels/paths,
+without comparing generated Strapi component IDs to source `_key` values.
+Regression tests preserve section/link order and reject non-loopback HTTP,
+credentials in media URLs and unsafe schemes.
+
+The authenticated local draft snapshot mapped successfully and matched the
+approved merged manifest semantically: one Article, one Category, Pricing
+present, no issues. At that checkpoint, content had not yet been published and
+the published endpoint returned `503`. No staging/production endpoint was
+contacted. Use the same environment-driven workflow for any later deployed
+target; no staging-specific code or infrastructure is introduced.
+
+Follow-up schema fix: Strapi's shared internal-link regex now allows safe
+fragments such as `/#ways-to-move`, matching the existing Landing validator;
+regression tests continue to reject external, traversal, query and unsafe
+fragment values.
+
+### Local published parity and static build — 2026-10-01
+
+After the user published Article, Category, Pricing Page, Site Setting and
+Primary Navigation in local Strapi, the authenticated published snapshot
+returned HTTP `200` with schema version `1`, one Article, one Category, Pricing,
+Site Settings and Primary Navigation present, and no Campaign/Marketing Page
+entries in the approved manifest. Semantic parity against the approved merged
+manifest passed with zero issues. The static Astro build using
+`LANDING_CONTENT_SOURCE=strapi` and the local Strapi read credential passed and
+generated Home, Article, Category and Pricing pages plus the supporting 404
+page. `/pricing/` is emitted only when published Pricing is present, and the
+sitemap includes its approved canonical path. The output contains the approved
+Pricing title and annual plan. Following the Product decision, local Strapi
+Primary Navigation was updated and published with a `Pricing` link to
+`/pricing/`, preserving the existing links and CTA labels. The authenticated
+published snapshot returned HTTP `200` and confirmed all three navigation
+links; the Strapi-backed static build passed again and generated `/pricing/`.
+The approved local parity baseline was updated to include this Product-approved
+navigation link, and the authenticated semantic parity check passed again.
+The built artifact was served locally and the user confirmed the Landing UI.
+Only local SQLite/uploads and build artifacts were involved; nothing was
+deployed.
+
+### M4 Level 2 local implementation addendum — 2026-09-30
+
+**Scope:** implement durable publish delivery locally before any deployed
+handshake. Strapi is the source of publication events and owns a PostgreSQL
+outbox (SQLite in local development). A Strapi event-hub subscriber persists
+allowlisted post-commit events. A polling worker coalesces ready rows, signs a
+bounded JSON batch with HMAC, sends it to the protected Landing preview
+webhook, and retries failed deliveries with bounded exponential backoff.
+Landing verifies the timestamp, delivery ID and raw-body signature before
+triggering the existing constrained Vercel Deploy Hook.
+
+**Decision:** use Strapi's post-commit Document Service event hub as the
+publication signal. Persist only allowlisted event, model UID, stable entry
+identity and timestamps; do not persist or transmit authored content. Use one
+outbox row per source event and a lease so a worker restart reclaims unfinished
+work. It waits for five seconds of inactivity and deduplicates event type/model
+pairs in each bounded batch. Batch identity is deterministic from sorted
+outbox row IDs. This gives
+durable at-least-once delivery; Landing's replay guard remains best-effort in
+the current serverless process and Vercel may accept a duplicate Deploy Hook if
+an acknowledgement is lost. A durable receiver-side idempotency store is a
+separate deployment integration gate before broad editor access.
+
+**Acceptance criteria:** local SQLite records only allowlisted publication
+events; duplicate event identities do not create duplicate rows; unsent events
+coalesce into one signed batch; Landing rejects missing, malformed, stale,
+tampered and replayed HMAC deliveries; transient network/non-2xx failures
+retain events and schedule retry; successful delivery marks the batch complete;
+no token, signature, request body or content copy enters logs/telemetry.
+
+**Verification:** CMS and Landing focused tests, then both workspaces'
+format/lint/type checks and CMS production build. Use Node 22.12+; local tests
+must use SQLite/fakes and localhost only, with no external service or secrets.
+
+**Verification result — 2026-09-30:** CMS tests **34/34 passed** and Landing
+tests **292/292 passed** on Node 22.20.0. Both workspaces' format, lint and
+type checks passed; `pnpm docs:check` and `git diff --check` passed. Strapi
+production build passed TS compilation and admin-panel build. Strapi printed an
+optional preferences-file `EPERM` warning for
+`~/Library/Preferences/com.strapi/config.json`; the build still exited 0.
+Local SQLite integration covered burst coalescing, duplicate identity,
+lease recovery after expiry, retry scheduling and completion. Landing tests
+covered HMAC validation, stale/tampered requests, replay suppression, batch
+acceptance, safe error mapping and deploy-hook retry behavior.
 
 ### Completed
 
@@ -548,6 +733,12 @@ approved:
   webhook input, event/model allowlists, replay-window validation, duplicate
   suppression, a constrained Vercel Deploy Hook destination, stable public
   errors and sanitized service observations.
+- Added the Level 2 local durable publish path: Strapi's post-commit event hub
+  writes allowlisted records to a PostgreSQL/SQLite outbox; a leased worker
+  coalesces, HMAC-signs and retries delivery; Landing verifies raw-body HMAC,
+  timestamp and delivery ID before triggering a deployment. The in-memory
+  replay guard is warm-instance protection only; cross-instance durable
+  idempotency remains a deployed gate.
 - Added M5 offline migration foundations: a versioned provider-neutral manifest,
   deterministic fixture exporter and a non-mutating Strapi import planner. The
   planner orders authors/media, categories, related documents and singletons,
@@ -602,14 +793,17 @@ approved:
   snapshot/semantic parity build (S2 completion).
 - Deploy CMS plus protected Astro preview and exercise the real Admin Preview
   handshake (S3 completion).
-- Exercise the Level 1 publish webhook against deployed Strapi and Vercel.
-  Replace process-local duplicate suppression with the Level 2 durable
-  HMAC/outbox/coalescing path before broad editor access (S4 completion).
-- Run the idempotent apply client against a production-like Strapi service after
-  adding the missing reviewed Pricing corpus, then run semantic parity. The
-  offline client, dry-run, revision confirmation and duplicate prevention are
-  implemented and an authenticated local HTTP apply-twice rehearsal passes.
-  Perform M6 cutover/rollback and M7 decommission afterward.
+- Exercise the Level 2 HMAC/outbox delivery against deployed Strapi and Vercel.
+  Prove coalescing, retry and cross-instance duplicate behavior before broad
+  editor access (S4 completion).
+- Run the idempotent apply client against the selected deployed Strapi target,
+  then run semantic parity. Product/Legal approval, local apply, publication,
+  Pricing navigation and local parity are complete. The local payload and
+  media resolver report no blockers. The offline client, dry-run, revision
+  confirmation and duplicate prevention are implemented and an authenticated
+  local HTTP apply-twice rehearsal passes. The deployed apply/parity gate remains
+  dependent on the hosting/environment decision. Perform M6 cutover/rollback
+  and M7 decommission afterward.
 
 ### Rough progress
 
@@ -618,18 +812,21 @@ approved:
 - M1 CMS foundation: **88%** — schemas/runtime/container and R2 provider
   configuration are complete; deployed storage and infrastructure proof remain.
 - M2 contract/source: **88%** — the shared versioned runtime contract, provider
-  mapping and unit evidence are complete; authenticated live snapshot parity
-  remains.
+  mapping and unit evidence are complete; authenticated local published
+  snapshot parity passes, while deployed snapshot proof remains.
 - M3 preview: **65%** — signing/session/integration complete; deployed iframe
   handshake remains.
-- M4 publish automation: **45%** — Level 1 authenticated delivery and tests are
-  complete; deployed proof and durable Level 2 delivery remain.
+- M4 publish automation: **70%** — durable HMAC/outbox, coalescing, retry and
+  local tests are complete; deployed proof and receiver-side idempotency remain.
 - M5 content migration: **88%** — contract/export/planning, blocker reporting,
   durable storage configuration, local binary resolution/checksums,
   CMS-controlled pricing visibility, guarded idempotent apply tooling, local
   HTTP apply-twice proof, semantic snapshot round-trip and both Astro delivery
   builds, provider-neutral parity and guarded Pricing merge are complete;
-  approved Pricing values and the deployed staging rehearsal remain.
+  Product- and Legal-approved Pricing is applied locally; user-reviewed
+  publication, published snapshot parity, conditional `/pricing/` route and
+  sitemap activation, and the Strapi-backed static Landing build pass. A
+  deployed parity gate remains for the eventual release target.
 - M6–M7: **0%**.
-- Strapi migration overall: **about 69%**. Existing Landing UI/SEO foundation
+- Strapi migration overall: **about 72%**. Existing Landing UI/SEO foundation
   remains about **95%** complete.

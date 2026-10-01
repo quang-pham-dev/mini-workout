@@ -149,13 +149,26 @@ export function mapLocalMedia(
     return { src: '', alt: '', width: 0, height: 0, caption: '' };
   }
   const src = requiredString(input, 'src', `${path}.src`, issues);
-  if (
-    src.length > 0 &&
-    !/^\/images\/[a-zA-Z0-9/_-]+\.(?:avif|webp|png|jpe?g)$/.test(src) &&
-    !/^https:\/\/cdn\.sanity\.io\/images\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9._-]+$/.test(
-      src,
-    )
-  ) {
+  const isLandingImage =
+    /^\/images\/[a-zA-Z0-9/_-]+\.(?:avif|webp|png|jpe?g)$/.test(src);
+  let isAllowedRemoteMedia = false;
+  if (!isLandingImage && src.length > 0) {
+    try {
+      const url = new URL(src);
+      const isSecureRemote =
+        url.protocol === 'https:' && !url.username && !url.password;
+      const isLocalStrapiUpload =
+        url.protocol === 'http:' &&
+        ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname) &&
+        url.pathname.startsWith('/uploads/') &&
+        !url.username &&
+        !url.password;
+      isAllowedRemoteMedia = isSecureRemote || isLocalStrapiUpload;
+    } catch {
+      isAllowedRemoteMedia = false;
+    }
+  }
+  if (src.length > 0 && !isLandingImage && !isAllowedRemoteMedia) {
     issues.push({ code: 'media_src', path: `${path}.src` });
   }
   return {

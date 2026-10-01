@@ -25,6 +25,22 @@ describe('published content parity', () => {
     ).toEqual({ ok: true, issues: [] });
   });
 
+  it('ignores CMS-generated component IDs while preserving semantic order', () => {
+    const expected = fixtureSnapshot();
+    const actual = structuredClone(expected);
+    actual.articles[0]!.sections = actual.articles[0]!.sections.map(
+      (section, index) => ({ ...section, key: `strapi-${index}` }),
+    );
+    actual.siteShell.primaryLinks = actual.siteShell.primaryLinks.map(
+      (link, index) => ({ ...link, key: `strapi-${index}` }),
+    );
+
+    expect(comparePublishedContentSnapshots(expected, actual)).toEqual({
+      ok: true,
+      issues: [],
+    });
+  });
+
   it('reports stable site-shell paths without exposing content values', () => {
     const expected = fixtureSnapshot();
     const actual = fixtureSnapshot();

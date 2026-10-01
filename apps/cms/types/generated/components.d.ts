@@ -200,6 +200,9 @@ export interface PricingPlan extends Struct.ComponentSchema {
       Schema.Attribute.Required;
     cta: Schema.Attribute.Component<'shared.conversion-cta', false> &
       Schema.Attribute.Required;
+    enabled: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
     entitlements: Schema.Attribute.Component<'pricing.entitlement', true> &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<

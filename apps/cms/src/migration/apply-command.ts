@@ -74,7 +74,16 @@ export async function runApplyCommand(
   try {
     const loadInputs = options.loadInputs ?? defaultLoadInputs;
     const { plan, media } = await loadInputs(manifestPath, mediaRoot);
-    if (!plan.readyToApply || !media.readyToApply) {
+    const remainingPlanBlockers = plan.blockers.filter(
+      ({ code }) => code !== 'MEDIA_BINARY_REQUIRED',
+    );
+    const resolvedPlan = {
+      ...plan,
+      blockers: remainingPlanBlockers,
+      readyToApply: remainingPlanBlockers.length === 0 && media.readyToApply,
+    };
+
+    if (!resolvedPlan.readyToApply || !media.readyToApply) {
       output(options.writeOutput, {
         mode: 'blocked',
         planRevision: plan.planRevision,
@@ -113,7 +122,7 @@ export async function runApplyCommand(
     const client = createClient({ apiUrl, token, fetcher: options.fetcher });
     const report = await client.apply({
       dryRun: !applyMode,
-      plan,
+      plan: resolvedPlan,
       media,
     });
     output(options.writeOutput, report);

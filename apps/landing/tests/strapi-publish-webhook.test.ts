@@ -2,9 +2,10 @@ import {
   createMemoryStrapiDeliveryStore,
   createStrapiPublishWebhookHandler,
 } from '../src/publish/strapi-publish-webhook.js';
+import { createHash, createHmac } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
 
-const token = 'strapi-webhook-token-at-least-thirty-two-characters';
+const signingSecret = 'publish-signing-secret-with-at-least-32-characters';
 const deployHookUrl =
   'https://api.vercel.com/v1/integrations/deploy/project/hook-secret';
 const now = Date.parse('2026-09-30T08:00:00.000Z');
@@ -15,11 +16,26 @@ const body = JSON.stringify({
 });
 
 function request(
-  overrides: { body?: string; token?: string; requestId?: string | null } = {},
+  overrides: {
+    body?: string;
+    deliveryId?: string;
+    requestId?: string | null;
+    signature?: string;
+    timestamp?: string;
+  } = {},
 ) {
+  const rawBody = overrides.body ?? body;
+  const timestamp = overrides.timestamp ?? new Date(now).toISOString();
+  const deliveryId =
+    overrides.deliveryId ?? createHash('sha256').update(rawBody).digest('hex');
+  const signature = createHmac('sha256', signingSecret)
+    .update(`${timestamp}.${deliveryId}.${rawBody}`)
+    .digest('hex');
   const headers: Record<string, string> = {
-    authorization: `Bearer ${overrides.token ?? token}`,
     'content-type': 'application/json',
+    'x-strapi-delivery-id': deliveryId,
+    'x-strapi-signature': overrides.signature ?? `sha256=${signature}`,
+    'x-strapi-timestamp': timestamp,
   };
   if (overrides.requestId !== null) {
     headers['x-request-id'] = overrides.requestId ?? 'request-1';
@@ -27,7 +43,7 @@ function request(
   return new Request(
     'https://preview.example.com/api/webhooks/strapi/publish',
     {
-      body: overrides.body ?? body,
+      body: rawBody,
       headers,
       method: 'POST',
     },
@@ -54,7 +70,7 @@ function setup(
       fetch: fetchStub,
       now: () => now,
       reporter,
-      webhookToken: token,
+      signingSecret,
     }),
     reporter,
   };
@@ -78,12 +94,57 @@ describe('Strapi publish webhook', () => {
 
   it('rejects invalid authentication without reporting or deploying', async () => {
     const { fetchStub, handler, reporter } = setup();
-    const response = await handler(request({ token: 'wrong' }));
+    const response = await handler(request({ signature: 'sha256=bad' }));
 
     expect(response.status).toBe(401);
     expect((await response.json()).error.code).toBe('AUTH_REQUIRED');
     expect(fetchStub).not.toHaveBeenCalled();
     expect(reporter.report).not.toHaveBeenCalled();
+  });
+
+  it('rejects a body changed after signing', async () => {
+    const { fetchStub, handler } = setup();
+    const timestamp = new Date(now).toISOString();
+    const deliveryId = createHash('sha256').update(body).digest('hex');
+    const signature = createHmac('sha256', signingSecret)
+      .update(`${timestamp}.${deliveryId}.${body}`)
+      .digest('hex');
+    const response = await handler(
+      request({
+        body: body.replace('api::article.article', 'api::campaign.campaign'),
+        deliveryId,
+        signature: `sha256=${signature}`,
+        timestamp,
+      }),
+    );
+
+    expect(response.status).toBe(401);
+    expect(fetchStub).not.toHaveBeenCalled();
+  });
+
+  it('rejects a correctly signed delivery outside the timestamp window', async () => {
+    const { fetchStub, handler } = setup();
+    const response = await handler(
+      request({ timestamp: '2026-09-30T07:54:59.000Z' }),
+    );
+
+    expect(response.status).toBe(401);
+    expect(fetchStub).not.toHaveBeenCalled();
+  });
+
+  it('accepts a bounded batch of allowlisted events as one deploy request', async () => {
+    const { fetchStub, handler } = setup();
+    const batch = JSON.stringify({
+      createdAt: new Date(now).toISOString(),
+      events: [
+        { event: 'entry.publish', model: 'api::article.article' },
+        { event: 'entry.unpublish', model: 'api::campaign.campaign' },
+      ],
+    });
+    const response = await handler(request({ body: batch }));
+
+    expect(response.status).toBe(202);
+    expect(fetchStub).toHaveBeenCalledTimes(1);
   });
 
   it.each([
@@ -122,7 +183,7 @@ describe('Strapi publish webhook', () => {
         body: JSON.stringify({
           createdAt: new Date(now).toISOString(),
           event: 'media.update',
-          media: { id: 1 },
+          model: 'plugin::upload.file',
         }),
       }),
     );
@@ -144,6 +205,9 @@ describe('Strapi publish webhook', () => {
     expect(await failed.text()).not.toContain('provider token leak');
     expect(retried.status).toBe(202);
     expect(reporter.report).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(reporter.report.mock.calls)).not.toContain(
+      'provider token leak',
+    );
     expect(fetchStub).toHaveBeenCalledTimes(2);
   });
 
@@ -151,7 +215,7 @@ describe('Strapi publish webhook', () => {
     const handler = createStrapiPublishWebhookHandler({
       deployHookUrl: 'https://attacker.example/hook',
       reporter: { report: vi.fn() },
-      webhookToken: '',
+      signingSecret: '',
     });
     const response = await handler(request({ requestId: null }));
 

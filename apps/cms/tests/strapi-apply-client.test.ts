@@ -113,9 +113,7 @@ describe('Strapi migration apply client', () => {
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
-        response({
-          data: [{ id: 41, name: `migration-${'a'.repeat(64)}.webp` }],
-        }),
+        response([{ id: 41, name: `migration-${'a'.repeat(64)}.webp` }]),
       )
       .mockResolvedValueOnce(
         response({ data: [{ documentId: 'author-document' }] }),
@@ -159,6 +157,7 @@ describe('Strapi migration apply client', () => {
       reuse: 1,
       upload: 0,
     });
+    expect(String(fetcher.mock.calls[0]?.[0])).toContain('/api/upload/files?');
     const write = fetcher.mock.calls[2];
     expect(String(write?.[0])).toContain('/api/authors/author-document');
     expect(write?.[1]?.method).toBe('PUT');
@@ -174,7 +173,7 @@ describe('Strapi migration apply client', () => {
     const checksum = 'b'.repeat(64);
     const fetcher = vi
       .fn<typeof fetch>()
-      .mockResolvedValueOnce(response({ data: [] }))
+      .mockResolvedValueOnce(response([]))
       .mockResolvedValueOnce(
         response([{ id: 42, name: `migration-${checksum}.webp` }], 201),
       );
@@ -225,9 +224,7 @@ describe('Strapi migration apply client', () => {
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
-        response({
-          data: [{ id: 41, name: `migration-${checksum}.webp` }],
-        }),
+        response([{ id: 41, name: `migration-${checksum}.webp` }]),
       )
       .mockResolvedValueOnce(response({ data: [] }))
       .mockResolvedValueOnce(

@@ -270,26 +270,25 @@ export function createStrapiApplyClient(options: ClientOptions) {
       'filters[name][$eq]': name,
       'pagination[pageSize]': '2',
     });
-    const { body } = await request(`upload/files/page?${query}`, {
+    const { body } = await request(`upload/files?${query}`, {
       method: 'GET',
     });
-    const data = record(body).data;
-    if (!Array.isArray(data)) {
+    if (!Array.isArray(body)) {
       throw new StrapiApplyError({
         category: 'dependency',
         code: 'DEPENDENCY_UNAVAILABLE',
         message: 'Strapi returned an invalid media response.',
       });
     }
-    if (data.length > 1) {
+    if (body.length > 1) {
       throw new StrapiApplyError({
         category: 'conflict',
         code: 'RESOURCE_CONFLICT',
         message: 'Multiple Strapi media assets share a migration checksum.',
       });
     }
-    if (data.length === 0) return null;
-    const candidate = record(data[0]);
+    if (body.length === 0) return null;
+    const candidate = record(body[0]);
     return typeof candidate.id === 'number' &&
       typeof candidate.name === 'string'
       ? { id: candidate.id, name: candidate.name }

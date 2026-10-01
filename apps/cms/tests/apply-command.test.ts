@@ -45,6 +45,47 @@ describe('Strapi migration apply command', () => {
     expect(output.join('')).not.toContain('undefined');
   });
 
+  it('allows apply after all media-only plan blockers are resolved', async () => {
+    const output: string[] = [];
+    const apply = vi.fn().mockResolvedValue({
+      schemaVersion: 1,
+      mode: 'dry-run',
+      planRevision: 'plan-v1',
+      actions: [],
+      totals: { create: 0, update: 0, reuse: 0, upload: 0 },
+    });
+    const createClient = vi.fn().mockReturnValue({ apply });
+
+    const exitCode = await runApplyCommand({
+      args: ['/manifest.json', '/media'],
+      env: {
+        STRAPI_API_URL: 'http://127.0.0.1:1337',
+        STRAPI_MIGRATION_TOKEN: 'local-test-token',
+      },
+      fetcher: vi.fn<typeof fetch>(),
+      writeOutput: (value) => output.push(value),
+      loadInputs: vi.fn().mockResolvedValue({
+        plan: {
+          ...readyPlan(),
+          readyToApply: false,
+          blockers: [{ code: 'MEDIA_BINARY_REQUIRED', path: '/image.webp' }],
+        },
+        media: readyMedia(),
+      }),
+      createClient,
+    });
+
+    expect(exitCode).toBe(0);
+    expect(apply).toHaveBeenCalledWith(
+      expect.objectContaining({ dryRun: true }),
+    );
+    expect(createClient.mock.results[0]?.value.apply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        plan: expect.objectContaining({ readyToApply: true, blockers: [] }),
+      }),
+    );
+  });
+
   it('defaults to dry-run and never includes the API token in output', async () => {
     const output: string[] = [];
     const apply = vi.fn().mockResolvedValue({

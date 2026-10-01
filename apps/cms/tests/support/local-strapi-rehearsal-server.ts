@@ -89,10 +89,10 @@ async function handleUpload(
   state: RehearsalState,
   url: URL,
 ): Promise<boolean> {
-  if (url.pathname === '/api/upload/files/page' && request.method === 'GET') {
+  if (url.pathname === '/api/upload/files' && request.method === 'GET') {
     const name = stableValue(url, 'name');
     const media = state.media.get(name);
-    send(response, 200, { data: media ? [media] : [], meta: {} });
+    send(response, 200, media ? [media] : []);
     return true;
   }
   if (url.pathname === '/api/upload' && request.method === 'POST') {

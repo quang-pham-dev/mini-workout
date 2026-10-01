@@ -71,12 +71,18 @@ Thumbs.db
 *.mobileprovision
 
 # Agentic / AI Tools
-# .agent
-# .agents
-# .claude
-# .codex
-# .cursor
-# .opencode
+.agent
+.agents
+!.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/strapi-docs-mcp/
+!.agents/skills/strapi-docs-mcp/**
+.claude
+.codex
+.cursor
+.opencode
 e2e-web
 .playwright-cli
-# skills-lock.json
+skills-lock.json

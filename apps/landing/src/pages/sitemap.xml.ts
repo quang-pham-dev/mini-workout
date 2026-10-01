@@ -1,19 +1,22 @@
 import { publishedContentRepository } from '../content/published-content-repository.js';
+import { createIndexablePaths } from '../content/sitemap-paths.js';
 import { planCampaignDelivery } from '../features/campaigns/delivery.js';
 import { sitemapXml } from '../lib/seo/index.js';
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ site }) => {
-  const { articles, campaigns, categories, marketingPages } =
+  const { articles, campaigns, categories, marketingPages, pricing } =
     await publishedContentRepository.load();
   const campaignPlan = planCampaignDelivery(campaigns, new Date());
-  const indexablePaths = [
-    '/',
-    ...campaignPlan.pages.map(({ campaign }) => campaign.seo.canonicalPath),
-    ...categories.map((category) => category.seo.canonicalPath),
-    ...articles.map((article) => article.seo.canonicalPath),
-    ...marketingPages.map((page) => page.seo.canonicalPath),
-  ] as const;
+  const indexablePaths = createIndexablePaths({
+    campaignPaths: campaignPlan.pages.map(
+      ({ campaign }) => campaign.seo.canonicalPath,
+    ),
+    pricingPath: pricing?.seo.canonicalPath ?? null,
+    categoryPaths: categories.map((category) => category.seo.canonicalPath),
+    articlePaths: articles.map((article) => article.seo.canonicalPath),
+    marketingPagePaths: marketingPages.map((page) => page.seo.canonicalPath),
+  });
   const body = sitemapXml(
     site?.toString() ?? 'https://example.com/',
     indexablePaths,

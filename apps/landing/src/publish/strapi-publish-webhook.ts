@@ -10,7 +10,7 @@ import {
   createRequestContext,
   toPublicError,
 } from '@mini-workout/observability';
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const maximumBodyBytes = 64 * 1024;
 const eventToleranceMs = 5 * 60 * 1000;
@@ -39,6 +39,8 @@ const allowedModels = new Set([
   'api::pricing-page.pricing-page',
   'primary-navigation',
   'api::primary-navigation.primary-navigation',
+  'site-setting',
+  'api::site-setting.site-setting',
   'site-settings',
   'api::site-settings.site-settings',
   'file',
@@ -51,7 +53,7 @@ export interface StrapiDeliveryStore {
 }
 
 interface StrapiPublishWebhookOptions {
-  webhookToken?: string;
+  signingSecret?: string;
   deployHookUrl?: string;
   deliveryStore?: StrapiDeliveryStore;
   fetch?: typeof fetch;
@@ -60,10 +62,14 @@ interface StrapiPublishWebhookOptions {
   reporter: ErrorReporter;
 }
 
-interface StrapiWebhookPayload {
+interface StrapiWebhookEvent {
   event: string;
+  model: string;
+}
+
+interface StrapiWebhookPayload {
   createdAt: string;
-  model?: string;
+  events: StrapiWebhookEvent[];
 }
 
 export function createMemoryStrapiDeliveryStore(): StrapiDeliveryStore {
@@ -140,7 +146,7 @@ function configurationError(): AppError {
   );
 }
 
-function dependencyError(cause?: unknown): AppError {
+function dependencyError(): AppError {
   return appError(
     'dependency',
     'DEPENDENCY_UNAVAILABLE',
@@ -148,25 +154,7 @@ function dependencyError(cause?: unknown): AppError {
     503,
     true,
     true,
-    cause,
   );
-}
-
-function isValidConfiguration(token: string, deployHookUrl: string): boolean {
-  if (token.length < 32) return false;
-  try {
-    const url = new URL(deployHookUrl);
-    return (
-      url.protocol === 'https:' &&
-      url.hostname === 'api.vercel.com' &&
-      url.username === '' &&
-      url.password === '' &&
-      url.hash === '' &&
-      url.pathname.startsWith('/v1/integrations/deploy/')
-    );
-  } catch {
-    return false;
-  }
 }
 
 function secureEqual(left: string, right: string): boolean {
@@ -220,21 +208,7 @@ function parsePayload(rawBody: string, now: number): StrapiWebhookPayload {
     throw inputError();
   }
   const record = value as Record<string, unknown>;
-  if (
-    typeof record.event !== 'string' ||
-    typeof record.createdAt !== 'string' ||
-    !allowedEvents.has(record.event)
-  ) {
-    throw inputError();
-  }
-  const isMediaEvent = record.event.startsWith('media.');
-  if (
-    (!isMediaEvent &&
-      (typeof record.model !== 'string' || !allowedModels.has(record.model))) ||
-    (isMediaEvent &&
-      record.model !== undefined &&
-      (typeof record.model !== 'string' || !allowedModels.has(record.model)))
-  ) {
+  if (typeof record.createdAt !== 'string') {
     throw inputError();
   }
   const createdAt = Date.parse(record.createdAt);
@@ -244,11 +218,66 @@ function parsePayload(rawBody: string, now: number): StrapiWebhookPayload {
   ) {
     throw inputError();
   }
-  return {
-    createdAt: record.createdAt,
-    event: record.event,
-    ...(typeof record.model === 'string' ? { model: record.model } : {}),
-  };
+  const rawEvents = Array.isArray(record.events)
+    ? record.events
+    : [{ event: record.event, model: record.model }];
+  if (rawEvents.length === 0 || rawEvents.length > 100) throw inputError();
+  const events = rawEvents.map((value) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      throw inputError();
+    }
+    const event = value as Record<string, unknown>;
+    if (
+      typeof event.event !== 'string' ||
+      !allowedEvents.has(event.event) ||
+      typeof event.model !== 'string' ||
+      !allowedModels.has(event.model)
+    ) {
+      throw inputError();
+    }
+    return { event: event.event, model: event.model };
+  });
+  return { createdAt: record.createdAt, events };
+}
+
+function isValidConfiguration(secret: string, deployHookUrl: string): boolean {
+  if (secret.length < 32) return false;
+  try {
+    const url = new URL(deployHookUrl);
+    return (
+      url.protocol === 'https:' &&
+      url.hostname === 'api.vercel.com' &&
+      url.username === '' &&
+      url.password === '' &&
+      url.hash === '' &&
+      url.pathname.startsWith('/v1/integrations/deploy/')
+    );
+  } catch {
+    return false;
+  }
+}
+
+function verifySignature(
+  rawBody: string,
+  timestamp: string,
+  deliveryId: string,
+  signature: string,
+  secret: string,
+  now: number,
+): boolean {
+  const timestampMs = Date.parse(timestamp);
+  if (
+    !Number.isFinite(timestampMs) ||
+    Math.abs(now - timestampMs) > eventToleranceMs ||
+    !/^[a-f0-9]{64}$/.test(deliveryId) ||
+    !/^sha256=[a-f0-9]{64}$/.test(signature)
+  ) {
+    return false;
+  }
+  const expected = createHmac('sha256', secret)
+    .update(`${timestamp}.${deliveryId}.${rawBody}`)
+    .digest('hex');
+  return secureEqual(signature.slice('sha256='.length), expected);
 }
 
 function responseHeaders(requestId: string): HeadersInit {
@@ -285,22 +314,29 @@ export function createStrapiPublishWebhookHandler(
       });
 
     try {
-      const webhookToken = options.webhookToken ?? '';
+      const signingSecret = options.signingSecret ?? '';
       const deployHookUrl = options.deployHookUrl ?? '';
-      if (!isValidConfiguration(webhookToken, deployHookUrl)) {
+      if (!isValidConfiguration(signingSecret, deployHookUrl)) {
         throw configurationError();
       }
-      const authorization = request.headers.get('authorization') ?? '';
+      const rawBody = await readBoundedBody(request);
+      const timestamp = request.headers.get('x-strapi-timestamp') ?? '';
+      const deliveryId = request.headers.get('x-strapi-delivery-id') ?? '';
+      const signature = request.headers.get('x-strapi-signature') ?? '';
       if (
-        !authorization.startsWith('Bearer ') ||
-        !secureEqual(authorization.slice(7), webhookToken)
+        !verifySignature(
+          rawBody,
+          timestamp,
+          deliveryId,
+          signature,
+          signingSecret,
+          now(),
+        )
       ) {
         throw authenticationError();
       }
-
-      const rawBody = await readBoundedBody(request);
       parsePayload(rawBody, now());
-      const deliveryKey = createHash('sha256').update(rawBody).digest('hex');
+      const deliveryKey = deliveryId;
       if (!deliveryStore.claim(deliveryKey, now(), deliveryTtlMs)) {
         record('duplicate');
         return Response.json(
@@ -319,8 +355,8 @@ export function createStrapiPublishWebhookHandler(
           redirect: 'error',
           signal: AbortSignal.timeout(8_000),
         });
-      } catch (cause) {
-        throw dependencyError(cause);
+      } catch {
+        throw dependencyError();
       }
       if (!deployResponse.ok) throw dependencyError();
 

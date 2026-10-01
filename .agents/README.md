@@ -48,6 +48,7 @@ The human-readable operating guide is [`../docs/AGENT_WORKFLOW.md`](../docs/AGEN
 | Next.js architecture       | `nextjs-app-architecture`, `nextjs-cache-architecture`                                   |
 | Admin app (TanStack Start) | `tanstack-start`                                                                         |
 | Authentication             | `better-auth`                                                                            |
+| Strapi CMS                 | `strapi-docs-mcp`                                                                        |
 | Observability / errors     | `observability-convention`                                                               |
 | Prisma and database        | `prisma-database-setup`, `prisma-client-api`, `prisma-postgres`, `nextjs-cache-architecture` |
 | Client data fetching       | `tanstack-query`, `tanstack-query-best-practices`                                      |

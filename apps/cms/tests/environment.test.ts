@@ -16,8 +16,10 @@ const productionEnvironment: NodeJS.ProcessEnv = {
   JWT_SECRET: 'h'.repeat(48),
   TRANSFER_TOKEN_SALT: 'i'.repeat(48),
   LANDING_PREVIEW_URL: 'https://preview.example.com',
+  LANDING_PUBLISH_WEBHOOK_URL:
+    'https://preview.example.com/api/webhooks/strapi/publish',
   STRAPI_PREVIEW_SECRET: 'j'.repeat(48),
-  STRAPI_WEBHOOK_TOKEN: 'k'.repeat(48),
+  STRAPI_WEBHOOK_SIGNING_SECRET: 'k'.repeat(48),
   CMS_UPLOAD_PROVIDER: 'r2',
   R2_ENDPOINT: 'https://account-id.r2.cloudflarestorage.com',
   R2_BUCKET: 'mini-workout-cms',
@@ -65,9 +67,11 @@ describe('CMS production environment', () => {
     expect(() =>
       validateCmsEnvironment({
         ...productionEnvironment,
-        STRAPI_WEBHOOK_TOKEN: 'weak',
+        STRAPI_WEBHOOK_SIGNING_SECRET: 'weak',
       }),
-    ).toThrow('STRAPI_WEBHOOK_TOKEN must contain at least 32 characters.');
+    ).toThrow(
+      'STRAPI_WEBHOOK_SIGNING_SECRET must contain at least 32 characters.',
+    );
     expect(() =>
       validateCmsEnvironment({
         ...productionEnvironment,
@@ -89,5 +93,22 @@ describe('CMS production environment', () => {
         R2_PUBLIC_URL: 'http://media.example.com/path',
       }),
     ).toThrow('R2_PUBLIC_URL must be a valid HTTPS origin.');
+  });
+
+  it('requires paired publish-delivery settings and the exact webhook path', () => {
+    expect(() =>
+      validateCmsEnvironment({
+        ...productionEnvironment,
+        LANDING_PUBLISH_WEBHOOK_URL: undefined,
+      }),
+    ).toThrow(
+      'LANDING_PUBLISH_WEBHOOK_URL and STRAPI_WEBHOOK_SIGNING_SECRET must be configured together.',
+    );
+    expect(() =>
+      validateCmsEnvironment({
+        ...productionEnvironment,
+        LANDING_PUBLISH_WEBHOOK_URL: 'https://preview.example.com/other',
+      }),
+    ).toThrow('LANDING_PUBLISH_WEBHOOK_URL must be a valid HTTPS webhook URL.');
   });
 });
