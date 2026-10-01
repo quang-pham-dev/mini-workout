@@ -7,8 +7,31 @@ const protectedPrefixes = [
 ];
 const fallbackPath = '/home';
 
+/**
+ * Routes that authenticated users should never see.
+ * /verify-email is intentionally excluded: a logged-in user may still
+ * need to confirm their address before certain features unlock.
+ */
+const authOnlyPrefixes = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+];
+
 export function isProtectedPath(pathname: string) {
   return protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
+/**
+ * Returns true when the pathname is a guest-only auth page (login, register,
+ * forgot-password, reset-password). Authenticated users are redirected away
+ * from these routes to avoid confusion.
+ */
+export function isAuthPath(pathname: string) {
+  return authOnlyPrefixes.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 }

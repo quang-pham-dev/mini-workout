@@ -1,5 +1,6 @@
 import {
   getLoginRedirectPath,
+  isAuthPath,
   isProtectedPath,
 } from '@/lib/auth/authorization';
 import {
@@ -21,6 +22,12 @@ export function proxy(request: NextRequest) {
         request.url,
       ),
     );
+  }
+
+  // Redirect authenticated users away from guest-only auth pages
+  // (login, register, forgot-password, reset-password).
+  if (hasSession && isAuthPath(pathname)) {
+    return NextResponse.redirect(new URL('/home', request.url));
   }
 
   // Optimistic edge guard for onboarding to eliminate layout flash

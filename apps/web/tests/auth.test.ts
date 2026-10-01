@@ -1,6 +1,7 @@
 import {
   getLoginRedirectPath,
   getSafeRedirectPath,
+  isAuthPath,
   isProtectedPath,
 } from '@/lib/auth/authorization';
 import { loginSchema, registerSchema } from '@/lib/auth/validation';
@@ -75,4 +76,25 @@ describe('authentication route boundaries', () => {
     );
     expect(getLoginRedirectPath(undefined)).toBe('/login');
   });
+});
+
+describe('isAuthPath — guest-only route guard', () => {
+  it.each(['/login', '/register', '/forgot-password', '/reset-password'])(
+    'identifies %s as an auth-only path',
+    (pathname) => {
+      expect(isAuthPath(pathname)).toBe(true);
+    },
+  );
+
+  it('identifies sub-paths of auth routes', () => {
+    expect(isAuthPath('/reset-password/abc123')).toBe(true);
+    expect(isAuthPath('/forgot-password/confirm')).toBe(true);
+  });
+
+  it.each(['/verify-email', '/home', '/profile', '/', '/api/auth/session'])(
+    'does not classify %s as auth-only',
+    (pathname) => {
+      expect(isAuthPath(pathname)).toBe(false);
+    },
+  );
 });
