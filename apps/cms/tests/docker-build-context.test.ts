@@ -28,4 +28,17 @@ describe('CMS Docker build workspace inputs', () => {
       dockerfile.indexOf('RUN pnpm --filter @mini-workout/contracts build'),
     ).toBeLessThan(cmsBuildStep);
   });
+
+  it('copies the actual Strapi admin client and TypeScript output', async () => {
+    const dockerfile = await readFile(
+      new URL('../Dockerfile', import.meta.url),
+      'utf8',
+    );
+
+    expect(dockerfile).toContain(
+      'cp -R apps/cms/.strapi/client /opt/cms/.strapi/client',
+    );
+    expect(dockerfile).toContain('cp -R apps/cms/dist /opt/cms/dist');
+    expect(dockerfile).not.toContain('apps/cms/build');
+  });
 });
