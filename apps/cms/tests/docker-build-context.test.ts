@@ -41,4 +41,13 @@ describe('CMS Docker build workspace inputs', () => {
     expect(dockerfile).toContain('cp -R apps/cms/dist /opt/cms/dist');
     expect(dockerfile).not.toContain('apps/cms/build');
   });
+
+  it('starts Strapi directly without selecting pnpm at runtime', async () => {
+    const dockerfile = await readFile(
+      new URL('../Dockerfile', import.meta.url),
+      'utf8',
+    );
+
+    expect(dockerfile).toContain('CMD ["./node_modules/.bin/strapi", "start"]');
+  });
 });
