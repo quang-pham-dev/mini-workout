@@ -1,3 +1,4 @@
+/* global module */
 /**
  * @see https://prettier.io/docs/configuration
  * @type {import("prettier").Config}

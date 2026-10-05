@@ -231,16 +231,16 @@ importers:
         version: 20.5.3
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:config/eslint-config
+        version: link:packages/eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:config/prettier-config
+        version: link:packages/prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:config/typescript-config
+        version: link:packages/typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:config/vitest-config
+        version: link:packages/vitest-config
       '@trivago/prettier-plugin-sort-imports':
         specifier: catalog:format
         version: 6.0.2(prettier@3.9.6)
@@ -306,7 +306,7 @@ importers:
         version: 1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26))
       better-auth:
         specifier: catalog:better-auth
-        version: 1.7.1(@opentelemetry/api@1.9.1)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26)))(better-sqlite3@12.8.0)(next@16.3.0(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(pg@8.16.3)(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7)
+        version: 1.7.1(@opentelemetry/api@1.9.1)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26)))(better-sqlite3@12.8.0)(next@16.3.0(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(pg@8.16.3)(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7)
       nitro:
         specifier: catalog:tanstack
         version: 3.0.260903-beta
@@ -322,16 +322,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../../packages/eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../../packages/prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../../packages/typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../../packages/vitest-config
       '@prisma/client':
         specifier: 6.19.3
         version: 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2)
@@ -431,13 +431,13 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../../packages/eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../../packages/prettier-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../../packages/vitest-config
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
@@ -501,16 +501,16 @@ importers:
         version: link:../../packages/design-system
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../../packages/eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../../packages/prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../../packages/typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../../packages/vitest-config
       '@tailwindcss/vite':
         specifier: catalog:ui-styling
         version: 4.3.3(vite@8.3.0(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))
@@ -562,13 +562,13 @@ importers:
         version: link:../../packages/design-system
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../../packages/eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../../packages/prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../../packages/typescript-config
       '@rolldown/plugin-babel':
         specifier: ^0.2.3
         version: 0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.2.1(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))
@@ -656,16 +656,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../../packages/eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../../packages/prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../../packages/typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../../packages/vitest-config
       '@types/react':
         specifier: ^19.2.2
         version: 19.2.2
@@ -722,7 +722,7 @@ importers:
         version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       better-auth:
         specifier: catalog:better-auth
-        version: 1.7.1(@opentelemetry/api@1.9.1)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26)))(better-sqlite3@12.8.0)(next@16.3.0(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(pg@8.16.3)(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7)
+        version: 1.7.1(@opentelemetry/api@1.9.1)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26)))(better-sqlite3@12.8.0)(next@16.3.0(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(pg@8.16.3)(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7)
       eslint-plugin-boundaries:
         specifier: ^7.2.0
         version: 7.2.0(eslint-import-resolver-typescript@4.4.5(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))
@@ -753,13 +753,13 @@ importers:
         version: link:../../packages/design-system
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../../packages/eslint-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../../packages/typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../../packages/vitest-config
       '@tailwindcss/postcss':
         specifier: catalog:ui-styling
         version: 4.3.3
@@ -794,86 +794,11 @@ importers:
         specifier: catalog:test-unit
         version: 3.2.7(@types/debug@4.1.13)(@types/node@22.15.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@2.3.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
 
-  config/eslint-config:
-    devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 9.39.1
-      '@next/eslint-plugin-next':
-        specifier: catalog:lint
-        version: 15.5.23
-      eslint:
-        specifier: 'catalog:'
-        version: 9.39.1(jiti@2.7.0)
-      eslint-config-prettier:
-        specifier: catalog:lint
-        version: 10.1.1(eslint@9.39.1(jiti@2.7.0))
-      eslint-plugin-only-warn:
-        specifier: catalog:lint
-        version: 1.1.0
-      eslint-plugin-react:
-        specifier: catalog:lint
-        version: 7.37.5(eslint@9.39.1(jiti@2.7.0))
-      eslint-plugin-react-hooks:
-        specifier: catalog:lint
-        version: 5.2.0(eslint@9.39.1(jiti@2.7.0))
-      eslint-plugin-storybook:
-        specifier: catalog:lint
-        version: 10.5.8(eslint@9.39.1(jiti@2.7.0))(storybook@10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.3.0))(typescript@5.9.2)
-      eslint-plugin-turbo:
-        specifier: catalog:lint
-        version: 2.7.1(eslint@9.39.1(jiti@2.7.0))(turbo@2.10.9)
-      globals:
-        specifier: catalog:lint
-        version: 17.11.0
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.2
-      typescript-eslint:
-        specifier: catalog:lint
-        version: 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-
-  config/prettier-config:
-    dependencies:
-      '@trivago/prettier-plugin-sort-imports':
-        specifier: catalog:format
-        version: 6.0.2(prettier@3.7.4)
-    devDependencies:
-      prettier:
-        specifier: 'catalog:'
-        version: 3.7.4
-
-  config/typescript-config: {}
-
-  config/vitest-config:
-    dependencies:
-      '@vitejs/plugin-react':
-        specifier: catalog:build-vite
-        version: 6.0.5(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))
-      '@vitest/coverage-v8':
-        specifier: catalog:test-unit
-        version: 3.2.7(vitest@3.2.7)
-      '@vitest/ui':
-        specifier: catalog:test-unit
-        version: 3.2.7(vitest@3.2.7)
-      jsdom:
-        specifier: catalog:test-unit
-        version: 27.4.0(@noble/hashes@2.3.0)
-      vite:
-        specifier: catalog:build-vite
-        version: 8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
-      vite-tsconfig-paths:
-        specifier: catalog:build-vite
-        version: 6.1.1(typescript@5.9.3)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))
-      vitest:
-        specifier: catalog:test-unit
-        version: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0(@noble/hashes@2.3.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
-
   e2e:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../config/eslint-config
+        version: link:../packages/eslint-config
       '@playwright/test':
         specifier: catalog:test-e2e
         version: 1.62.1
@@ -901,16 +826,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
@@ -937,7 +862,7 @@ importers:
     dependencies:
       '@better-auth/prisma-adapter':
         specifier: 1.7.1
-        version: 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))
+        version: 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))
       '@better-auth/utils':
         specifier: 0.4.2
         version: 0.4.2
@@ -956,16 +881,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@tanstack/react-start':
         specifier: catalog:tanstack
         version: 1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(@swc/core@1.16.12)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28))
@@ -999,16 +924,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
@@ -1045,16 +970,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
@@ -1085,16 +1010,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
@@ -1137,10 +1062,10 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
@@ -1163,20 +1088,59 @@ importers:
         specifier: catalog:test-unit
         version: 3.2.7(@types/debug@4.1.13)(@types/node@22.15.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@2.3.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
 
+  packages/eslint-config:
+    devDependencies:
+      '@eslint/js':
+        specifier: 'catalog:'
+        version: 9.39.1
+      '@next/eslint-plugin-next':
+        specifier: catalog:lint
+        version: 15.5.23
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.5(jiti@2.7.0)
+      eslint-config-prettier:
+        specifier: catalog:lint
+        version: 10.1.1(eslint@9.39.5(jiti@2.7.0))
+      eslint-plugin-only-warn:
+        specifier: catalog:lint
+        version: 1.1.0
+      eslint-plugin-react:
+        specifier: catalog:lint
+        version: 7.37.5(eslint@9.39.5(jiti@2.7.0))
+      eslint-plugin-react-hooks:
+        specifier: catalog:lint
+        version: 5.2.0(eslint@9.39.5(jiti@2.7.0))
+      eslint-plugin-storybook:
+        specifier: catalog:lint
+        version: 10.5.8(eslint@9.39.5(jiti@2.7.0))(storybook@10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.3.0))(typescript@5.9.2)
+      eslint-plugin-turbo:
+        specifier: catalog:lint
+        version: 2.7.1(eslint@9.39.5(jiti@2.7.0))(turbo@2.10.9)
+      globals:
+        specifier: catalog:lint
+        version: 17.11.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.2
+      typescript-eslint:
+        specifier: catalog:lint
+        version: 8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.2)
+
   packages/feature-flags:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.3
@@ -1207,16 +1171,16 @@ importers:
         version: 9.39.1
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@vitest/coverage-v8':
         specifier: catalog:test-unit
         version: 3.2.7(vitest@3.2.7)
@@ -1241,6 +1205,18 @@ importers:
       vitest:
         specifier: catalog:test-unit
         version: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@2.3.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
+
+  packages/prettier-config:
+    dependencies:
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: catalog:format
+        version: 6.0.2(prettier@3.9.6)
+    devDependencies:
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+
+  packages/typescript-config: {}
 
   packages/ui:
     dependencies:
@@ -1283,16 +1259,16 @@ importers:
     devDependencies:
       '@mini-workout/eslint-config':
         specifier: workspace:*
-        version: link:../../config/eslint-config
+        version: link:../eslint-config
       '@mini-workout/prettier-config':
         specifier: workspace:*
-        version: link:../../config/prettier-config
+        version: link:../prettier-config
       '@mini-workout/typescript-config':
         specifier: workspace:*
-        version: link:../../config/typescript-config
+        version: link:../typescript-config
       '@mini-workout/vitest-config':
         specifier: workspace:*
-        version: link:../../config/vitest-config
+        version: link:../vitest-config
       '@storybook/react':
         specifier: catalog:ui-storybook
         version: 10.5.8(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.2.0))(typescript@5.9.2)
@@ -1335,6 +1311,30 @@ importers:
       vitest:
         specifier: catalog:test-unit
         version: 3.2.7(@types/debug@4.1.13)(@types/node@22.15.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@2.3.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
+
+  packages/vitest-config:
+    dependencies:
+      '@vitejs/plugin-react':
+        specifier: catalog:build-vite
+        version: 6.0.5(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))
+      '@vitest/coverage-v8':
+        specifier: catalog:test-unit
+        version: 3.2.7(vitest@3.2.7)
+      '@vitest/ui':
+        specifier: catalog:test-unit
+        version: 3.2.7(vitest@3.2.7)
+      jsdom:
+        specifier: catalog:test-unit
+        version: 27.4.0(@noble/hashes@2.3.0)
+      vite:
+        specifier: catalog:build-vite
+        version: 8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
+      vite-tsconfig-paths:
+        specifier: catalog:build-vite
+        version: 6.1.1(typescript@5.9.3)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))
+      vitest:
+        specifier: catalog:test-unit
+        version: 3.2.7(@types/debug@4.1.13)(@types/node@24.13.3)(@vitest/ui@3.2.7)(jiti@2.7.0)(jsdom@27.4.0(@noble/hashes@2.3.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0)
 
 packages:
 
@@ -10553,10 +10553,6 @@ packages:
     resolution: {integrity: sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==}
     engines: {node: '>= 0.4'}
 
-  hasown@2.0.2:
-    resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
-    engines: {node: '>= 0.4'}
-
   hasown@2.0.4:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
@@ -13748,10 +13744,6 @@ packages:
     resolution: {integrity: sha512-Mb/GvXPHBAXdgGIcnfU5L3ldpn1XcxrGkPHwqgRx17/I2XRfqlFKk2vGkHWINn1kdXvzJZeuO3is6I9KLPFm0g==}
     engines: {node: '>=20'}
 
-  side-channel-list@1.0.0:
-    resolution: {integrity: sha512-FCLHtRD/gnpCiCHEiJLOwdmFP+wzCmDEkc9y7NsYxeF4u7Btsn1ZuwgwJGxImImHicJArLP4R0yX4c2KCrMrTA==}
-    engines: {node: '>= 0.4'}
-
   side-channel-list@1.0.1:
     resolution: {integrity: sha512-mjn/0bi/oUURjc5Xl7IaWi/OJJJumuoJFQJfDDyO46+hBWsfaVM65TBHq2eoZBhzl9EchxOijpkbRC8SVBQU0w==}
     engines: {node: '>= 0.4'}
@@ -13762,10 +13754,6 @@ packages:
 
   side-channel-weakmap@1.0.2:
     resolution: {integrity: sha512-WPS/HvHQTYnHisLo9McqBHOJk2FkHO/tlpvldyrnem4aeQp4hai3gythswg6p01oSoTl58rcpiFAjF2br2Ak2A==}
-    engines: {node: '>= 0.4'}
-
-  side-channel@1.1.0:
-    resolution: {integrity: sha512-ZX99e6tRweoUXqR+VBrslhda51Nh5MTQwou5tnUDgbtyM0dBgmhEDtWGP/xbKn6hqfPRHujUNwz5fy/wbbhnpw==}
     engines: {node: '>= 0.4'}
 
   side-channel@1.1.1:
@@ -16962,9 +16950,28 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
 
+  '@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)':
+    dependencies:
+      '@better-auth/utils': 0.4.2
+      '@better-fetch/fetch': 1.3.1
+      '@opentelemetry/semantic-conventions': 1.43.0
+      '@standard-schema/spec': 1.1.0
+      better-call: 1.4.0(zod@4.6.5)
+      jose: 6.2.9
+      kysely: 0.29.5
+      nanostores: 1.5.1
+      zod: 4.4.3
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
+
   '@better-auth/drizzle-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)':
     dependencies:
       '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
+      '@better-auth/utils': 0.4.2
+
+  '@better-auth/drizzle-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)':
+    dependencies:
+      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
       '@better-auth/utils': 0.4.2
 
   '@better-auth/kysely-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(kysely@0.29.5)':
@@ -16974,14 +16981,31 @@ snapshots:
     optionalDependencies:
       kysely: 0.29.5
 
+  '@better-auth/kysely-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(kysely@0.29.5)':
+    dependencies:
+      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
+      '@better-auth/utils': 0.4.2
+    optionalDependencies:
+      kysely: 0.29.5
+
   '@better-auth/memory-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)':
     dependencies:
       '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
       '@better-auth/utils': 0.4.2
 
+  '@better-auth/memory-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)':
+    dependencies:
+      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
+      '@better-auth/utils': 0.4.2
+
   '@better-auth/mongo-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)':
     dependencies:
       '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
+      '@better-auth/utils': 0.4.2
+
+  '@better-auth/mongo-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)':
+    dependencies:
+      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
       '@better-auth/utils': 0.4.2
 
   '@better-auth/prisma-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))':
@@ -16992,9 +17016,23 @@ snapshots:
       '@prisma/client': 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2)
       prisma: 6.19.3(magicast@0.3.5)(typescript@5.9.2)
 
+  '@better-auth/prisma-adapter@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))':
+    dependencies:
+      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
+      '@better-auth/utils': 0.4.2
+    optionalDependencies:
+      '@prisma/client': 6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2)
+      prisma: 6.19.3(magicast@0.3.5)(typescript@5.9.2)
+
   '@better-auth/telemetry@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)':
     dependencies:
       '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
+      '@better-auth/utils': 0.4.2
+      '@better-fetch/fetch': 1.3.1
+
+  '@better-auth/telemetry@1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)':
+    dependencies:
+      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
       '@better-auth/utils': 0.4.2
       '@better-fetch/fetch': 1.3.1
 
@@ -17840,11 +17878,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
-
-  '@eslint-community/eslint-utils@4.10.1(eslint@9.39.1(jiti@2.7.0))':
-    dependencies:
-      eslint: 9.39.1(jiti@2.7.0)
-      eslint-visitor-keys: 3.4.3
 
   '@eslint-community/eslint-utils@4.10.1(eslint@9.39.5(jiti@2.7.0))':
     dependencies:
@@ -21581,7 +21614,7 @@ snapshots:
       '@strapi/design-system': 2.2.4(@babel/runtime@7.29.7)(@codemirror/autocomplete@6.20.3)(@codemirror/language@6.12.4)(@codemirror/lint@6.9.7)(@codemirror/search@6.7.2)(@codemirror/theme-one-dark@6.1.3)(@strapi/icons@2.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)))(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(codemirror@6.0.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@strapi/icons': 2.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@strapi/permissions': 5.55.1(ts-toolbelt@9.6.0)
-      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.3)
+      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.2)
       '@strapi/typescript-utils': 5.55.1
       '@strapi/utils': 5.55.1(ts-toolbelt@9.6.0)
       '@testing-library/dom': 10.4.1
@@ -21779,7 +21812,7 @@ snapshots:
       '@strapi/database': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)
       '@strapi/design-system': 2.2.4(@babel/runtime@7.29.7)(@codemirror/autocomplete@6.20.3)(@codemirror/language@6.12.4)(@codemirror/lint@6.9.7)(@codemirror/search@6.7.2)(@codemirror/theme-one-dark@6.1.3)(@strapi/icons@2.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)))(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(codemirror@6.0.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@strapi/icons': 2.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
-      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.3)
+      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.2)
       '@strapi/utils': 5.55.1(ts-toolbelt@9.6.0)
       date-fns: 2.30.0
       date-fns-tz: 2.0.1(date-fns@2.30.0)
@@ -21881,7 +21914,7 @@ snapshots:
       '@strapi/logger': 5.55.1
       '@strapi/openapi': 5.55.1
       '@strapi/permissions': 5.55.1(ts-toolbelt@9.6.0)
-      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.3)
+      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.2)
       '@strapi/typescript-utils': 5.55.1
       '@strapi/utils': 5.55.1(ts-toolbelt@9.6.0)
       '@vercel/stega': 0.1.2
@@ -21966,7 +21999,7 @@ snapshots:
   '@strapi/data-transfer@5.55.1(@types/node@22.15.3)(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.2)':
     dependencies:
       '@strapi/logger': 5.55.1
-      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.3)
+      '@strapi/types': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.2)
       '@strapi/utils': 5.55.1(ts-toolbelt@9.6.0)
       chalk: 4.1.2
       cli-table3: 0.6.5
@@ -22427,36 +22460,6 @@ snapshots:
       koa: 2.16.4
       koa-body: 6.0.1
       typedoc: 0.28.19(typescript@5.9.2)
-      typedoc-github-wiki-theme: 2.1.0(typedoc-plugin-markdown@4.11.0(typedoc@0.28.19(typescript@5.9.2)))
-      typedoc-plugin-markdown: 4.11.0(typedoc@0.28.19(typescript@5.9.2))
-      zod: 4.4.3
-    transitivePeerDependencies:
-      - better-sqlite3
-      - mysql
-      - mysql2
-      - pg
-      - pg-native
-      - sqlite3
-      - supports-color
-      - tedious
-      - ts-toolbelt
-      - typescript
-
-  '@strapi/types@5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)(typescript@5.9.3)':
-    dependencies:
-      '@casl/ability': 6.7.5
-      '@koa/cors': 5.0.0
-      '@koa/router': 12.0.2
-      '@strapi/database': 5.55.1(better-sqlite3@12.8.0)(pg@8.16.3)(ts-toolbelt@9.6.0)
-      '@strapi/logger': 5.55.1
-      '@strapi/permissions': 5.55.1(ts-toolbelt@9.6.0)
-      '@strapi/utils': 5.55.1(ts-toolbelt@9.6.0)
-      commander: 8.3.0
-      croner: 10.0.1
-      json-logic-js: 2.0.5
-      koa: 2.16.4
-      koa-body: 6.0.1
-      typedoc: 0.28.19(typescript@5.9.3)
       typedoc-github-wiki-theme: 2.1.0(typedoc-plugin-markdown@4.11.0(typedoc@0.28.19(typescript@5.9.2)))
       typedoc-plugin-markdown: 4.11.0(typedoc@0.28.19(typescript@5.9.2))
       zod: 4.4.3
@@ -23246,20 +23249,6 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.7.4)':
-    dependencies:
-      '@babel/generator': 7.29.8
-      '@babel/parser': 7.29.8
-      '@babel/traverse': 7.29.8
-      '@babel/types': 7.29.8
-      javascript-natural-sort: 0.7.1
-      lodash-es: 4.18.1
-      minimatch: 9.0.5
-      parse-imports-exports: 0.2.4
-      prettier: 3.7.4
-    transitivePeerDependencies:
-      - supports-color
-
   '@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.9.6)':
     dependencies:
       '@babel/generator': 7.29.8
@@ -23551,22 +23540,6 @@ snapshots:
 
   '@types/use-sync-external-store@0.0.3': {}
 
-  '@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2))(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)':
-    dependencies:
-      '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/scope-manager': 8.67.0
-      '@typescript-eslint/type-utils': 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/visitor-keys': 8.67.0
-      eslint: 9.39.1(jiti@2.7.0)
-      ignore: 7.0.5
-      natural-compare: 1.4.0
-      ts-api-utils: 2.5.0(typescript@5.9.2)
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - supports-color
-
   '@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.2))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
@@ -23579,18 +23552,6 @@ snapshots:
       ignore: 7.0.5
       natural-compare: 1.4.0
       ts-api-utils: 2.5.0(typescript@5.9.2)
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@typescript-eslint/parser@8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)':
-    dependencies:
-      '@typescript-eslint/scope-manager': 8.67.0
-      '@typescript-eslint/types': 8.67.0
-      '@typescript-eslint/typescript-estree': 8.67.0(typescript@5.9.2)
-      '@typescript-eslint/visitor-keys': 8.67.0
-      debug: 4.4.3(supports-color@8.1.1)
-      eslint: 9.39.1(jiti@2.7.0)
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -23625,18 +23586,6 @@ snapshots:
     dependencies:
       typescript: 5.9.2
 
-  '@typescript-eslint/type-utils@8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)':
-    dependencies:
-      '@typescript-eslint/types': 8.67.0
-      '@typescript-eslint/typescript-estree': 8.67.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      debug: 4.4.3(supports-color@8.1.1)
-      eslint: 9.39.1(jiti@2.7.0)
-      ts-api-utils: 2.5.0(typescript@5.9.2)
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - supports-color
-
   '@typescript-eslint/type-utils@8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.2)':
     dependencies:
       '@typescript-eslint/types': 8.67.0
@@ -23662,17 +23611,6 @@ snapshots:
       semver: 7.8.5
       tinyglobby: 0.2.17
       ts-api-utils: 2.5.0(typescript@5.9.2)
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@typescript-eslint/utils@8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)':
-    dependencies:
-      '@eslint-community/eslint-utils': 4.10.1(eslint@9.39.1(jiti@2.7.0))
-      '@typescript-eslint/scope-manager': 8.67.0
-      '@typescript-eslint/types': 8.67.0
-      '@typescript-eslint/typescript-estree': 8.67.0(typescript@5.9.2)
-      eslint: 9.39.1(jiti@2.7.0)
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -24695,7 +24633,7 @@ snapshots:
 
   bcryptjs@2.4.3: {}
 
-  better-auth@1.7.1(@opentelemetry/api@1.9.1)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26)))(better-sqlite3@12.8.0)(next@16.3.0(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(pg@8.16.3)(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7):
+  better-auth@1.7.1(@opentelemetry/api@1.9.1)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26)))(better-sqlite3@12.8.0)(next@16.3.0(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(pg@8.16.3)(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.7):
     dependencies:
       '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
       '@better-auth/drizzle-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)
@@ -24730,13 +24668,13 @@ snapshots:
 
   better-auth@1.7.1(@opentelemetry/api@1.9.1)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@tanstack/react-start@1.168.54(crossws@0.4.12(srvx@1.0.5))(esbuild@0.28.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rolldown@1.2.8)(rollup@4.62.4)(vite@8.3.0(@types/node@22.15.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.12)(yaml@2.9.0))(webpack@5.109.2(@swc/core@1.16.12)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)))(better-sqlite3@12.8.0)(next@16.3.0(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@22.15.3)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(pg@8.16.3)(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(vitest@3.2.7):
     dependencies:
-      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
-      '@better-auth/drizzle-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)
-      '@better-auth/kysely-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(kysely@0.29.5)
-      '@better-auth/memory-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)
-      '@better-auth/mongo-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)
-      '@better-auth/prisma-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))
-      '@better-auth/telemetry': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)
+      '@better-auth/core': 1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1)
+      '@better-auth/drizzle-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)
+      '@better-auth/kysely-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(kysely@0.29.5)
+      '@better-auth/memory-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)
+      '@better-auth/mongo-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)
+      '@better-auth/prisma-adapter': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@prisma/client@6.19.3(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(prisma@6.19.3(magicast@0.3.5)(typescript@5.9.2))
+      '@better-auth/telemetry': 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.1)(better-call@1.4.0(zod@4.6.5))(jose@6.2.9)(kysely@0.29.5)(nanostores@1.5.1))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)
       '@better-auth/utils': 0.4.2
       '@better-fetch/fetch': 1.3.1
       '@noble/ciphers': 2.3.0
@@ -24769,6 +24707,15 @@ snapshots:
       set-cookie-parser: 3.1.2
     optionalDependencies:
       zod: 4.4.3
+
+  better-call@1.4.0(zod@4.6.5):
+    dependencies:
+      '@better-auth/utils': 0.5.0
+      '@better-fetch/fetch': 1.3.1
+      rou3: 0.9.2
+      set-cookie-parser: 3.1.2
+    optionalDependencies:
+      zod: 4.6.5
 
   better-sqlite3@12.8.0:
     dependencies:
@@ -25985,10 +25932,6 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-config-prettier@10.1.1(eslint@9.39.1(jiti@2.7.0)):
-    dependencies:
-      eslint: 9.39.1(jiti@2.7.0)
-
   eslint-config-prettier@10.1.1(eslint@9.39.5(jiti@2.7.0)):
     dependencies:
       eslint: 9.39.5(jiti@2.7.0)
@@ -26048,10 +25991,6 @@ snapshots:
 
   eslint-plugin-only-warn@1.1.0: {}
 
-  eslint-plugin-react-hooks@5.2.0(eslint@9.39.1(jiti@2.7.0)):
-    dependencies:
-      eslint: 9.39.1(jiti@2.7.0)
-
   eslint-plugin-react-hooks@5.2.0(eslint@9.39.5(jiti@2.7.0)):
     dependencies:
       eslint: 9.39.5(jiti@2.7.0)
@@ -26060,7 +25999,7 @@ snapshots:
     dependencies:
       eslint: 9.39.5(jiti@2.7.0)
 
-  eslint-plugin-react@7.37.5(eslint@9.39.1(jiti@2.7.0)):
+  eslint-plugin-react@7.37.5(eslint@9.39.5(jiti@2.7.0)):
     dependencies:
       array-includes: 3.1.9
       array.prototype.findlast: 1.2.5
@@ -26068,11 +26007,11 @@ snapshots:
       array.prototype.tosorted: 1.1.4
       doctrine: 2.1.0
       es-iterator-helpers: 1.2.1
-      eslint: 9.39.1(jiti@2.7.0)
+      eslint: 9.39.5(jiti@2.7.0)
       estraverse: 5.3.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       jsx-ast-utils: 3.3.5
-      minimatch: 3.1.2
+      minimatch: 3.1.5
       object.entries: 1.1.9
       object.fromentries: 2.0.8
       object.values: 1.2.1
@@ -26081,16 +26020,6 @@ snapshots:
       semver: 6.3.1
       string.prototype.matchall: 4.0.12
       string.prototype.repeat: 1.0.0
-
-  eslint-plugin-storybook@10.5.8(eslint@9.39.1(jiti@2.7.0))(storybook@10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.3.0))(typescript@5.9.2):
-    dependencies:
-      '@typescript-eslint/types': 8.67.0
-      '@typescript-eslint/utils': 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      eslint: 9.39.1(jiti@2.7.0)
-      storybook: 10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.3.0)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
 
   eslint-plugin-storybook@10.5.8(eslint@9.39.5(jiti@2.7.0))(storybook@10.5.8(@types/react@19.2.2)(prettier@3.9.6)(react@19.3.0))(typescript@5.9.2):
     dependencies:
@@ -26102,10 +26031,10 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-turbo@2.7.1(eslint@9.39.1(jiti@2.7.0))(turbo@2.10.9):
+  eslint-plugin-turbo@2.7.1(eslint@9.39.5(jiti@2.7.0))(turbo@2.10.9):
     dependencies:
       dotenv: 16.0.3
-      eslint: 9.39.1(jiti@2.7.0)
+      eslint: 9.39.5(jiti@2.7.0)
       turbo: 2.10.9
 
   eslint-scope@5.1.1:
@@ -26858,10 +26787,6 @@ snapshots:
     dependencies:
       has-symbols: 1.1.0
 
-  hasown@2.0.2:
-    dependencies:
-      function-bind: 1.1.2
-
   hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
@@ -27143,7 +27068,7 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
       hasown: 2.0.4
-      side-channel: 1.1.0
+      side-channel: 1.1.1
 
   interpret@2.2.0: {}
 
@@ -30671,11 +30596,6 @@ snapshots:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.5
 
-  side-channel-list@1.0.0:
-    dependencies:
-      es-errors: 1.3.0
-      object-inspect: 1.13.4
-
   side-channel-list@1.0.1:
     dependencies:
       es-errors: 1.3.0
@@ -30695,14 +30615,6 @@ snapshots:
       get-intrinsic: 1.3.0
       object-inspect: 1.13.4
       side-channel-map: 1.0.1
-
-  side-channel@1.1.0:
-    dependencies:
-      es-errors: 1.3.0
-      object-inspect: 1.13.4
-      side-channel-list: 1.0.0
-      side-channel-map: 1.0.1
-      side-channel-weakmap: 1.0.2
 
   side-channel@1.1.1:
     dependencies:
@@ -30978,7 +30890,7 @@ snapshots:
       internal-slot: 1.1.0
       regexp.prototype.flags: 1.5.4
       set-function-name: 2.0.2
-      side-channel: 1.1.0
+      side-channel: 1.1.1
 
   string.prototype.repeat@1.0.0:
     dependencies:
@@ -31517,15 +31429,6 @@ snapshots:
       typescript: 5.9.2
       yaml: 2.9.0
 
-  typedoc@0.28.19(typescript@5.9.3):
-    dependencies:
-      '@gerrit0/mini-shiki': 3.23.0
-      lunr: 2.3.9
-      markdown-it: 14.3.2
-      minimatch: 10.2.6
-      typescript: 5.9.3
-      yaml: 2.9.0
-
   typeid-js@0.3.0:
     dependencies:
       uuidv7: 0.4.4
@@ -31539,17 +31442,6 @@ snapshots:
   typescript-auto-import-cache@0.3.6:
     dependencies:
       semver: 7.8.5
-
-  typescript-eslint@8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2):
-    dependencies:
-      '@typescript-eslint/eslint-plugin': 8.67.0(@typescript-eslint/parser@8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2))(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/parser': 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      '@typescript-eslint/typescript-estree': 8.67.0(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.67.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.2)
-      eslint: 9.39.1(jiti@2.7.0)
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - supports-color
 
   typescript-eslint@8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.2):
     dependencies:

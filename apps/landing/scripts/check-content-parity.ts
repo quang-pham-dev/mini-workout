@@ -10,7 +10,9 @@ import { createPublishedContentSnapshotFromManifest } from '../src/migration/man
 import { readFile } from 'node:fs/promises';
 
 try {
-  const actualConfig = resolveContentParityRepositoryConfig(process.env);
+  const actualConfig = resolveContentParityRepositoryConfig(
+    process.env as Record<string, string | undefined>,
+  );
   const baselineManifestPath =
     process.env.LANDING_PARITY_BASELINE_MANIFEST?.trim();
   const [expected, actual] = await Promise.all([

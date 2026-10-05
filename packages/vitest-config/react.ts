@@ -1,8 +1,8 @@
+import { baseConfig } from './index.ts';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig, mergeConfig } from 'vitest/config';
-import { baseConfig } from './index.ts';
 
 export const reactConfig = defineConfig(
   mergeConfig(baseConfig, {
