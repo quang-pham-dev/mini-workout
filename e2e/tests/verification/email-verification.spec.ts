@@ -90,6 +90,7 @@ test('flag-on password recovery is generic, revokes sessions, and consumes its t
     await expect(page).toHaveURL(/\/onboarding/);
 
     await page.goto('/forgot-password');
+    await expect(page.getByLabel('Email')).toBeVisible({ timeout: 10_000 });
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Send reset link' }).click();
     await expect(page.getByRole('status')).toHaveText(
