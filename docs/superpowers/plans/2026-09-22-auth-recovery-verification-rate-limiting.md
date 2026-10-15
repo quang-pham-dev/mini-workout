@@ -353,8 +353,6 @@ packages/feature-flags/
   output; keep provider secrets out of pass-through env unless strictly needed.
 - `apps/admin` — only integrate the shared flag/config contract after the Admin
   policy decision is approved; do not cross-import the Web auth instance.
-- `docs/NEXTJS_16_3_WORKOUT_MASTER_PLAN.md` — update status only after tests
-  and rollout evidence exist.
 - `docs/ERROR_HANDLING_CONVENTION.md` — no change expected; implementation must
   follow it.
 

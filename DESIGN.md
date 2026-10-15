@@ -1,8 +1,6 @@
 # Product and Design Notes
 
 The current repository is a UI and architecture foundation for Mini Workout.
-The active product direction is documented in
-[`docs/NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](docs/NEXTJS_16_3_WORKOUT_MASTER_PLAN.md).
 
 ## Current design sources
 

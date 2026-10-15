@@ -5,6 +5,9 @@ guidance, testing strategy, and product roadmap.
 
 ## Engineering documentation
 
+- [`PRODUCTION_LEARNING_GUIDE.md`](PRODUCTION_LEARNING_GUIDE.md) —
+  master learning curriculum and production technical breakdown (Next.js 16.3,
+  React 19, Node.js, Clean Architecture, Better Auth, DevOps, and AI Harness).
 - [`AGENT_WORKFLOW.md`](AGENT_WORKFLOW.md) — team workflow for starting,
   implementing, verifying, reviewing, and handing off features with agents.
 - [`AGENT_HARNESS_REVIEW.md`](AGENT_HARNESS_REVIEW.md) — harness assessment,
@@ -26,8 +29,6 @@ guidance, testing strategy, and product roadmap.
   — Campaign/Pricing published-content eligibility gate and release sequence.
 - [`observability/LANDING_SERVICE_LEVELS.md`](observability/LANDING_SERVICE_LEVELS.md)
   — provisional editor-preview and publishing SLO/incident policy.
-- [`NEXTJS_16_3_WORKOUT_MASTER_PLAN.md`](NEXTJS_16_3_WORKOUT_MASTER_PLAN.md) —
-  product scope and learning roadmap, with implementation status.
 
 ## Next.js 16.3 experiments
 
